@@ -1,0 +1,41 @@
+<!doctype html>
+<!-- A Work Experience section whose entries carry no panel marker of any kind: no data-automation-id="panel",
+     no fieldset, just repeated fields under a numbered heading. Code that identified an entry by its container
+     added several entries here and then filled none of them, which is exactly what a real tenant did. -->
+<html lang="en">
+<head><meta charset="utf-8"><title>My Experience</title></head>
+<body>
+<h2 data-automation-id="pageHeader">My Experience</h2>
+
+<div role="group" aria-labelledby="Work-Experience-section">
+  <h4 id="Work-Experience-section">Work Experience</h4>
+  <div id="entries"></div>
+  <button data-automation-id="Add Another" onclick="addEntry()">Add Another</button>
+</div>
+
+<button data-automation-id="pageFooterNextButton">Save and Continue</button>
+
+<script>
+  var n = 0;
+  function addEntry() {
+    n += 1;
+    var wrap = document.createElement('div');          // a plain div: nothing marks it as an entry
+    wrap.innerHTML =
+      '<h5>Work Experience ' + n + '</h5>' +
+      '<label for="t' + n + '">Job Title</label><input id="t' + n + '" name="title-' + n + '">' +
+      '<label for="c' + n + '">Company</label><input id="c' + n + '" name="company-' + n + '">' +
+      '<label for="l' + n + '">Location</label><input id="l' + n + '" name="location-' + n + '">' +
+      '<label for="k' + n + '">I currently work here</label>' +
+      '<input id="k' + n + '" name="current-' + n + '" type="checkbox">' +
+      '<div role="group" aria-labelledby="f' + n + '"><span id="f' + n + '">From</span>' +
+        '<label for="fm' + n + '">Month</label><input id="fm' + n + '" name="from-month-' + n + '">' +
+        '<label for="fy' + n + '">Year</label><input id="fy' + n + '" name="from-year-' + n + '"></div>' +
+      '<div role="group" aria-labelledby="e' + n + '"><span id="e' + n + '">To</span>' +
+        '<label for="tm' + n + '">Month</label><input id="tm' + n + '" name="to-month-' + n + '">' +
+        '<label for="ty' + n + '">Year</label><input id="ty' + n + '" name="to-year-' + n + '"></div>' +
+      '<label for="d' + n + '">Role Description</label><textarea id="d' + n + '" name="desc-' + n + '"></textarea>';
+    document.getElementById('entries').appendChild(wrap);
+  }
+</script>
+</body>
+</html>

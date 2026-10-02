@@ -1,0 +1,28 @@
+<div id="batch-progress" {% if b.status == 'running' %}hx-get="/scoring/batches/{{ b.id }}/progress" hx-trigger="every 2s" hx-swap="outerHTML"{% endif %} class="space-y-3">
+  <div class="card flex flex-wrap items-center gap-4">
+    <span class="rounded px-2 py-0.5 {{ 'bg-green-100' if b.status == 'complete' else ('bg-red-100' if b.status == 'failed' else ('bg-amber-100' if b.status == 'stopped' else 'bg-blue-100')) }}">{{ b.status }}</span>
+    <div class="min-w-[16rem] flex-1">
+      <div class="funnel-bar"><span style="width: {{ (100 * b.done / b.total) | round(1) if b.total else 0 }}%"></span></div>
+      <div class="mt-1 text-xs text-slate-500">{{ b.done }} of {{ b.total }} · {{ b.raised }} went up · {{ b.lowered }} went down · {{ b.failed }} failed · started {{ b.started_at | local }}{% if b.finished_at %} · finished {{ b.finished_at | local }}{% endif %}</div>
+    </div>
+    {% if b.status == 'running' %}
+    <form method="post" action="/scoring/batches/{{ b.id }}/stop"><button class="rounded bg-red-700 px-3 py-1.5 text-white">Stop</button></form>
+    {% else %}
+    <a class="rounded bg-slate-800 px-3 py-1.5 text-white" href="/queue?status=scored&min_score=0&sort=total">See scored jobs →</a>
+    {% endif %}
+  </div>
+  {% if b.errors %}
+  <div class="card"><h2 class="mb-1 font-semibold">Errors ({{ b.errors | length }})</h2>
+    <ul class="max-h-48 overflow-y-auto text-xs">{% for e in b.errors[:50] %}<li>{{ e }}</li>{% endfor %}</ul></div>
+  {% endif %}
+  <div class="card">
+    <h2 class="mb-2 font-semibold">Biggest changes</h2>
+    <table class="text-sm">
+      {% for c in (b.changes | sort(attribute='new', reverse=true))[:40] %}
+      <tr class="border-t"><td class="py-1 pr-4"><a class="text-blue-700" href="/jobs/{{ c.id }}">job #{{ c.id }}</a></td>
+        <td class="pr-2 text-right">{{ '%.0f' % c.old if c.old is not none else 'new' }}</td><td class="px-1">→</td>
+        <td><b class="{{ 'text-green-700' if c.old is not none and c.new > c.old else ('text-red-700' if c.old is not none and c.new < c.old else '') }}">{{ '%.0f' % c.new }}</b></td></tr>
+      {% else %}<tr><td class="text-slate-500">Nothing scored yet.</td></tr>{% endfor %}
+    </table>
+  </div>
+</div>

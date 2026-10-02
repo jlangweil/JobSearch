@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Queue{% endblock %}
+{% block content %}
+<form method="get" action="/queue" class="mb-3 flex flex-wrap items-end gap-2 rounded border bg-white p-3">
+  <div><label for="f-q" class="block text-xs text-slate-500">Keywords</label>
+    <input id="f-q" name="q" value="{{ params.q }}" class="rounded border px-2 py-1 w-48"></div>
+  <div><label for="f-min" class="block text-xs text-slate-500">Min score</label>
+    <input id="f-min" name="min_score" type="number" min="0" max="100" value="{{ params.min_score }}" class="rounded border px-2 py-1 w-20"></div>
+  <div><label for="f-ghost" class="block text-xs text-slate-500">Max ghost</label>
+    <input id="f-ghost" name="max_ghost" type="number" min="0" max="100" value="{{ params.max_ghost }}" class="rounded border px-2 py-1 w-20"></div>
+  <div><label for="f-status" class="block text-xs text-slate-500">Status</label>
+    <select id="f-status" name="status" class="rounded border px-2 py-1">
+      {% for s in statuses %}<option value="{{ s }}" {% if (params.status or 'scored') == s %}selected{% endif %}>{{ s }}</option>{% endfor %}
+    </select></div>
+  <div><label for="f-remote" class="block text-xs text-slate-500">Remote</label>
+    <select id="f-remote" name="remote" class="rounded border px-2 py-1">
+      {% for s in ['', 'remote', 'hybrid', 'onsite', 'unknown'] %}<option value="{{ s }}" {% if params.remote == s %}selected{% endif %}>{{ s or 'any' }}</option>{% endfor %}
+    </select></div>
+  <div><label for="f-emp" class="block text-xs text-slate-500">Employment</label>
+    <select id="f-emp" name="employment" class="rounded border px-2 py-1">
+      {% for s in ['', 'fte', 'c2h', 'contract', 'unknown'] %}<option value="{{ s }}" {% if params.employment == s %}selected{% endif %}>{{ s or 'any' }}</option>{% endfor %}
+    </select></div>
+  <div><label for="f-company" class="block text-xs text-slate-500">Company</label>
+    <input id="f-company" name="company" value="{{ params.company }}" class="rounded border px-2 py-1 w-36"></div>
+  <div><label for="f-source" class="block text-xs text-slate-500">Source</label>
+    <select id="f-source" name="source" class="rounded border px-2 py-1">
+      {% for s in ['', 'workday', 'successfactors', 'phenom', 'eightfold', 'greenhouse', 'lever', 'ashby', 'adzuna'] %}<option value="{{ s }}" {% if params.source == s %}selected{% endif %}>{{ s or 'any' }}</option>{% endfor %}
+    </select></div>
+  <div><label for="f-scorer" class="block text-xs text-slate-500">Scored by</label>
+    <select id="f-scorer" name="scorer" class="rounded border px-2 py-1">
+      {% for v, label in [('', 'any'), ('claude', 'Claude'), ('local', 'Local')] %}<option value="{{ v }}" {% if params.scorer == v %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select></div>
+  <div><label for="f-scored" class="block text-xs text-slate-500">Scored</label>
+    <select id="f-scored" name="scored" class="rounded border px-2 py-1">
+      <option value="" {% if not params.scored %}selected{% endif %}>any time</option>
+      {% for v, (days, label) in within.items() %}<option value="{{ v }}" {% if params.scored == v %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select></div>
+  <div><label for="f-retrieved" class="block text-xs text-slate-500">Retrieved</label>
+    <select id="f-retrieved" name="retrieved" class="rounded border px-2 py-1">
+      <option value="" {% if not params.retrieved %}selected{% endif %}>any time</option>
+      {% for v, (days, label) in within.items() %}<option value="{{ v }}" {% if params.retrieved == v %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select></div>
+  <div><label for="f-added" class="block text-xs text-slate-500">Added in run</label>
+    <select id="f-added" name="added" class="rounded border px-2 py-1">
+      <option value="" {% if not params.added %}selected{% endif %}>any</option>
+      <option value="latest" {% if params.added == 'latest' %}selected{% endif %} title="the most recent run that retrieved new jobs">latest run</option>
+      {% for r in recent_runs %}<option value="{{ r.id }}" {% if params.added == r.id|string %}selected{% endif %}>#{{ r.id }} · {{ r.started_at | local | truncate(16, true, '') }} · {{ r.counts.new or 0 }} new</option>{% endfor %}
+    </select></div>
+  <div><label for="f-sort" class="block text-xs text-slate-500">Sort</label>
+    <select id="f-sort" name="sort" class="rounded border px-2 py-1">
+      {% for s, label in sorts.items() %}<option value="{{ s }}" {% if (params.sort or 'total') == s %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select></div>
+  <button class="rounded bg-slate-800 px-3 py-1.5 text-white">Apply filters</button>
+  <a href="/queue/export?{{ qs(params, page=None) }}" class="rounded border px-3 py-1.5">Export .xlsx</a>
+  <span class="ml-auto text-slate-500">{{ total }} job{{ '' if total == 1 else 's' }}</span>
+</form>
+
+{% if (params.status or 'scored') == 'discovered' %}
+<div class="mb-3 flex flex-wrap items-center gap-3 rounded border border-blue-200 bg-blue-50 p-3 text-sm">
+  <span><b>{{ total }}</b> saved job{{ '' if total == 1 else 's' }} waiting to be scored{% if params.company %} for “{{ params.company }}”{% endif %}. Use <b>Score now</b> on a row for one job, or:</span>
+  <form method="post" action="/runs" class="flex items-center gap-2">
+    <input type="hidden" name="mode" value="stored">
+    {% if params.company %}<input type="hidden" name="companies" value="{{ params.company }}">{% endif %}
+    <label class="text-xs">max <input type="number" name="max_to_score" min="1" value="{{ total or 1 }}" class="w-16 rounded border px-1"></label>
+    <button class="rounded bg-green-700 px-3 py-1 text-white" {% if not total %}disabled{% endif %}>Score {{ 'these' if params.company else 'all waiting' }} ({{ scoring_cost() }})</button>
+  </form>
+</div>
+{% endif %}
+{% if running_batch %}
+<div class="mb-3 rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm">Rescoring in progress: <a class="text-blue-700" href="/scoring/batches/{{ running_batch.id }}">{{ running_batch.done }} of {{ running_batch.total }} done →</a></div>
+{% endif %}
+{% if total %}
+<details id="rescore" class="mb-3 rounded border bg-white px-3 py-2">
+  <summary class="font-semibold">{{ 'Score' if (params.status or 'scored') == 'discovered' else 'Rescore' }} these {{ total }} job{{ '' if total == 1 else 's' }} with Local or Claude…</summary>
+  <form method="post" action="/scoring/batches" class="mt-2 flex flex-wrap items-center gap-3 text-sm">
+    {% for k, v in params.items() %}{% if v and k != 'page' %}<input type="hidden" name="{{ k }}" value="{{ v }}">{% endif %}{% endfor %}
+    <input type="hidden" name="filters" value="{{ qs(params) }}">
+    <span>Model:</span>
+    <label class="inline-flex items-center gap-1"><input type="radio" name="provider" value="local" {% if cfg_provider == 'local' %}checked{% endif %}> Local <span class="text-xs text-slate-500">(free)</span></label>
+    <label class="inline-flex items-center gap-1 {{ 'text-slate-400' if not api_key_set }}"><input type="radio" name="provider" value="anthropic" {% if cfg_provider == 'anthropic' %}checked{% endif %} {% if not api_key_set %}disabled{% endif %}> Claude <span class="text-xs text-slate-500">(about $0.01 each{% if not api_key_set %}; needs the API key{% endif %})</span></label>
+    <label class="inline-flex items-center gap-1">first <input type="number" name="limit" min="1" max="2000" value="{{ [total, 2000] | min }}" class="w-20 rounded border px-1"> in the current sort order</label>
+    <button class="rounded bg-slate-800 px-3 py-1.5 text-white">Start</button>
+    <span class="w-full text-xs text-slate-500">Adds a new score to each job's history (the latest one counts). Jobs keep their status. Changing only the scoring focus or weights doesn't need this: those recompute instantly on Settings.</span>
+  </form>
+</details>
+<script>if (location.hash === "#rescore") document.getElementById("rescore").open = true;</script>
+{% endif %}
+<div class="overflow-x-auto rounded border bg-white">
+<table class="min-w-full">
+  <thead class="bg-slate-100 text-left text-xs uppercase text-slate-600">
+    <tr>
+      {% macro sort_th(label, first, second, cls='px-2') -%}
+        {#- first click sorts by `first`; clicking the active column again switches to `second` -#}
+        {%- set current = params.sort or 'total' -%}
+        {%- set descending = ['total', 'seen', 'posted', 'pay', 'company_desc', 'title_desc', 'ghost_desc'] -%}
+        {%- set active = current in (first, second) -%}
+        <th class="{{ cls }}"{% if active %} aria-sort="{{ 'descending' if current in descending else 'ascending' }}"{% endif %}>
+          <a class="sort-link {{ 'sort-active' if active }}" href="/queue?{{ qs(params, sort=(second if current == first else first), page=None) }}" title="Sort by {{ label|lower }} (click again to reverse)">{{ label }}{% if active %} {{ '▼' if current in descending else '▲' }}{% endif %}</a>
+        </th>
+      {%- endmacro %}
+      {{ sort_th('Score', 'total', 'total_asc', 'px-2 py-2') }}{{ sort_th('Company', 'company', 'company_desc') }}{{ sort_th('Title', 'title', 'title_desc') }}<th class="px-2">Location</th>
+      {{ sort_th('Comp', 'pay', 'pay_asc') }}<th class="px-2">Type</th>{{ sort_th('Age', 'posted', 'posted_asc') }}{{ sort_th('Retrieved', 'seen', 'seen_asc') }}{{ sort_th('Ghost', 'ghost', 'ghost_desc') }}
+      <th class="px-2">Rationale</th><th class="px-2">Actions</th>
+    </tr>
+  </thead>
+  <tbody id="queue-rows">
+    {% include "fragments/queue_rows.html" %}
+  </tbody>
+</table>
+</div>
+
+{% if pages > 1 %}
+<nav class="mt-3 flex items-center gap-2" aria-label="Pagination">
+  {% if filters.page > 1 %}<a class="rounded border bg-white px-2 py-1" href="/queue?{{ qs(params, page=filters.page - 1) }}">← Prev</a>{% endif %}
+  <span>Page {{ filters.page }} of {{ pages }}</span>
+  {% if filters.page < pages %}<a class="rounded border bg-white px-2 py-1" href="/queue?{{ qs(params, page=filters.page + 1) }}">Next →</a>{% endif %}
+</nav>
+{% endif %}
+{% endblock %}

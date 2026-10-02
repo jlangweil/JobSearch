@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>My Experience</title></head>
+<body>
+<h2 data-automation-id="pageHeader">My Experience</h2>
+<div data-automation-id="WorkExperienceSection">
+  <h3>Work Experience</h3>
+  <div id="roles"></div>
+  <button data-automation-id="add" onclick="addRole()">Add</button>
+</div>
+<div data-automation-id="formField-resume"><label for="cv">Resume/CV</label>
+  <input id="cv" type="file" data-automation-id="file-upload-input-ref"></div>
+<button data-automation-id="pageFooterNextButton" onclick="location.href='questions.html'">Save and Continue</button>
+<template id="role-tpl">
+  <div data-automation-id="panel">
+    <label>Job Title<input name="title" type="text"></label>
+    <label>Company<input name="company" type="text"></label>
+    <label>Location<input name="location" type="text"></label>
+    <label>From<input name="from" type="text"></label>
+    <label>To<input name="to" type="text"></label>
+    <label>Role Description<textarea name="desc"></textarea></label>
+  </div>
+</template>
+<script>
+  function addRole() {
+    var tpl = document.getElementById('role-tpl');
+    document.getElementById('roles').appendChild(tpl.content.cloneNode(true));
+  }
+</script>
+</body></html>

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Auto-apply run {{ run.id }}{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <a class="text-xs underline" href="/apply">← auto-apply</a>
+  <h1 class="text-lg font-semibold">{{ run.company_name_raw }} — {{ run.title }}</h1>
+  <p class="text-xs text-slate-500">{{ run.host }} · <a class="underline" href="/jobs/{{ run.job_id }}">job page</a></p>
+</div>
+{% include "fragments/apply_run.html" %}
+{% endblock %}

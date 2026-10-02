@@ -1,0 +1,10 @@
+<p class="mb-2 text-xs">Checked {{ p.checked }} scored jobs · <b class="text-red-700">{{ p.capped }}</b> would be capped · <b class="text-green-700">{{ p.boosted }}</b> have a boost phrase in the title</p>
+<table class="w-full text-xs">
+  {% for m in p.movers %}
+  <tr class="border-t align-top">
+    <td class="py-1 pr-2"><a class="text-blue-700" href="/jobs/{{ m.id }}">{{ m.title }}</a><div class="text-slate-500">{{ m.company }}
+      {% for h in m.hits.avoid %}<span class="rounded bg-red-100 px-1 text-red-800">{{ h }}</span>{% endfor %}{% for h in m.hits.title %}<span class="rounded bg-green-100 px-1 text-green-800">{{ h }}</span>{% endfor %}</div></td>
+    <td class="whitespace-nowrap py-1 text-right">{{ '%.0f' % (m.old or 0) }} → <b class="{{ 'text-green-700' if (m.new or 0) > (m.old or 0) else 'text-red-700' }}">{{ '%.0f' % (m.new or 0) }}</b></td>
+  </tr>
+  {% else %}<tr><td class="text-slate-500">No scored jobs yet.</td></tr>{% endfor %}
+</table>

@@ -1,0 +1,31 @@
+<!doctype html>
+<!-- What "Autofill with Resume" leaves behind: the site's parser has made two panels, filled one and left the
+     other blank. Skipping the section because it "already has entries" left those blanks unanswered, and the
+     run then stopped to ask about Job Title and Company. -->
+<html lang="en"><head><meta charset="utf-8"><title>My Experience</title></head>
+<body>
+<h2 data-automation-id="pageHeader">My Experience</h2>
+<div role="group" aria-labelledby="Work-Experience-section">
+  <h4 id="Work-Experience-section">Work Experience</h4>
+  <div data-automation-id="panel">
+    <div data-automation-id="formField-jobTitle"><label for="t1">Job Title</label>
+      <input id="t1" name="title" value="Project Lead"></div>
+    <div data-automation-id="formField-company"><label for="c1">Company</label>
+      <input id="c1" name="company" value="Acme Insurance Inc."></div>
+    <div data-automation-id="formField-startDate" role="group" aria-labelledby="f1"><span id="f1">From</span>
+      <label for="fm1">Month</label><input id="fm1" name="from-month" value="01">
+      <label for="fy1">Year</label><input id="fy1" name="from-year" value="2026"></div>
+  </div>
+  <div data-automation-id="panel">
+    <div data-automation-id="formField-jobTitle"><label for="t2">Job Title</label>
+      <input id="t2" name="title"></div>
+    <div data-automation-id="formField-company"><label for="c2">Company</label>
+      <input id="c2" name="company"></div>
+    <div data-automation-id="formField-startDate" role="group" aria-labelledby="f2"><span id="f2">From</span>
+      <label for="fm2">Month</label><input id="fm2" name="from-month">
+      <label for="fy2">Year</label><input id="fy2" name="from-year"></div>
+  </div>
+  <button data-automation-id="Add">Add Another</button>
+</div>
+<button data-automation-id="pageFooterNextButton">Save and Continue</button>
+</body></html>

@@ -1,0 +1,16 @@
+<nav class="app-sidebar" aria-label="Main" data-sidebar>
+  <a href="/home" class="brand">
+    <span class="brand-mark">{{ icon('search', 'h-4 w-4') }}</span> jobhunt
+  </a>
+  {% for section in sh.sections %}
+    {% if section.title %}<div class="nav-heading">{{ section.title }}</div>{% endif %}
+    {% for it in section["items"] %}
+    <a href="{{ it.href }}" class="nav-link {{ 'nav-active' if it.active }}" {% if it.active %}aria-current="page"{% endif %}{% if it.hint %} title="{{ it.hint }}"{% endif %}>
+      {{ icon(it.icon) }}<span class="flex-1 truncate">{{ it.label }}</span>
+      {% if it.badge %}<span class="nav-badge {{ 'nav-badge-live' if it.badge == 'live' else ('nav-badge-warn' if it.badge == 'paused' else '') }}">{{ it.badge }}</span>{% endif %}
+    </a>
+    {% endfor %}
+  {% endfor %}
+  <div class="nav-foot"><kbd>Ctrl</kbd>+<kbd>K</kbd> jump anywhere · <kbd>/</kbd> search</div>
+</nav>
+<div class="app-scrim" data-nav-toggle hidden></div>

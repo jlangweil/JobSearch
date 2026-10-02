@@ -1,0 +1,38 @@
+<!doctype html>
+<!-- Dates as the tenant actually draws them: one box showing "MM/YYYY" with a calendar icon. Some tenants build
+     that from two inputs whose labels say nothing useful ("" and ""), so a date can only be filled by finding
+     the container labelled From or To and filling its inputs in order. -->
+<html lang="en">
+<head><meta charset="utf-8"><title>My Experience</title></head>
+<body>
+<h2 data-automation-id="pageHeader">My Experience</h2>
+
+<div role="group" aria-labelledby="Work-Experience-section">
+  <h4 id="Work-Experience-section">Work Experience</h4>
+  <div id="entries"></div>
+  <button data-automation-id="Add Another" onclick="addEntry()">Add Another</button>
+</div>
+
+<button data-automation-id="pageFooterNextButton">Save and Continue</button>
+
+<script>
+  var n = 0;
+  function addEntry() {
+    n += 1;
+    var wrap = document.createElement('div');
+    // "From" is a single MM/YYYY box; "To" is a pair of inputs with no labels of their own
+    wrap.innerHTML =
+      '<h5>Work Experience ' + n + '</h5>' +
+      '<label for="t' + n + '">Job Title</label><input id="t' + n + '" name="title-' + n + '">' +
+      '<label for="c' + n + '">Company</label><input id="c' + n + '" name="company-' + n + '">' +
+      '<div data-automation-id="dateWidget"><span>From</span>' +
+        '<input name="from-' + n + '" placeholder="MM/YYYY"><span class="icon">calendar</span></div>' +
+      '<div data-automation-id="dateWidget"><span>To</span>' +
+        '<input name="to-month-' + n + '" placeholder="MM"> / ' +
+        '<input name="to-year-' + n + '" placeholder="YYYY"><span class="icon">calendar</span></div>' +
+      '<label for="d' + n + '">Role Description</label><textarea id="d' + n + '" name="desc-' + n + '"></textarea>';
+    document.getElementById('entries').appendChild(wrap);
+  }
+</script>
+</body>
+</html>

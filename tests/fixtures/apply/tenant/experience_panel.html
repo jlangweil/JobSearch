@@ -1,0 +1,68 @@
+<!doctype html>
+<!-- The real "Work Experience 1" panel: Job Title, Company, Location, an "I currently work here" checkbox, and
+     From/To dates that are each a *pair* of Month and Year inputs inside a labelled group. Those two inputs are
+     labelled only "Month" and "Year", so a value can only reach them through the group they sit in. -->
+<html lang="en">
+<head><meta charset="utf-8"><title>My Experience</title></head>
+<body>
+<h2 data-automation-id="pageHeader">My Experience</h2>
+
+<div role="group" aria-labelledby="Work-Experience-section">
+  <h4 id="Work-Experience-section">Work Experience</h4>
+  <div id="roles"></div>
+  <button data-automation-id="Add" onclick="addRole()">Add</button>
+</div>
+
+<button data-automation-id="pageFooterNextButton">Save and Continue</button>
+
+<template id="role-tpl">
+  <div data-automation-id="panel">
+    <h5>Work Experience</h5>
+    <div data-automation-id="formField-jobTitle">
+      <label for="jt">Job Title</label><input id="jt" name="title" type="text">
+    </div>
+    <div data-automation-id="formField-company">
+      <label for="co">Company</label><input id="co" name="company" type="text">
+    </div>
+    <div data-automation-id="formField-location">
+      <label for="lo">Location</label><input id="lo" name="location" type="text">
+    </div>
+    <div data-automation-id="formField-current">
+      <label for="cur">I currently work here</label><input id="cur" name="current" type="checkbox">
+    </div>
+    <div data-automation-id="formField-startDate" role="group" aria-labelledby="from-label">
+      <span id="from-label">From</span>
+      <label for="fm">Month</label><input id="fm" name="from-month" type="text" placeholder="MM">
+      <label for="fy">Year</label><input id="fy" name="from-year" type="text" placeholder="YYYY">
+    </div>
+    <div data-automation-id="formField-endDate" role="group" aria-labelledby="to-label">
+      <span id="to-label">To</span>
+      <label for="tm">Month</label><input id="tm" name="to-month" type="text" placeholder="MM">
+      <label for="ty">Year</label><input id="ty" name="to-year" type="text" placeholder="YYYY">
+    </div>
+    <div data-automation-id="formField-roleDescription">
+      <label for="rd">Role Description</label><textarea id="rd" name="desc"></textarea>
+    </div>
+  </div>
+</template>
+
+<script>
+  var n = 0;
+  function addRole() {
+    var frag = document.getElementById('role-tpl').content.cloneNode(true);
+    n += 1;
+    // ids must stay unique across panels, the way Workday numbers them
+    frag.querySelectorAll('[id]').forEach(function (el) {
+      var old = el.id;
+      el.id = old + '-' + n;
+      var lab = frag.querySelector('label[for="' + old + '"]');
+      if (lab) { lab.setAttribute('for', el.id); }
+      var group = frag.querySelector('[aria-labelledby="' + old + '"]');
+      if (group) { group.setAttribute('aria-labelledby', el.id); }
+    });
+    frag.querySelector('h5').textContent = 'Work Experience ' + n;
+    document.getElementById('roles').appendChild(frag);
+  }
+</script>
+</body>
+</html>

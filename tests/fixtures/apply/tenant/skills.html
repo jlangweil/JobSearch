@@ -1,0 +1,38 @@
+<!doctype html>
+<!-- "Type to Add Skills": typing filters a list, and only a suggestion that is clicked is actually added. -->
+<html lang="en"><head><meta charset="utf-8"><title>My Experience</title></head>
+<body>
+<h2 data-automation-id="pageHeader">My Experience</h2>
+<div role="group" aria-labelledby="Skills-section">
+  <h4 id="Skills-section">Professional Skills</h4>
+  <label for="sk">Type to Add Skills</label>
+  <input id="sk" type="text" oninput="suggest()" autocomplete="off">
+  <ul id="opts" role="listbox"></ul>
+  <ul id="chosen"></ul>
+</div>
+<button data-automation-id="pageFooterNextButton">Save and Continue</button>
+<script>
+  var KNOWN = ['Team Leadership', 'Enterprise Integration', 'API Architecture', 'Microservices', 'DevOps'];
+  function suggest() {
+    var q = document.getElementById('sk').value.toLowerCase();
+    var list = document.getElementById('opts');
+    list.innerHTML = '';
+    if (!q) { return; }
+    KNOWN.filter(function (k) { return k.toLowerCase().indexOf(q) === 0; }).forEach(function (k) {
+      var li = document.createElement('li');
+      li.setAttribute('role', 'option');
+      li.textContent = k;
+      li.onclick = function () { add(k); };
+      list.appendChild(li);
+    });
+  }
+  function add(k) {
+    var li = document.createElement('li');
+    li.className = 'chosen';
+    li.textContent = k;
+    document.getElementById('chosen').appendChild(li);
+    document.getElementById('sk').value = '';
+    document.getElementById('opts').innerHTML = '';
+  }
+</script>
+</body></html>

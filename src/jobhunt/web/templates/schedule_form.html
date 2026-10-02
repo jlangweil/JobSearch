@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ 'Edit schedule' if schedule else 'New schedule' }}{% endblock %}
+{% block content %}
+<div class="mb-3 text-xs"><a class="text-blue-700" href="/schedules">← Schedules</a></div>
+{% if errors %}
+<div role="alert" class="mb-3 rounded border border-red-300 bg-red-50 px-3 py-2 text-red-900">
+  <b>Please fix:</b><ul class="list-disc pl-5">{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+{% if not schedule %}
+<div class="subnav"><span class="self-center text-xs text-slate-500">Start from:</span>
+  {% for key, p in presets.items() %}<a href="/schedules/new?preset={{ key }}">{{ p.name }}</a>{% endfor %}
+</div>
+{% endif %}
+
+<form method="post" action="{{ '/schedules/' ~ schedule.id if schedule else '/schedules' }}"
+      hx-post="/schedules/preview" hx-trigger="change delay:150ms, keyup changed delay:400ms from:input[name=cron]" hx-target="#schedule-preview" hx-swap="innerHTML"
+      class="grid gap-4 xl:grid-cols-3">
+  <div class="space-y-4 xl:col-span-2">
+    <section class="card space-y-3">
+      <div class="flex flex-wrap items-end gap-4">
+        <label class="flex-1 text-xs font-semibold uppercase text-slate-500">Name
+          <input name="name" value="{{ v.name }}" required maxlength="80" placeholder="e.g. Weekday morning fetch" class="mt-1 block w-full rounded border px-2 py-1.5 text-sm font-normal normal-case text-slate-900"></label>
+        <label class="flex items-center gap-2 pb-1.5"><span class="switch"><input type="checkbox" name="enabled" {% if v.enabled %}checked{% endif %}><span></span></span> <b>Enabled</b></label>
+      </div>
+
+      <fieldset>
+        <legend class="mb-1 text-xs font-semibold uppercase text-slate-500">What it does</legend>
+        <div class="grid gap-2 md:grid-cols-3">
+          {% for key, label in modes.items() %}
+          <label class="flex items-start gap-2 rounded border p-2 {{ 'border-slate-800' if v.mode == key }}">
+            <input type="radio" name="mode" value="{{ key }}" {% if v.mode == key %}checked{% endif %} class="mt-0.5">
+            <span><b>{{ label }}</b>{% if key == 'fetch' %} <span class="rounded bg-green-100 px-1 text-[10px] text-green-800">free</span>{% endif %}<br>
+              <span class="text-xs text-slate-500">{{ {
+                'fetch': 'Fetch, filter and save. Jobs wait in “Waiting to score” until you score them.',
+                'full': 'Fetch, filter, save and score with the model selected at that time.',
+                'stored': 'No fetching. Scores jobs already waiting, e.g. overnight with the local model.'}[key] }}</span></span>
+          </label>
+          {% endfor %}
+        </div>
+        <label class="mt-2 inline-flex items-center gap-2 text-sm" data-show-if="mode=full|stored">Max jobs to score per run
+          <input type="number" name="max_to_score" min="1" max="5000" value="{{ v.max_to_score or '' }}" placeholder="{{ max_per_run }}" class="w-24 rounded border px-2 py-1"></label>
+      </fieldset>
+    </section>
+
+    <section class="card space-y-3">
+      <fieldset>
+        <legend class="mb-1 text-xs font-semibold uppercase text-slate-500">When</legend>
+        <div class="mb-2 flex flex-wrap gap-4">
+          <label class="flex items-center gap-1"><input type="radio" name="when_kind" value="days" {% if v.when_kind == 'days' %}checked{% endif %}> Days &amp; times</label>
+          <label class="flex items-center gap-1"><input type="radio" name="when_kind" value="interval" {% if v.when_kind == 'interval' %}checked{% endif %}> Every few hours</label>
+          <label class="flex items-center gap-1"><input type="radio" name="when_kind" value="cron" {% if v.when_kind == 'cron' %}checked{% endif %}> Custom (cron)</label>
+        </div>
+        <div data-show-if="when_kind=days|interval" class="mb-2">
+          <div class="flex flex-wrap gap-1">
+            {% for d in days %}<label class="flex items-center gap-1 rounded border px-2 py-1"><input type="checkbox" name="days" value="{{ d }}" {% if d in (v.days or []) %}checked{% endif %}> {{ day_labels[d] }}</label>{% endfor %}
+          </div>
+          <div class="mt-1 flex gap-2 text-xs">
+            <button type="button" class="text-blue-700" onclick="setDays(this.form, ['mon','tue','wed','thu','fri'])">Weekdays</button>
+            <button type="button" class="text-blue-700" onclick="setDays(this.form, ['mon','tue','wed','thu','fri','sat','sun'])">Every day</button>
+            <button type="button" class="text-blue-700" onclick="setDays(this.form, ['sat','sun'])">Weekends</button>
+          </div>
+        </div>
+        <div data-show-if="when_kind=days" id="times" class="flex flex-wrap items-center gap-2">
+          <span class="text-sm">At</span>
+          {% for t in (v.times or ['07:00']) %}
+          <span class="time-slot inline-flex items-center gap-1"><input type="time" name="times" value="{{ t }}" class="rounded border px-2 py-1"><button type="button" class="text-slate-400" title="Remove" onclick="removeTime(this)">×</button></span>
+          {% endfor %}
+          <button type="button" class="rounded border px-2 py-1 text-xs" onclick="addTime()">+ add a time</button>
+        </div>
+        <div data-show-if="when_kind=interval" class="flex flex-wrap items-center gap-2 text-sm">
+          Every <input type="number" name="every_hours" min="1" max="12" value="{{ v.every_hours or 3 }}" class="w-16 rounded border px-2 py-1"> hours
+          from <select name="window_start" class="rounded border px-2 py-1">{% for h in range(24) %}<option value="{{ h }}" {% if (v.window_start if v.window_start is not none else 8) == h %}selected{% endif %}>{{ '%02d:00' % h }}</option>{% endfor %}</select>
+          until <select name="window_end" class="rounded border px-2 py-1">{% for h in range(24) %}<option value="{{ h }}" {% if (v.window_end if v.window_end is not none else 17) == h %}selected{% endif %}>{{ '%02d:00' % h }}</option>{% endfor %}</select>
+        </div>
+        <div data-show-if="when_kind=cron" class="text-sm">
+          <input name="cron" value="{{ v.cron or '' }}" placeholder="0 7 * * 1-5" class="w-56 rounded border px-2 py-1 font-mono">
+          <p class="mt-1 text-xs text-slate-500">minute hour day-of-month month day-of-week (0 or 7 = Sunday). <code>0 7 * * 1-5</code> = 7:00 on weekdays · <code>30 6,18 * * *</code> = 6:30 and 18:30 every day.</p>
+        </div>
+        <label class="mt-3 block text-sm">Time zone
+          <input name="timezone" value="{{ v.timezone }}" list="tz-list" class="ml-1 w-56 rounded border px-2 py-1"></label>
+        <datalist id="tz-list">{% for tz in timezones %}<option value="{{ tz }}">{% endfor %}</datalist>
+      </fieldset>
+    </section>
+
+    <section class="card space-y-3">
+      <fieldset>
+        <legend class="mb-1 text-xs font-semibold uppercase text-slate-500">Which companies <span class="font-normal normal-case">(nothing ticked = every active company)</span></legend>
+        <div class="mb-2 flex flex-wrap gap-x-4 gap-y-1">
+          {% for ind, n in industries %}<label class="inline-flex items-center gap-1"><input type="checkbox" name="industries" value="{{ ind }}" {% if ind in (v.industries or []) %}checked{% endif %}> {{ ind }} <span class="text-[10px] text-slate-400">{{ n }}</span></label>{% endfor %}
+        </div>
+        <p class="mb-2 text-xs text-slate-500">Industries stay live: companies you add to an industry later are included automatically.</p>
+        <div class="grid gap-2 md:grid-cols-2">
+          {% for ind, rows in grouped.items() %}
+          {% set ticked = rows|selectattr('checked')|list|length %}
+          <details class="rounded border px-2 py-1" {% if ticked %}open{% endif %}>
+            <summary>{{ ind }} <span class="text-xs text-slate-500">{{ rows|length }}{% if ticked %} · {{ ticked }} ticked{% endif %}</span></summary>
+            <div class="mt-1 columns-2 text-sm">
+              {% for c in rows %}<label class="flex items-center gap-1"><input type="checkbox" name="companies" value="{{ c.slug }}" {% if c.checked %}checked{% endif %}> {{ c.name }} <span class="text-[10px] text-slate-400">{{ c.ats }}</span></label>{% endfor %}
+            </div>
+          </details>
+          {% endfor %}
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend class="mb-1 text-xs font-semibold uppercase text-slate-500">Sources <span class="font-normal normal-case">(nothing ticked = all enabled)</span></legend>
+        {% for s in all_sources %}<label class="mr-3 inline-flex items-center gap-1"><input type="checkbox" name="sources" value="{{ s }}" {% if s in (v.sources or []) %}checked{% endif %}> {{ s }}{% if s not in enabled %} <span class="text-[10px] text-slate-400">disabled</span>{% endif %}</label>{% endfor %}
+      </fieldset>
+    </section>
+
+    <section class="card space-y-2">
+      <legend class="text-xs font-semibold uppercase text-slate-500">Options</legend>
+      <div class="flex flex-wrap items-center gap-2 text-sm">If another run is already going:
+        <label class="inline-flex items-center gap-1"><input type="radio" name="if_busy" value="wait" {% if v.if_busy != 'skip' %}checked{% endif %}> wait and retry (every 10 min, up to 2 h)</label>
+        <label class="inline-flex items-center gap-1"><input type="radio" name="if_busy" value="skip" {% if v.if_busy == 'skip' %}checked{% endif %}> skip this time</label>
+      </div>
+      <label class="flex items-center gap-2 text-sm"><input type="checkbox" name="catch_up" {% if v.catch_up %}checked{% endif %}> Catch up: if the PC was off or asleep at the scheduled time, run when the server is back (within 12 hours)</label>
+      <label class="block text-sm">Notes <textarea name="notes" rows="2" maxlength="500" class="mt-1 block w-full rounded border px-2 py-1">{{ v.notes or '' }}</textarea></label>
+    </section>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <button class="rounded bg-slate-800 px-4 py-2 text-white">{{ 'Save changes' if schedule else 'Create schedule' }}</button>
+      <a href="/schedules" class="rounded border px-3 py-2">Cancel</a>
+      {% if schedule %}
+      <span class="ml-auto text-xs text-slate-500">created {{ schedule.created_at | local }} · updated {{ schedule.updated_at | local }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <aside class="space-y-4">
+    <div class="card xl:sticky xl:top-20">
+      <h2 class="mb-2 flex items-center gap-2 font-semibold">{{ icon('clock') }} Preview</h2>
+      <div id="schedule-preview">{% include "fragments/schedule_preview.html" %}</div>
+    </div>
+    {% if schedule %}
+    <div class="card">
+      <h2 class="mb-2 font-semibold">Recent runs from this schedule</h2>
+      <ul class="space-y-1 text-sm">
+        {% for r in runs %}
+        <li><a class="text-blue-700" href="/runs/{{ r.id }}">#{{ r.id }}</a> · {{ r.started_at | local }} · <span class="rounded px-1 {{ 'bg-green-100' if r.status == 'complete' else ('bg-red-100' if r.status == 'failed' else 'bg-blue-100') }}">{{ r.status }}</span>
+          <span class="text-xs text-slate-500">{% for k in ['fetched', 'waiting_to_score', 'scored'] %}{% if r.counts[k] is defined %}{{ k.replace('_', ' ') }} {{ r.counts[k] }} {% endif %}{% endfor %}</span></li>
+        {% else %}<li class="text-slate-500">None yet.</li>{% endfor %}
+      </ul>
+      {% if schedule.last_result %}<p class="mt-2 text-xs text-slate-500">Last result: {{ schedule.last_result }}</p>{% endif %}
+    </div>
+    {% endif %}
+  </aside>
+</form>
+{% if schedule %}
+<div class="mt-4 flex gap-2">
+  <form method="post" action="/schedules/{{ schedule.id }}/run"><button class="flex items-center gap-1 rounded border px-3 py-1.5">{{ icon('play') }} Run now</button></form>
+  <a href="/schedules/new?copy={{ schedule.id }}" class="flex items-center gap-1 rounded border px-3 py-1.5">{{ icon('copy') }} Duplicate</a>
+  <form method="post" action="/schedules/{{ schedule.id }}/delete" onsubmit="return confirm('Delete this schedule? Its past runs are kept.')"><button class="flex items-center gap-1 rounded border border-red-300 px-3 py-1.5 text-red-700">{{ icon('trash') }} Delete</button></form>
+</div>
+{% endif %}
+<script>
+  function setDays(form, days) {
+    form.querySelectorAll('input[name="days"]').forEach(function (b) { b.checked = days.indexOf(b.value) >= 0; });
+    form.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+  function addTime() {
+    var box = document.getElementById("times");
+    var slot = document.createElement("span");
+    slot.className = "time-slot inline-flex items-center gap-1";
+    slot.innerHTML = '<input type="time" name="times" value="12:00" class="rounded border px-2 py-1"><button type="button" class="text-slate-400" title="Remove" onclick="removeTime(this)">×</button>';
+    box.insertBefore(slot, box.lastElementChild);
+    box.closest("form").dispatchEvent(new Event("change", { bubbles: true }));
+  }
+  function removeTime(btn) {
+    var form = btn.closest("form");
+    if (document.querySelectorAll("#times .time-slot").length > 1) btn.parentElement.remove();
+    form.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Facts{% endblock %}
+{% block content %}
+<nav class="mb-3 flex gap-1 border-b text-sm" aria-label="Fact bank">
+  <a class="rounded-t border border-b-0 bg-white px-3 py-1.5 font-semibold" href="/facts" aria-current="page">Facts</a>
+  <a class="rounded-t px-3 py-1.5 text-slate-600" href="/facts/skills">Skill levels</a>
+</nav>
+<div class="mb-3 flex flex-wrap items-center gap-2">
+  <h1 class="text-xl font-bold">Fact bank <span class="text-sm font-normal text-slate-500">{{ rows|length }} shown</span></h1>
+  <a class="rounded bg-slate-800 px-3 py-1 text-white" href="/facts/edit">Edit facts.yaml</a>
+  <form method="post" action="/facts/sync"><button class="rounded border bg-white px-3 py-1">Sync from facts.yaml</button></form>
+  <span class="text-xs text-slate-500">Use Sync after editing the file outside the app.</span>
+</div>
+{% if file_error %}<div role="alert" class="mb-3 rounded border border-red-300 bg-red-50 p-2 text-sm text-red-900 whitespace-pre-wrap">facts.yaml has problems: {{ file_error }}</div>{% endif %}
+{% if lint %}
+<details class="mb-3 rounded border border-amber-300 bg-amber-50 p-2 text-sm">
+  <summary>{{ lint|length }} lint note{{ '' if lint|length == 1 else 's' }} (things worth checking)</summary>
+  <ul class="mt-1 ml-5 list-disc text-xs">{% for i in lint %}<li><b>{{ i.severity }}</b> {{ i.fact_id }}: {{ i.message }}</li>{% endfor %}</ul>
+</details>
+{% endif %}
+<div class="grid gap-4 lg:grid-cols-3">
+  <section class="lg:col-span-2">
+    <form method="get" action="/facts" class="mb-3 flex gap-2">
+      <label for="fq" class="sr-only">Search facts</label>
+      <input id="fq" name="q" value="{{ q }}" placeholder="search text, id, tags, org" class="rounded border px-2 py-1 w-72">
+      <label for="fk" class="sr-only">Kind</label>
+      <select id="fk" name="kind" class="rounded border px-2 py-1"><option value="">all kinds</option>{% for k in kinds %}<option value="{{ k }}" {% if kind == k %}selected{% endif %}>{{ k }}</option>{% endfor %}</select>
+      <button class="rounded bg-slate-800 px-3 py-1 text-white">Search</button>
+    </form>
+    <table class="min-w-full rounded border bg-white">
+      <thead class="bg-slate-100 text-left text-xs uppercase text-slate-600"><tr><th class="px-2 py-2">Id</th><th class="px-2">Kind</th><th class="px-2">Text</th><th class="px-2">Metrics / tags</th></tr></thead>
+      <tbody>
+      {% for f in rows %}
+      <tr class="border-t align-top">
+        <td class="px-2 py-1 font-mono text-xs">{{ f.id }}{% if f.parent_id %}<div class="text-slate-400">↳ {{ f.parent_id }}</div>{% endif %}</td>
+        <td class="px-2">{{ f.kind }}</td>
+        <td class="px-2">{% if f.title or f.org %}<b>{{ f.title or '' }}</b> {{ f.org or '' }} {{ f.start_date or '' }}{% if f.end_date %}–{{ f.end_date }}{% endif %}<br>{% endif %}{{ f.text }}</td>
+        <td class="px-2 text-xs">{% if f.metrics %}{{ f.metrics }}<br>{% endif %}{{ f.tags | join(', ') }}</td>
+      </tr>
+      {% else %}<tr><td colspan="4" class="px-3 py-6 text-center text-slate-500">No facts loaded. Use “Edit facts.yaml” or “Sync from facts.yaml” above.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </section>
+  <aside class="rounded border bg-white p-3">
+    <h2 class="mb-2 font-semibold">Add a fact</h2>
+    <p class="mb-2 text-xs text-slate-500">Appends to <code>{{ facts_path }}</code> (the source of truth) and syncs. Only record things that are true and you can defend in an interview.</p>
+    <form method="post" action="/facts" class="space-y-2">
+      <label class="block text-xs">Id <input name="id" required pattern="[A-Za-z0-9_.\-]+" class="w-full rounded border px-1 py-1"></label>
+      <label class="block text-xs">Kind <select name="kind" class="w-full rounded border px-1 py-1">{% for k in kinds %}<option>{{ k }}</option>{% endfor %}</select></label>
+      <label class="block text-xs">Parent role or project id (achievements) <input name="parent_id" class="w-full rounded border px-1 py-1"></label>
+      <label class="block text-xs">Org / institution <input name="org" class="w-full rounded border px-1 py-1"></label>
+      <label class="block text-xs">Title / degree <input name="title" class="w-full rounded border px-1 py-1"></label>
+      <div class="flex gap-2"><label class="block text-xs">Start (YYYY-MM) <input name="start_date" class="w-full rounded border px-1 py-1"></label>
+        <label class="block text-xs">End (YYYY-MM / present) <input name="end_date" class="w-full rounded border px-1 py-1"></label></div>
+      <label class="block text-xs">Text <textarea name="text" required rows="3" class="w-full rounded border px-1 py-1"></textarea></label>
+      <label class="block text-xs">Tags (comma separated) <input name="tags" class="w-full rounded border px-1 py-1"></label>
+      <label class="block text-xs">Metrics (one <code>key: value</code> per line) <textarea name="metrics" rows="3" class="w-full rounded border px-1 py-1" placeholder="uptime: 99.95%"></textarea></label>
+      <button class="rounded bg-green-700 px-3 py-1.5 text-white">Add fact</button>
+    </form>
+  </aside>
+</div>
+{% endblock %}

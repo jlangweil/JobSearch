@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}jobhunt{% endblock %} · jobhunt</title>
+  <script>
+    /* Apply the saved theme before first paint (dark by default). */
+    (function () {
+      var t = "dark";
+      try { t = localStorage.getItem("jh-theme") || "dark"; } catch (e) {}
+      var dark = t === "dark" || (t === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+      document.documentElement.classList.toggle("dark", dark);
+      document.documentElement.dataset.themeChoice = t;
+    })();
+  </script>
+  {# Tailwind Play CDN: localhost only (SPEC 2). Swap for a built stylesheet if this is ever exposed. #}
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="{{ asset('htmx.min.js') }}"></script>
+  <link rel="stylesheet" href="{{ asset('app.css') }}">
+  <script src="{{ asset('app.js') }}" defer></script>
+</head>
+{% from "_icons.html" import icon %}
+{% set sh = shell(request) %}
+<body class="bg-slate-50 text-slate-900 text-sm">
+<div class="app-shell">
+  {% include "_nav.html" %}
+  <div class="app-main">
+    <header class="app-topbar">
+      <button type="button" class="topbar-btn lg:hidden" data-nav-toggle aria-label="Open navigation">{{ icon('menu') }}</button>
+      <div class="min-w-0 truncate text-base font-semibold">{% block heading %}{{ self.title() }}{% endblock %}</div>
+
+      {% if sh.running %}
+      <a href="/runs/{{ sh.running.id }}" class="pill pill-live" title="A discovery run is in progress">
+        <span class="live-dot"></span> Run #{{ sh.running.id }} · {{ sh.running.current_node }}{% if sh.running.counts.scored %} · {{ sh.running.counts.scored }} scored{% endif %}
+      </a>
+      {% endif %}
+
+      <form action="/search" method="get" role="search" class="ml-auto hidden md:block">
+        <label for="nav-q" class="sr-only">Search jobs</label>
+        <input id="nav-q" name="q" placeholder="Search jobs…   /" class="topbar-search">
+      </form>
+
+      <form method="post" action="/settings/scoring-provider" class="seg" title="Model used for scoring and rescoring">
+        <input type="hidden" name="next" value="{{ sh.full_path }}">
+        <span class="seg-label">Scoring</span>
+        <button name="provider" value="local" class="seg-btn {{ 'seg-on' if sh.provider == 'local' }}" title="{{ sh.local_model }} on this PC (free)">{{ icon('cpu', 'h-3.5 w-3.5') }} Local</button>
+        <button name="provider" value="anthropic" class="seg-btn {{ 'seg-on' if sh.provider == 'anthropic' }}" {% if not sh.api_key_set %}disabled title="Add ANTHROPIC_API_KEY to .env and restart jobhunt serve to enable Claude"{% else %}title="Claude {{ sh.claude_model }} (about $0.01 per job)"{% endif %}>{{ icon('bolt', 'h-3.5 w-3.5') }} Claude</button>
+      </form>
+
+      <button type="button" class="topbar-btn" data-palette-open title="Jump to a page or action (Ctrl+K)">{{ icon('command') }}<span class="hidden text-xs xl:inline">Ctrl K</span></button>
+      <button type="button" class="topbar-btn" data-theme-cycle title="Theme">
+        <span data-theme-icon="dark">{{ icon('moon') }}</span><span data-theme-icon="light" hidden>{{ icon('sun') }}</span><span data-theme-icon="system" hidden>{{ icon('monitor') }}</span>
+      </button>
+    </header>
+    <main class="app-content">
+      {% if message %}<div role="status" class="mb-3 rounded border border-green-300 bg-green-50 px-3 py-2 text-green-900">{{ message }}</div>{% endif %}
+      {% if error %}<div role="alert" class="mb-3 rounded border border-red-300 bg-red-50 px-3 py-2 text-red-900">{{ error }}</div>{% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+<dialog id="palette" class="palette" aria-label="Jump to">
+  <input id="palette-input" type="text" placeholder="Type a page, an action, or a job id like #123…" autocomplete="off" class="palette-input">
+  <ul id="palette-list" class="palette-list" role="listbox"></ul>
+  <div class="palette-foot">↑ ↓ move · Enter open · Esc close</div>
+</dialog>
+<script type="application/json" id="palette-data">{{ palette | tojson }}</script>
+</body>
+</html>

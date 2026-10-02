@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ 'Replace posting text' if replace else 'Add a job' }}{% endblock %}
+{% block content %}
+{% if replace %}
+<div class="mb-3 rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm">
+  Updating <a class="text-blue-700" href="/jobs/{{ replace.id }}">job #{{ replace.id }}: {{ replace.title }} at {{ replace.company_name_raw }}</a>.
+  Paste the full posting (or its link) and its description replaces the stored one{% if replace.source == 'adzuna' %}, which from Adzuna is only a short snippet{% endif %}.
+</div>
+{% endif %}
+
+{% if not draft %}
+<p class="mb-3 max-w-3xl text-slate-600">Found a job somewhere else? Paste its link or its text. You'll check what was read, then save it and
+  choose what happens next: tailor a resume and cover letter, score it, just keep it, or record that you already applied.</p>
+<form method="post" action="/jobs/new/read" class="grid gap-4 lg:grid-cols-2" hx-indicator="#reading">
+  {% if replace %}<input type="hidden" name="replace_job_id" value="{{ replace.id }}">{% endif %}
+  <section class="card space-y-2">
+    <h2 class="flex items-center gap-2 font-semibold">{{ icon('send') }} From a link</h2>
+    <input name="url" value="{{ url }}" placeholder="https://company.wd5.myworkdayjobs.com/…/job/…" class="w-full rounded border px-2 py-2">
+    <p class="text-xs text-slate-500">Workday, Greenhouse, Lever, Ashby, Phenom, Eightfold and SuccessFactors links are read from the company's job
+      system directly. Other career sites are read from the page. LinkedIn, Indeed, Glassdoor and ZipRecruiter can't be read: paste the text
+      instead (you can still put the link here so it's saved with the job).</p>
+  </section>
+  <section class="card space-y-2">
+    <h2 class="flex items-center gap-2 font-semibold">{{ icon('pen') }} Paste the posting</h2>
+    <textarea name="text" rows="9" placeholder="Paste the whole posting: title, company, location, responsibilities, requirements…" class="w-full rounded border px-2 py-1">{{ text }}</textarea>
+    <p class="text-xs text-slate-500">If both are filled in, the pasted text is used and the link is kept with the job. Missing title, company or location
+      are filled in by {{ scoring_label() }} for you to check.</p>
+  </section>
+  <div class="lg:col-span-2 flex items-center gap-3">
+    <button class="rounded bg-slate-800 px-4 py-2 text-white">Read posting</button>
+    <span id="reading" class="spinner text-slate-500">reading… (a model call can take up to a minute)</span>
+  </div>
+</form>
+
+{% else %}
+{% if draft.existing_job_id and not replace %}
+<div class="mb-3 rounded border border-amber-300 bg-amber-50 px-3 py-2 text-amber-800">
+  This posting is already saved as <a class="text-blue-700" href="/jobs/{{ draft.existing_job_id }}">job #{{ draft.existing_job_id }}</a> (status {{ draft.existing_status }}).
+  Saving again updates it; the next step below still applies.
+</div>
+{% endif %}
+<form method="post" action="/jobs/new" class="grid gap-4 xl:grid-cols-3">
+  {% for k in ['source', 'source_job_id', 'posted_at', 'employment_hint'] %}<input type="hidden" name="{{ k }}" value="{{ draft[k] or '' }}">{% endfor %}
+  {% if replace %}<input type="hidden" name="replace_job_id" value="{{ replace.id }}">{% endif %}
+  <div class="space-y-4 xl:col-span-2">
+    <section class="card space-y-3">
+      <div class="flex flex-wrap items-center gap-2">
+        <h2 class="font-semibold">Check the details</h2>
+        {% if draft.read_with %}<span class="chip">read from {{ draft.read_with }}</span>{% endif %}
+        <a href="/jobs/new{{ '?replace=' ~ replace.id if replace }}" class="ml-auto text-xs text-blue-700">start over</a>
+      </div>
+      {% for n in draft.notes %}<p class="rounded bg-amber-50 px-2 py-1 text-xs text-amber-800">{{ n }}</p>{% endfor %}
+      <div class="grid gap-3 md:grid-cols-2">
+        <label class="text-xs font-semibold uppercase text-slate-500">Job title *<input name="title" required value="{{ draft.title }}" class="mt-1 block w-full rounded border px-2 py-1.5 text-sm font-normal normal-case text-slate-900"></label>
+        <label class="text-xs font-semibold uppercase text-slate-500">Company *<input name="company" required value="{{ draft.company }}" class="mt-1 block w-full rounded border px-2 py-1.5 text-sm font-normal normal-case text-slate-900"></label>
+        <label class="text-xs font-semibold uppercase text-slate-500">Location<input name="location" value="{{ draft.location }}" class="mt-1 block w-full rounded border px-2 py-1.5 text-sm font-normal normal-case text-slate-900"></label>
+        <label class="text-xs font-semibold uppercase text-slate-500">Work arrangement
+          <select name="remote_type" class="mt-1 block w-full rounded border px-2 py-1.5 text-sm font-normal normal-case text-slate-900">
+            {% for v, label in [('', 'work it out from the text'), ('remote', 'remote'), ('hybrid', 'hybrid'), ('onsite', 'on-site')] %}<option value="{{ v }}" {% if (draft.remote_type or '')|lower == v %}selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select></label>
+        <label class="text-xs font-semibold uppercase text-slate-500">Pay from (yearly $)<input name="comp_min" value="{{ draft.comp_min or '' }}" class="mt-1 block w-full rounded border px-2 py-1.5 text-sm font-normal normal-case text-slate-900"></label>
+        <label class="text-xs font-semibold uppercase text-slate-500">Pay to<input name="comp_max" value="{{ draft.comp_max or '' }}" class="mt-1 block w-full rounded border px-2 py-1.5 text-sm font-normal normal-case text-slate-900"></label>
+        <label class="text-xs font-semibold uppercase text-slate-500">Posting link<input name="url" value="{{ draft.url }}" class="mt-1 block w-full rounded border px-2 py-1.5 text-sm font-normal normal-case text-slate-900"></label>
+        <label class="text-xs font-semibold uppercase text-slate-500">Apply link<input name="apply_url" value="{{ draft.apply_url }}" class="mt-1 block w-full rounded border px-2 py-1.5 text-sm font-normal normal-case text-slate-900"></label>
+      </div>
+      <label class="block text-xs font-semibold uppercase text-slate-500">Job description * <span class="font-normal normal-case">(the resume and cover letter are tailored to this; remove anything that isn't the posting)</span>
+        <textarea name="description" rows="18" class="editor mt-1 block w-full rounded border px-2 py-1 text-sm font-normal normal-case text-slate-900">{{ draft.description }}</textarea></label>
+    </section>
+  </div>
+
+  <aside class="space-y-4">
+    <section class="card space-y-2 xl:sticky xl:top-20">
+      <h2 class="font-semibold">Then</h2>
+      <label class="flex items-start gap-2 rounded border p-2"><input type="radio" name="next_step" value="score" class="mt-1" checked>
+        <span><b>Score it first</b> <span class="rounded bg-green-100 px-1 text-[10px] text-green-800">recommended</span><br><span class="text-xs text-slate-500">See how well it fits before spending time on a resume. The job page shows the score with a <b>Tailor my resume &amp; cover letter</b> button.</span></span></label>
+      <div data-show-if="next_step=score" class="space-y-2 pl-6 text-xs">
+        <div class="flex flex-wrap items-center gap-3">Score with
+          <label class="inline-flex items-center gap-1"><input type="radio" name="score_provider" value="local" {% if cfg_scoring_provider == 'local' %}checked{% endif %}> Local <span class="text-slate-500">(free)</span></label>
+          <label class="inline-flex items-center gap-1 {{ 'text-slate-400' if not api_key_set }}"><input type="radio" name="score_provider" value="anthropic" {% if cfg_scoring_provider == 'anthropic' %}checked{% endif %} {% if not api_key_set %}disabled{% endif %}> Claude <span class="text-slate-500">(about $0.01)</span></label>
+        </div>
+        <label class="flex items-center gap-2"><input type="checkbox" name="auto_tailor"> Then tailor automatically if it scores at least
+          <input type="number" name="tailor_min" min="0" max="100" value="{{ shortlist_threshold|int }}" class="w-16 rounded border px-1 py-0.5"></label>
+      </div>
+      <label class="flex items-start gap-2 rounded border p-2"><input type="radio" name="next_step" value="tailor" class="mt-1">
+        <span><b>Tailor now, without scoring</b><br><span class="text-xs text-slate-500">Starts the workflow now with {{ tailor_label }}: you review the resume, then the cover letter, then approve and confirm when you've applied, which adds it to Applications.</span>
+        {% if not tailor_ready %}<br><span class="text-xs text-red-700">Needs ANTHROPIC_API_KEY in .env (or tailoring set to the local model on Settings).</span>{% endif %}</span></label>
+      <div data-show-if="next_step=tailor|score" class="space-y-1 pl-6">
+        <label class="block text-xs">Emphasis for drafting <input name="emphasis" placeholder="e.g. MuleSoft platform ownership" class="block w-full rounded border px-1 py-1"></label>
+        <label class="block text-xs">Company notes for the cover letter <textarea name="company_notes" rows="2" class="block w-full rounded border px-1"></textarea></label>
+      </div>
+      <label class="flex items-start gap-2 rounded border p-2"><input type="radio" name="next_step" value="save" class="mt-1">
+        <span><b>Just save it</b><br><span class="text-xs text-slate-500">It waits in Waiting to score.</span></span></label>
+      <label class="flex items-start gap-2 rounded border p-2"><input type="radio" name="next_step" value="applied" class="mt-1">
+        <span><b>I already applied</b><br><span class="text-xs text-slate-500">Adds it to Applications now, without tailoring.</span></span></label>
+      <div data-show-if="next_step=applied" class="grid grid-cols-2 gap-2 pl-6 text-xs">
+        <label>Applied on <input type="date" name="applied_on" value="{{ today }}" class="block w-full rounded border px-1 py-1"></label>
+        <label>How <select name="method" class="block w-full rounded border px-1 py-1"><option value="manual">manual</option><option value="deep_link">deep_link</option><option value="referral">referral</option><option value="email">email</option></select></label>
+        <label class="col-span-2">Confirmation / reference <input name="confirmation_ref" class="block w-full rounded border px-1 py-1"></label>
+        <label class="col-span-2">Notes <textarea name="application_notes" rows="2" class="block w-full rounded border px-1"></textarea></label>
+      </div>
+      <button class="w-full rounded bg-green-700 px-4 py-2 text-white">Save job</button>
+    </section>
+  </aside>
+</form>
+{% endif %}
+{% endblock %}

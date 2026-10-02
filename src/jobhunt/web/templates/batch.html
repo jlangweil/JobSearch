@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Rescoring #{{ b.id }}{% endblock %}
+{% block content %}
+<p class="mb-3 text-slate-600">Jobs: {{ b.label }} · model <span class="font-mono text-xs">{{ b.model }}</span></p>
+{% include "fragments/batch_progress.html" %}
+{% endblock %}

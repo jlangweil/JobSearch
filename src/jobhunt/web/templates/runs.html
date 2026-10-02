@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Runs{% endblock %}
+{% block content %}
+<form method="post" action="/runs" class="mb-4 space-y-3 rounded border bg-white p-4">
+  <div class="flex flex-wrap items-center gap-2"><h1 class="text-lg font-bold">Start a run</h1>
+    <a href="/schedules" class="ml-auto text-sm text-blue-700">Run automatically on a schedule →</a></div>
+
+  <fieldset class="flex flex-wrap gap-4">
+    <legend class="mb-1 text-xs font-semibold uppercase text-slate-500">What to do</legend>
+    <label class="flex max-w-xs items-start gap-2 rounded border p-2 {{ 'border-slate-800' if mode == 'full' }}">
+      <input type="radio" name="mode" value="full" {% if mode == 'full' %}checked{% endif %}>
+      <span><b>Full run</b><br><span class="text-xs text-slate-600">Fetch, filter, store, then score survivors with {{ scoring_label() }} ({{ scoring_cost() }}, capped below).{% if not scoring_ready() %} <span class="text-red-700">No API key: stops before scoring.</span>{% endif %}</span></span></label>
+    <label class="flex max-w-xs items-start gap-2 rounded border p-2 {{ 'border-slate-800' if mode == 'fetch' }}">
+      <input type="radio" name="mode" value="fetch" {% if mode == 'fetch' %}checked{% endif %}>
+      <span><b>Fetch &amp; save</b> <span class="rounded bg-green-100 px-1 text-[10px] text-green-800">free</span><br><span class="text-xs text-slate-600">Fetch, filter and store, but don't score. Review the jobs first, then score all or some of them later.</span></span></label>
+    <label class="flex max-w-xs items-start gap-2 rounded border p-2 {{ 'border-slate-800' if mode == 'dry' }}">
+      <input type="radio" name="mode" value="dry" {% if mode == 'dry' %}checked{% endif %}>
+      <span><b>Dry run</b> <span class="rounded bg-green-100 px-1 text-[10px] text-green-800">free</span><br><span class="text-xs text-slate-600">Fetch and filter only. Shows counts, filter reasons and survivors. Saves nothing, no LLM.</span></span></label>
+    <label class="flex max-w-xs items-start gap-2 rounded border p-2 {{ 'border-slate-800' if mode == 'stored' }}">
+      <input type="radio" name="mode" value="stored" {% if mode == 'stored' %}checked{% endif %}>
+      <span><b>Score stored jobs only</b><br><span class="text-xs text-slate-600">No fetching. Scores jobs already saved and waiting ({{ pending }} now) — only those of the companies/industries you tick, or all of them.</span></span></label>
+  </fieldset>
+
+  <div class="grid gap-4 lg:grid-cols-3">
+    <fieldset>
+      <legend class="mb-1 text-xs font-semibold uppercase text-slate-500">Sources <span class="normal-case font-normal">(none ticked = all enabled)</span></legend>
+      {% for s in all_sources %}<label class="mr-3 inline-flex items-center gap-1"><input type="checkbox" name="sources" value="{{ s }}"> {{ s }}{% if s not in enabled %} <span class="text-[10px] text-slate-400">disabled</span>{% endif %}</label>{% endfor %}
+    </fieldset>
+    <fieldset>
+      <legend class="mb-1 text-xs font-semibold uppercase text-slate-500">Industries <span class="normal-case font-normal">(adds every active company in them)</span></legend>
+      {% for ind, n in industries %}<label class="mr-3 inline-flex items-center gap-1"><input type="checkbox" name="industries" value="{{ ind }}"> {{ ind }} <span class="text-[10px] text-slate-400">{{ n }}</span></label>{% endfor %}
+    </fieldset>
+    <div>
+      <label class="text-xs font-semibold uppercase text-slate-500" for="max-score">Max jobs to score</label>
+      <input id="max-score" type="number" name="max_to_score" min="1" value="{{ max_per_run }}" class="block w-28 rounded border px-2 py-1">
+      <p class="text-[11px] text-slate-500">Scoring uses {{ scoring_label() }} (<a class="text-blue-700" href="/settings#llm">change</a>). Unscored jobs wait for the next run.</p>
+    </div>
+    <div>
+      <label class="text-xs font-semibold uppercase text-slate-500" for="posted-since">Only jobs posted since</label>
+      <input id="posted-since" type="date" name="posted_since" max="{{ today }}" class="block rounded border px-2 py-1">
+      <p class="text-[11px] text-slate-500">Optional, this run only: e.g. the date of your last run. Postings dated earlier are left out (a later run without a date can still pick them up); undated ones are kept.</p>
+    </div>
+  </div>
+
+  <fieldset>
+    <legend class="mb-1 text-xs font-semibold uppercase text-slate-500">Companies <span class="normal-case font-normal">(none ticked and no industry = all active companies · {{ preselected|length }} preselected) · <a class="text-blue-700" href="/companies">manage companies</a></span></legend>
+    <div class="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+      {% for ind, rows in grouped|dictsort %}
+      {% set checked = rows|selectattr('checked')|list|length %}
+      <details class="rounded border px-2 py-1" {% if checked %}open{% endif %}>
+        <summary>{{ ind }} <span class="text-xs text-slate-500">{{ rows|length }} companies{% if checked %} · {{ checked }} ticked{% endif %}</span></summary>
+        <div class="mt-1 columns-2 text-sm">
+          {% for c in rows %}<label class="flex items-center gap-1"><input type="checkbox" name="companies" value="{{ c.slug }}" {% if c.checked %}checked{% endif %}> {{ c.name }} <span class="text-[10px] text-slate-400">{{ c.ats }}</span></label>{% endfor %}
+        </div>
+      </details>
+      {% endfor %}
+    </div>
+  </fieldset>
+
+  <button class="rounded bg-green-700 px-4 py-2 text-white">Start</button>
+  <span class="text-xs text-slate-500">A full crawl of every company takes ~40 minutes the first time; pick a few companies to test. You can stop a run at any time and resume it later.</span>
+</form>
+
+{% if dry_runs %}
+<h2 class="mb-1 font-semibold">Dry runs (this session)</h2>
+<ul class="mb-4 rounded border bg-white p-2 text-sm">
+  {% for d in dry_runs %}<li><a class="text-blue-700" href="/dryruns/{{ d.id }}">dry run #{{ d.id }}</a> · {{ d.status }} · {{ d.started_at | local }} · {{ d.companies|length or 'all' }} companies</li>{% endfor %}
+</ul>
+{% endif %}
+
+<h2 class="mb-1 font-semibold">Run history</h2>
+<table class="min-w-full rounded border bg-white">
+  <thead class="bg-slate-100 text-left text-xs uppercase text-slate-600"><tr><th class="px-2 py-2">Run</th><th class="px-2">Started</th><th class="px-2">Trigger</th><th class="px-2">Status</th><th class="px-2">Node</th><th class="px-2">Counts</th><th class="px-2">Errors</th></tr></thead>
+  <tbody>
+  {% for r in runs %}
+  <tr class="border-t">
+    <td class="px-2 py-1"><a class="text-blue-700" href="/runs/{{ r.id }}">#{{ r.id }}</a></td>
+    <td class="px-2">{{ r.started_at | local }}</td>
+    <td class="px-2">{{ r.trigger }}{% if r.schedule_id %} · <a class="text-blue-700" href="/schedules/{{ r.schedule_id }}">{{ schedule_names.get(r.schedule_id, 'deleted schedule') }}</a>{% endif %}</td>
+    <td class="px-2"><span class="rounded px-1 {{ 'bg-green-100' if r.status == 'complete' else ('bg-red-100' if r.status == 'failed' else 'bg-blue-100') }}">{{ r.status }}</span></td>
+    <td class="px-2">{{ r.current_node }}</td>
+    <td class="px-2 text-xs">{% for k in ['fetched', 'new', 'duplicates', 'filtered', 'left_to_score', 'waiting_to_score', 'scored', 'above_threshold'] %}{% if r.counts[k] is defined %}{{ k.replace('_', ' ') }} {{ r.counts[k] }} · {% endif %}{% endfor %}</td>
+    <td class="px-2">{{ r.errors | length }}</td>
+  </tr>
+  {% else %}<tr><td colspan="7" class="px-3 py-6 text-center text-slate-500">No runs yet.</td></tr>{% endfor %}
+  </tbody>
+</table>
+{% endblock %}

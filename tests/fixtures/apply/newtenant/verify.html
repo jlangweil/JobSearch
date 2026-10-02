@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Verify Your Email</title></head>
+<body>
+<h2 data-automation-id="pageHeader">Verify Your Email</h2>
+<p>We emailed you a verification code. Enter it below to finish creating your account.</p>
+<label for="vc">Verification Code</label><input id="vc" data-automation-id="verificationCode" type="text">
+<button data-automation-id="submitButton" onclick="check()">Verify</button>
+<div data-automation-id="errorMessage" id="err" hidden>That code is not valid.</div>
+<script>
+  function check() {
+    var v = document.getElementById('vc').value;
+    if (/^\d{6}$/.test(v)) { location.href = '../tenant/information.html'; }
+    else { document.getElementById('err').hidden = false; }
+  }
+</script>
+</body></html>

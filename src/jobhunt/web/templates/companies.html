@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Companies{% endblock %}
+{% block content %}
+<div class="mb-3 flex flex-wrap items-center gap-3">
+  <h1 class="text-xl font-bold">Companies <span class="text-sm font-normal text-slate-500">{{ rows|length }} shown of {{ total }}</span></h1>
+  <form method="post" action="/companies/sync"><button class="rounded border bg-white px-3 py-1">Re-sync from config.yaml</button></form>
+  <a class="rounded border bg-white px-3 py-1" href="/settings/config">Edit config.yaml</a>
+  <span class="text-xs text-slate-500">Changes here are written to config.yaml (a backup of the previous version is kept in exports\config-backups).</span>
+</div>
+
+<div class="mb-4 grid gap-4 lg:grid-cols-2">
+  <section class="rounded border bg-white p-3">
+    <h2 class="mb-2 font-semibold">1. Check a career site</h2>
+    <form method="get" action="/companies" class="flex flex-wrap items-end gap-2">
+      <label class="text-xs">ATS <select name="probe_ats" class="block rounded border px-2 py-1">{% for a in ['workday', 'successfactors', 'phenom', 'eightfold', 'greenhouse', 'lever', 'ashby'] %}<option {% if probe_ats == a %}selected{% endif %}>{{ a }}</option>{% endfor %}</select></label>
+      <label class="flex-1 text-xs">Career site URL, domain or board slug
+        <input name="probe_target" value="{{ probe_target }}" required placeholder="https://cigna.wd5.myworkdayjobs.com · careers.swissre.com · oscar" class="block w-full rounded border px-2 py-1"></label>
+      <button class="rounded bg-slate-800 px-3 py-1 text-white">Check</button>
+    </form>
+    <p class="mt-1 text-[11px] text-slate-500">Workday: paste any page from the company's myworkdayjobs.com site. Takes a few seconds.</p>
+    {% if probe %}
+    <div class="mt-2 rounded border {{ 'border-green-300 bg-green-50' if probe.ok else 'border-red-300 bg-red-50' }} p-2 text-sm">
+      <p><b>{{ 'Readable' if probe.ok else 'Problem' }}:</b> {{ probe.message }}</p>
+      {% for b in probe.boards %}
+      <form method="post" action="/companies" class="mt-2 border-t pt-2">
+        <input type="hidden" name="ats_type" value="{{ probe_ats }}"><input type="hidden" name="board_token" value="{{ b.board_token }}">
+        <div class="font-mono text-xs">{{ b.board_token }} — {{ b.total if b.total is not none else '?' }} postings</div>
+        {% for n in b.facets %}<div class="text-[11px] text-slate-600">facet {{ n }}</div>{% endfor %}
+        <div class="mt-1 flex flex-wrap gap-2">
+          <input name="name" required placeholder="Company name" class="rounded border px-1">
+          <input name="industry" placeholder="industry (insurance, health…)" class="rounded border px-1">
+          <button class="rounded bg-green-700 px-2 text-white" {% if b.total is none %}disabled{% endif %}>Add this board</button>
+        </div>
+      </form>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="rounded border bg-white p-3">
+    <h2 class="mb-2 font-semibold">2. Add a company directly</h2>
+    <form method="post" action="/companies" class="grid gap-2 md:grid-cols-2">
+      <label class="text-xs">Name <input name="name" required class="block w-full rounded border px-2 py-1"></label>
+      <label class="text-xs">ATS <select name="ats_type" class="block w-full rounded border px-2 py-1">{% for a in ats_types %}<option>{{ a }}</option>{% endfor %}</select></label>
+      <label class="text-xs md:col-span-2">Board token <input name="board_token" placeholder="pru.wd5.myworkdayjobs.com/Careers · careers.swissre.com · oscar" class="block w-full rounded border px-2 py-1"></label>
+      <label class="text-xs">Industry <input name="industry" list="industry-list" class="block w-full rounded border px-2 py-1"></label>
+      <datalist id="industry-list">{% for ind, _ in industries %}<option value="{{ ind }}">{% endfor %}</datalist>
+      <label class="text-xs">Search terms (optional, comma-separated) <input name="queries" class="block w-full rounded border px-2 py-1"></label>
+      <div class="md:col-span-2"><button class="rounded bg-green-700 px-3 py-1.5 text-white">Add company</button></div>
+    </form>
+  </section>
+</div>
+
+<form method="get" action="/companies" class="mb-2 flex flex-wrap items-end gap-2">
+  <label class="text-xs">Name <input name="q" value="{{ filters.q }}" class="block rounded border px-2 py-1"></label>
+  <label class="text-xs">Industry <select name="industry" class="block rounded border px-2 py-1"><option value="">any</option>{% for ind, n in industries %}<option value="{{ ind }}" {% if filters.industry == ind %}selected{% endif %}>{{ ind }} ({{ n }})</option>{% endfor %}</select></label>
+  <label class="text-xs">ATS <select name="ats" class="block rounded border px-2 py-1"><option value="">any</option>{% for a in ats_types %}<option {% if filters.ats == a %}selected{% endif %}>{{ a }}</option>{% endfor %}</select></label>
+  <label class="text-xs">Active <select name="active" class="block rounded border px-2 py-1">{% for v, l in [('', 'any'), ('yes', 'active'), ('no', 'paused')] %}<option value="{{ v }}" {% if filters.active == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select></label>
+  <button class="rounded bg-slate-800 px-3 py-1 text-white">Filter</button>
+  {% if rows %}<a class="rounded border bg-white px-3 py-1" href="/runs?mode=dry{% for c in rows if c.active %}&company={{ c.slug }}{% endfor %}">Dry-run these {{ rows|selectattr('active')|list|length }} →</a>{% endif %}
+</form>
+
+<div class="overflow-x-auto rounded border bg-white">
+<table class="min-w-full text-sm">
+  <thead class="bg-slate-100 text-left text-xs uppercase text-slate-600"><tr><th class="px-2 py-2">Company</th><th class="px-2">Industry</th><th class="px-2">ATS / board</th><th class="px-2">Jobs stored</th><th class="px-2">Scored</th><th class="px-2">In pipeline</th><th class="px-2">Last seen</th><th class="px-2">Active</th><th class="px-2">Run</th></tr></thead>
+  <tbody>
+  {% for c in rows %}
+  <tr class="border-t {{ 'text-slate-400' if not c.active }}">
+    <td class="px-2 py-1 font-medium">{{ c.name }}</td>
+    <td class="px-2">{{ c.industry }}</td>
+    <td class="px-2 text-xs">{{ c.ats_type }}<div class="font-mono text-[11px] text-slate-500">{{ c.board_token or '' }}</div>{% if c.queries %}<div class="text-[11px]">terms: {{ c.queries|join(', ') }}</div>{% endif %}</td>
+    <td class="px-2"><a class="text-blue-700" href="/queue?status=any&company={{ c.name|urlencode }}&sort=seen">{{ c.jobs }}</a></td>
+    <td class="px-2"><a class="text-blue-700" href="/queue?status=scored&min_score=0&company={{ c.name|urlencode }}&sort=total">{{ c.scored }}</a></td>
+    <td class="px-2">{{ c.pipeline }}</td>
+    <td class="px-2 text-xs">{{ c.last_seen | local('%Y-%m-%d') }}</td>
+    <td class="px-2">
+      <form method="post" action="/companies/active">
+        <input type="hidden" name="name" value="{{ c.name }}"><input type="hidden" name="next" value="{{ current_url }}">
+        <input type="hidden" name="active" value="{{ 'false' if c.active else 'true' }}">
+        <button class="rounded px-2 py-0.5 text-xs {{ 'bg-green-100 text-green-800' if c.active else 'bg-slate-200 text-slate-600' }}" title="click to {{ 'pause' if c.active else 'activate' }}">{{ 'active' if c.active else 'paused' }}</button>
+      </form>
+    </td>
+    <td class="px-2 whitespace-nowrap text-xs">{% if c.active %}<a class="text-blue-700" href="/runs?mode=dry&company={{ c.slug }}">dry run</a> · <a class="text-blue-700" href="/runs?mode=full&company={{ c.slug }}">run</a>{% endif %}</td>
+  </tr>
+  {% else %}<tr><td colspan="9" class="px-3 py-6 text-center text-slate-500">No companies match.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

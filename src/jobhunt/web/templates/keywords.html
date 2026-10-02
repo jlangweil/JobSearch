@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Keyword heatmap{% endblock %}
+{% macro tiles(rows) -%}
+<div class="flex flex-wrap gap-1.5">
+  {% for k in rows %}
+  {% set heat = 0.12 + 0.78 * (k.jobs / top) %}
+  {% set held = k.have * 2 >= k.jobs %}
+  <div class="rounded px-2 py-1 text-sm" style="background-color: rgba(249, 115, 22, {{ '%.2f' % heat }})"
+       title="{{ k.label }}: asked for by {{ k.jobs }} of {{ meta.jobs }} top jobs ({{ '%.0f' % (k.share * 100) }}%), required in {{ k.required }}. Your background covers it in {{ k.have }} of {{ k.jobs }}.">
+    <span class="font-medium">{{ k.label }}</span>
+    <span class="text-xs opacity-80">{{ k.jobs }}</span>
+    <span class="text-xs {{ 'text-green-800' if held else 'text-red-800' }}">{{ '✓' if held else '✗' }}</span>
+  </div>
+  {% else %}<p class="text-sm text-slate-500">Nothing yet: jobs scored with rubric v5 or later fill this in.</p>{% endfor %}
+</div>
+{%- endmacro %}
+{% block content %}
+<div class="mb-3 flex flex-wrap items-center gap-3">
+  <h1 class="text-xl font-bold">Keyword heatmap</h1>
+  <span class="text-sm text-slate-500">what the {{ meta.jobs or 0 }} jobs scoring {{ '%.0f' % min_score }}+ ask for{% if meta.built_at %} · updated {{ meta.built_at | local }}{% endif %}</span>
+  <form method="post" action="/keywords/rebuild" class="ml-auto"><button class="rounded border px-3 py-1 text-sm">Recount now</button></form>
+</div>
+<p class="mb-3 max-w-3xl text-sm text-slate-600">The deeper the colour, the more of your best-matching jobs ask for it (the number is how many).
+  <span class="text-green-800">✓</span> your background covers it in most of those jobs; <span class="text-red-800">✗</span> it usually doesn't.
+  Rebuilt automatically every time a job is scored. Hover a keyword for details.</p>
+
+{% if gaps %}
+<div class="mb-4 rounded border border-amber-300 bg-amber-50 p-3">
+  <h2 class="mb-1 font-semibold">Gaps worth a look</h2>
+  <p class="mb-2 text-xs text-slate-600">Asked for by at least 10% of your top jobs, but usually not shown by your background. If you have real experience with one, add it to your <a class="text-blue-700" href="/facts">facts</a> or <a class="text-blue-700" href="/facts/skills">skill levels</a>.</p>
+  <ul class="flex flex-wrap gap-2 text-sm">{% for g in gaps %}<li class="rounded border border-amber-300 bg-white px-2 py-0.5">{{ g.label }} <span class="text-xs text-slate-500">{{ g.jobs }} jobs · {{ g.kind }}</span></li>{% endfor %}</ul>
+</div>
+{% endif %}
+
+<section class="mb-4 rounded border bg-white p-3">
+  <h2 class="mb-2 font-semibold">Technologies <span class="text-xs font-normal text-slate-500">{{ tech | length }}</span></h2>
+  {{ tiles(tech) }}
+</section>
+<section class="rounded border bg-white p-3">
+  <h2 class="mb-2 font-semibold">Leadership &amp; delivery <span class="text-xs font-normal text-slate-500">{{ comps | length }} · from jobs scored with rubric v8+</span></h2>
+  {{ tiles(comps) }}
+</section>
+{% endblock %}

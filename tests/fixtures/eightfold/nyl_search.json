@@ -1,0 +1,86 @@
+{
+ "count": 78,
+ "positions": [
+  {
+   "id": 43547931,
+   "name": "Senior Associate - Integration Technical Lead",
+   "posting_name": "Senior Associate - Integration Technical Lead",
+   "location": "New York,New York,United States",
+   "locations": [
+    "New York,New York,United States"
+   ],
+   "hot": 0,
+   "department": "Tech Data AI Ventures",
+   "business_unit": "CORP",
+   "t_update": 1789138924,
+   "t_create": 1785187464,
+   "ats_job_id": "94496",
+   "display_job_id": "94496",
+   "type": "ATS",
+   "id_locale": "94496-en_US",
+   "job_description": "",
+   "locale": "en_US",
+   "stars": 0.0,
+   "medallionProgram": null,
+   "location_flexibility": null,
+   "work_location_option": "hybrid",
+   "canonicalPositionUrl": "https://careers.newyorklife.com/careers/job/43547931",
+   "isPrivate": false,
+   "latlongs": "40.7127753,-74.0059728"
+  },
+  {
+   "id": 43294881,
+   "name": "Corporate Vice President - IT Service Management Lead",
+   "posting_name": "Corporate Vice President - IT Service Management Lead",
+   "location": "Remote,New York,United States",
+   "locations": [
+    "Remote,New York,United States"
+   ],
+   "hot": 0,
+   "department": "Tech Data AI Ventures",
+   "business_unit": "CORP",
+   "t_update": 1785764924,
+   "t_create": 1784649601,
+   "ats_job_id": "94442",
+   "display_job_id": "94442",
+   "type": "ATS",
+   "id_locale": "94442-en_US",
+   "job_description": "",
+   "locale": "en_US",
+   "stars": 0.0,
+   "medallionProgram": null,
+   "location_flexibility": null,
+   "work_location_option": "remote_local",
+   "canonicalPositionUrl": "https://careers.newyorklife.com/careers/job/43294881",
+   "isPrivate": false,
+   "latlongs": "40.7127753,-74.0059728"
+  },
+  {
+   "id": 42989249,
+   "name": "Associate - Full Stack Developer",
+   "posting_name": "Associate - Full Stack Developer",
+   "location": "New York,New York,United States",
+   "locations": [
+    "New York,New York,United States"
+   ],
+   "hot": 0,
+   "department": "Tech Data AI Ventures",
+   "business_unit": "CORP",
+   "t_update": 1789139006,
+   "t_create": 1783448032,
+   "ats_job_id": "94359",
+   "display_job_id": "94359",
+   "type": "ATS",
+   "id_locale": "94359-en_US",
+   "job_description": "",
+   "locale": "en_US",
+   "stars": 0.0,
+   "medallionProgram": null,
+   "location_flexibility": null,
+   "work_location_option": "hybrid",
+   "canonicalPositionUrl": "https://careers.newyorklife.com/careers/job/42989249",
+   "isPrivate": false,
+   "latlongs": "40.7127753,-74.0059728"
+  }
+ ]
+}

@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Application Questions</title></head>
+<body>
+<h2 data-automation-id="pageHeader">Application Questions</h2>
+<fieldset data-automation-id="formField-auth"><legend>Are you legally authorized to work in the United States?</legend>
+  <label for="au-y">Yes</label><input id="au-y" type="radio" name="auth" value="y">
+  <label for="au-n">No</label><input id="au-n" type="radio" name="auth" value="n"></fieldset>
+<fieldset data-automation-id="formField-sponsor"><legend>Will you now or in the future require sponsorship for employment visa status?</legend>
+  <label for="sp-y">Yes</label><input id="sp-y" type="radio" name="sponsor" value="y">
+  <label for="sp-n">No</label><input id="sp-n" type="radio" name="sponsor" value="n"></fieldset>
+<div data-automation-id="formField-salary"><label for="sal">What are your salary expectations?</label><input id="sal" type="text"></div>
+<!-- required, because only a required question is worth stopping a run over -->
+<div data-automation-id="formField-values"><label for="vl">Which of our company values resonates with you most?</label>
+  <input id="vl" type="text" required aria-required="true"></div>
+<button data-automation-id="pageFooterNextButton" onclick="location.href='review.html'">Save and Continue</button>
+</body></html>

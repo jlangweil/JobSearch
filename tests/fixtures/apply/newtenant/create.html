@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Create Account</title></head>
+<body>
+<h2 data-automation-id="pageHeader">Create Account</h2>
+<label for="em">Email Address</label><input id="em" data-automation-id="email" type="email">
+<label for="pw">Password</label><input id="pw" data-automation-id="password" type="password">
+<label for="vp">Verify New Password</label><input id="vp" data-automation-id="verifyPassword" type="password">
+<label><input data-automation-id="createAccountCheckbox" type="checkbox"> I agree to the Terms and Conditions</label>
+<button data-automation-id="createAccountSubmitButton" onclick="submitAccount()">Create Account</button>
+<div data-automation-id="errorMessage" id="err" hidden></div>
+<script>
+  // this tenant's password policy is stricter than most: 12+ characters with a symbol and a digit
+  function submitAccount() {
+    var pw = document.getElementById('pw').value, err = document.getElementById('err');
+    var ok = pw.length >= 12 && /[^A-Za-z0-9]/.test(pw) && /[0-9]/.test(pw);
+    if (!ok) { err.textContent = 'Your password must be at least 12 characters and include a number and a symbol.'; err.hidden = false; }
+    else { location.href = 'verify.html'; }
+  }
+</script>
+</body></html>

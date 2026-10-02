@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Schedules{% endblock %}
+{% block content %}
+<div class="mb-4 flex flex-wrap items-center gap-3">
+  <p class="max-w-3xl text-slate-600">Each schedule starts a run automatically: <b>fetch &amp; save</b> (free; jobs wait for you to score them),
+    <b>full run</b> (fetch and score), or <b>score waiting jobs</b> (no fetching). Switch any schedule on or off at any time.</p>
+  <div class="ml-auto flex items-center gap-2">
+    <form method="post" action="/schedules/pause">
+      <input type="hidden" name="paused" value="{{ '0' if paused else '1' }}">
+      <button class="flex items-center gap-1 rounded border px-3 py-1.5 {{ 'border-amber-300 bg-amber-50 text-amber-800' if paused }}">{{ icon('pause' if not paused else 'play') }} {{ 'Resume all' if paused else 'Pause all' }}</button>
+    </form>
+    <a href="/schedules/new" class="flex items-center gap-1 rounded bg-slate-800 px-3 py-1.5 text-white">{{ icon('plus') }} New schedule</a>
+  </div>
+</div>
+
+{% if paused %}
+<div class="mb-3 rounded border border-amber-300 bg-amber-50 px-3 py-2 text-amber-800"><b>All schedules are paused.</b> Their on/off settings are kept; nothing runs automatically until you click <b>Resume all</b>. Run now still works.</div>
+{% endif %}
+{% if not scheduler_active %}
+<div class="mb-3 rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm">Schedules fire only while <code>jobhunt serve</code> is running. The times shown are what will happen when it is.</div>
+{% endif %}
+
+<div class="grid gap-4 xl:grid-cols-3">
+  <div class="xl:col-span-2">
+    {% if rows %}
+    <div class="overflow-x-auto rounded border bg-white">
+      <table class="min-w-full">
+        <thead class="bg-slate-100 text-left text-xs uppercase text-slate-600">
+          <tr><th class="px-3 py-2">On</th><th class="px-2">Schedule</th><th class="px-2">What</th><th class="px-2">Next</th><th class="px-2">Last result</th><th class="px-2 text-right">Actions</th></tr>
+        </thead>
+        <tbody>
+          {% for s in rows %}{% include "fragments/schedule_row.html" %}{% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="card">
+      <h2 class="mb-1 text-base font-semibold">No schedules yet</h2>
+      <p class="mb-3 text-slate-600">Start from a template (you can change everything before saving):</p>
+      <div class="grid gap-2 md:grid-cols-2">
+        {% for key, p in presets.items() %}
+        <a href="/schedules/new?preset={{ key }}" class="stat"><b>{{ p.name }}</b><div class="stat-label">{{ {'fetch': 'Fetch & save only', 'full': 'Full run', 'stored': 'Score waiting jobs'}[p.mode] }}{% if p.notes %} · {{ p.notes }}{% endif %}</div></a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <aside class="space-y-4">
+    <div class="card">
+      <h2 class="mb-2 flex items-center gap-2 font-semibold">{{ icon('clock') }} Coming up</h2>
+      <ul class="space-y-1.5">
+        {% for u in upcoming %}
+        <li class="flex items-baseline justify-between gap-3"><a class="text-blue-700" href="/schedules/{{ u.schedule.id }}">{{ u.schedule.name }}</a><span class="whitespace-nowrap text-xs text-slate-500">{{ u.when | when }}</span></li>
+        {% else %}
+        <li class="text-slate-500">{{ 'Paused.' if paused else 'Nothing scheduled. Turn a schedule on to see its next runs here.' }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="card text-sm">
+      <h2 class="mb-2 font-semibold">How it behaves</h2>
+      <ul class="list-disc space-y-1 pl-4 text-slate-600">
+        <li>A scheduled run is a normal run: watch or stop it on <a class="text-blue-700" href="/runs">Runs</a>.</li>
+        <li>Only one run at a time. With <b>wait if busy</b>, a schedule retries every 10 minutes for up to 2 hours.</li>
+        <li><b>Catch up</b>: if the PC was off or asleep at the scheduled time, the run starts when the server is back (within 12 hours).</li>
+        <li>Fetch-only runs leave jobs in <a class="text-blue-700" href="/queue?status=discovered&sort=seen">Waiting to score</a> ({{ waiting }} now).</li>
+        <li>Scoring uses the model picked in the top bar at the time the run scores.</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+{% endblock %}

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>My Information</title></head>
+<body>
+<h2 data-automation-id="pageHeader">My Information</h2>
+<form>
+  <div data-automation-id="formField-source">
+    <span id="src-label">How Did You Hear About Us?</span>
+    <button type="button" id="src-btn" aria-haspopup="listbox" aria-labelledby="src-label"
+            onclick="var l=document.getElementById('src-list'); l.hidden=!l.hidden">Select One</button>
+    <ul id="src-list" role="listbox" hidden>
+      <li role="option" data-automation-id="promptOption" onclick="pick(this)">Job Board</li>
+      <li role="option" data-automation-id="promptOption" onclick="pick(this)">Company website</li>
+      <li role="option" data-automation-id="promptOption" onclick="pick(this)">LinkedIn</li>
+    </ul>
+  </div>
+  <fieldset data-automation-id="formField-former"><legend>Have you ever worked for Example Insurance Co?</legend>
+    <label for="f-y">Yes</label><input id="f-y" type="radio" name="former" value="y">
+    <label for="f-n">No</label><input id="f-n" type="radio" name="former" value="n"></fieldset>
+  <div data-automation-id="formField-firstName"><label for="fn">First Name</label><input id="fn" type="text"></div>
+  <div data-automation-id="formField-lastName"><label for="ln">Last Name</label><input id="ln" type="text"></div>
+  <div data-automation-id="formField-addressLine1"><label for="a1">Address Line 1</label><input id="a1" type="text"></div>
+  <div data-automation-id="formField-city"><label for="ct">City</label><input id="ct" type="text"></div>
+  <div data-automation-id="formField-postalCode"><label for="pc">Postal Code</label><input id="pc" type="text"></div>
+  <div data-automation-id="formField-phone"><label for="ph">Phone Number</label><input id="ph" type="tel"></div>
+</form>
+<button data-automation-id="pageFooterNextButton" onclick="location.href='experience.html'">Save and Continue</button>
+<script>function pick(li){document.getElementById('src-btn').textContent=li.textContent;document.getElementById('src-list').hidden=true;}</script>
+</body></html>

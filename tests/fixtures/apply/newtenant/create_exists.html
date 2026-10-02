@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Create Account</title></head>
+<body>
+<h2 data-automation-id="pageHeader">Create Account</h2>
+<label for="em">Email Address</label><input id="em" data-automation-id="email" type="email">
+<label for="pw">Password</label><input id="pw" data-automation-id="password" type="password">
+<button data-automation-id="createAccountSubmitButton" onclick="document.getElementById('err').hidden=false">Create Account</button>
+<a data-automation-id="signInLink" href="signin_ok.html">Sign In</a>
+<div data-automation-id="errorMessage" id="err" hidden>An account already exists with this email address.</div>
+</body></html>

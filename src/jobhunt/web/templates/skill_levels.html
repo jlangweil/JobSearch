@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Skill levels{% endblock %}
+{% block content %}
+<nav class="mb-3 flex gap-1 border-b text-sm" aria-label="Fact bank">
+  <a class="rounded-t px-3 py-1.5 text-slate-600" href="/facts">Facts</a>
+  <a class="rounded-t border border-b-0 bg-white px-3 py-1.5 font-semibold" href="/facts/skills" aria-current="page">Skill levels</a>
+</nav>
+<div class="mb-3">
+  <h1 class="text-xl font-bold">Skill levels <span class="text-sm font-normal text-slate-500">{{ rated }} of {{ total }} rated</span></h1>
+  <p class="mt-1 max-w-3xl text-sm text-slate-600">Rate how well you know each skill, 1-10. Scoring compares your rating with the depth a posting
+    needs: AWS rated 5 on a job that needs expert AWS counts as about half a match, not a full one. Skills you leave blank count
+    the way they always have (full credit when your facts show them). Saving updates existing scores straight away, without calling a model.</p>
+  <p class="mt-1 text-xs text-slate-500">{% for lo, hi, name in bands %}<span class="mr-3"><b>{{ lo }}–{{ hi }}</b> {{ name }}</span>{% endfor %}</p>
+</div>
+
+<form method="post" action="/facts/skills" class="space-y-3">
+  {% set ns = namespace(i=0) %}
+  {% for category, items in groups.items() %}
+  <details class="rounded border bg-white p-3" {% if category != experience %}open{% endif %}>
+    <summary class="font-semibold">{{ category }} <span class="text-xs font-normal text-slate-500">{{ items|length }} skill{{ '' if items|length == 1 else 's' }}{% if category == experience %} · tags on your roles and accomplishments that no skill fact lists{% endif %}</span></summary>
+    <div class="mt-2 grid gap-x-6 gap-y-1 sm:grid-cols-2 xl:grid-cols-3">
+      {% for it in items %}
+      <div class="flex items-center gap-2 text-sm">
+        <input type="hidden" name="skill_{{ ns.i }}" value="{{ it.skill }}">
+        <input type="hidden" name="label_{{ ns.i }}" value="{{ it.label }}">
+        {% if it.custom %}<input type="hidden" name="custom_{{ ns.i }}" value="1">{% endif %}
+        <label for="lvl-{{ ns.i }}" class="flex-1 truncate" title="{{ it.label }}{% if it.uses %} · tagged on {{ it.uses }} role{{ '' if it.uses == 1 else 's' }}/accomplishment{{ '' if it.uses == 1 else 's' }}{% endif %}">{{ it.label }}{% if it.uses %} <span class="text-xs text-slate-500">×{{ it.uses }}</span>{% endif %}</label>
+        <select id="lvl-{{ ns.i }}" name="level_{{ ns.i }}" class="rounded border px-1 py-0.5 {{ 'bg-green-50' if it.level }}">
+          <option value="">–</option>
+          {% for n in range(1, 11) %}<option value="{{ n }}" {% if it.level == n %}selected{% endif %}>{{ n }}</option>{% endfor %}
+        </select>
+        {% if it.custom %}<button type="submit" form="rm-{{ ns.i }}" class="text-xs text-red-700" title="remove {{ it.label }}">✕</button>{% endif %}
+      </div>
+      {% set ns.i = ns.i + 1 %}
+      {% endfor %}
+    </div>
+  </details>
+  {% endfor %}
+
+  <div class="flex flex-wrap items-end gap-2 rounded border bg-white p-3 text-sm">
+    <div><label for="new-label" class="block text-xs text-slate-500">Add a skill your facts don't list</label>
+      <input id="new-label" name="new_label" placeholder="e.g. Kubernetes" class="rounded border px-2 py-1 w-56"></div>
+    <div><label for="new-level" class="block text-xs text-slate-500">Level</label>
+      <select id="new-level" name="new_level" class="rounded border px-1 py-1"><option value="">–</option>{% for n in range(1, 11) %}<option value="{{ n }}">{{ n }}</option>{% endfor %}</select></div>
+  </div>
+
+  <div class="sticky bottom-0 flex items-center gap-3 border-t bg-white py-2">
+    <button class="rounded bg-slate-800 px-4 py-1.5 text-white">Save levels</button>
+    <span class="text-xs text-slate-500">A rated skill counts as something you have, even when your facts don't mention it.</span>
+  </div>
+</form>
+
+{# removal forms live outside the main form (forms can't nest) #}
+{% set ns2 = namespace(i=0) %}
+{% for category, items in groups.items() %}{% for it in items %}
+  {% if it.custom %}<form id="rm-{{ ns2.i }}" method="post" action="/facts/skills/remove" class="hidden"><input type="hidden" name="skill" value="{{ it.skill }}"></form>{% endif %}
+  {% set ns2.i = ns2.i + 1 %}
+{% endfor %}{% endfor %}
+{% endblock %}

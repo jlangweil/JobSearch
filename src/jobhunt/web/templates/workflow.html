@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Workflow · {{ job.title }}{% endblock %}
+{% block content %}
+<div class="mb-3 flex items-start gap-4">
+  <div>
+    <h1 class="text-xl font-bold">Tailoring: {{ job.title }}</h1>
+    <div class="text-slate-600"><a class="text-blue-700" href="/jobs/{{ job.id }}">{{ job.company_name_raw }}</a> · job status <b>{{ job.status }}</b></div>
+  </div>
+  <div class="ml-auto flex gap-2">
+    {% if workday %}<a href="/jobs/{{ job.id }}/auto-apply" class="rounded border border-amber-300 bg-amber-50 px-3 py-1.5 text-amber-900" title="Fill this Workday application in a browser with your tailored documents">Auto-apply <span class="text-[10px] uppercase">beta</span></a>{% endif %}
+    <a href="{{ job.apply_url or job.url }}" target="_blank" rel="noopener" class="rounded bg-blue-700 px-3 py-1.5 text-white">Apply link ↗</a>
+  </div>
+</div>
+{% include "fragments/draft_panel.html" %}
+{% endblock %}

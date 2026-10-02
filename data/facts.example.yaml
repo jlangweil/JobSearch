@@ -1,0 +1,114 @@
+# Fact bank — the ONLY material resumes and cover letters may be built from.
+#
+# >>> PLACEHOLDER CONTENT <<<  Copy this file to data/facts.yaml and replace every entry with your real
+# history, then run:  jobhunt facts lint  &&  jobhunt facts sync
+#
+# Rules the validator enforces:
+#   * Every resume bullet cites exactly one achievement fact.
+#   * Every number, %, $ amount, multiplier (3x) and year in a bullet must appear in that fact's `text`
+#     or `metrics`. Write metrics the way you want them to appear ("$2.5M", "60%", "120").
+#     Numeric metric values count as plain numbers; name the key *_pct / *_usd / *_x to type them.
+#   * Role headings must match a `role` fact's org and dates; education/certifications must match facts.
+#   * Skills listed on the resume must appear in some fact's text or tags.
+#   * `variants` are alternative phrasings of the SAME fact — never add numbers there.
+#
+# kinds: role | achievement | skill | education | cert | summary | project
+#   project: a portfolio project (title = name, org = its link, tags = its technologies). Its accomplishments are
+#   achievements whose parent_id is the project. Tailored resumes get a Projects section with the projects whose tags
+#   the posting mentions (tailoring.projects in config.yaml), written from these facts word for word.
+# dates: YYYY or YYYY-MM, or "present"
+
+contact:                     # rendered at the top of every document (never in a page header)
+  name: "Your Name"
+  email: "you@example.com"
+  phone: "555-555-0100"
+  location: "Springfield, IL"
+  linkedin: "linkedin.com/in/your-profile"
+
+answers:                     # reusable answers suggested at the apply step
+  - question: "Are you legally authorized to work in the United States?"
+    answer: "Yes"
+    kind: work_authorization
+  - question: "Will you now or in the future require visa sponsorship?"
+    answer: "No"
+    kind: sponsorship
+  - question: "What are your salary expectations?"
+    answer: "PLACEHOLDER — e.g. $180,000–$210,000 base, flexible for the right role"
+    kind: compensation
+
+facts:                       # keep `facts:` as the LAST section (the web form appends to it)
+  - id: summary-primary
+    kind: summary
+    text: "PLACEHOLDER: Integration architect with 25 years of experience leading API and iPaaS platforms in insurance and financial services."
+
+  - id: role-example-current
+    kind: role
+    org: "Example Insurance Co"
+    title: "Lead Integration Architect"
+    start_date: 2019-03
+    end_date: present
+    text: "PLACEHOLDER: Own the enterprise integration platform for a mid-size P&C insurer."
+    tags: [integration, architecture, insurance]
+
+  - id: ach-example-gateway
+    kind: achievement
+    parent_id: role-example-current
+    text: "PLACEHOLDER: Migrated 120 partner integrations to a centralized API gateway, cutting partner onboarding time 60%."
+    variants:
+      - "PLACEHOLDER: Consolidated 120 partner integrations onto one API gateway, reducing onboarding time 60%."
+    metrics: {integrations: "120", onboarding_time_reduction: "60%"}
+    tags: [api, api gateway, partner integration, mulesoft]
+
+  - id: ach-example-budget
+    kind: achievement
+    parent_id: role-example-current
+    text: "PLACEHOLDER: Managed a $2.5M annual integration platform budget across 3 delivery teams."
+    metrics: {budget: "$2.5M", teams: "3"}
+    tags: [budget, leadership, vendor management]
+
+  - id: role-example-previous
+    kind: role
+    org: "Example Health Plan"
+    title: "Senior Integration Engineer"
+    start_date: 2012-06
+    end_date: 2019-02
+    text: "PLACEHOLDER: Built integrations between claims, eligibility and provider systems."
+    tags: [integration, healthcare]
+
+  - id: ach-example-mulesoft
+    kind: achievement
+    parent_id: role-example-previous
+    text: "PLACEHOLDER: Introduced MuleSoft as the integration standard, reaching 99.95% uptime for eligibility APIs."
+    metrics: {uptime: "99.95%"}
+    tags: [mulesoft, ipaas, api, reliability]
+
+  - id: skill-integration
+    kind: skill
+    text: "MuleSoft, REST APIs, API gateways, Kafka, event-driven architecture, AWS"
+    tags: [mulesoft, rest, api, kafka, aws, event-driven architecture]
+
+  - id: edu-example
+    kind: education
+    org: "Example University"
+    title: "B.S. Computer Science"
+    end_date: 1999
+    text: "B.S. Computer Science, Example University, 1999."
+
+  - id: cert-example
+    kind: cert
+    org: "MuleSoft"
+    title: "MuleSoft Certified Integration Architect"
+    text: "MuleSoft Certified Integration Architect."
+
+  - id: project-example
+    kind: project
+    title: "Example Integration Toolkit"
+    org: "github.com/your-name/example-toolkit"
+    text: "PLACEHOLDER: Open-source toolkit for testing REST APIs and MuleSoft flows."
+    tags: [Python, REST APIs, MuleSoft, API testing, open source]
+
+  - id: ach-example-toolkit
+    kind: achievement
+    parent_id: project-example
+    text: "PLACEHOLDER: Built a Python toolkit that generates API contract tests from OpenAPI specs and runs them in CI."
+    tags: [python, api testing, openapi, ci/cd]

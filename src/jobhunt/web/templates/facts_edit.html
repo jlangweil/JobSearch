@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}facts.yaml{% endblock %}
+{% block content %}
+<div class="mb-2 flex flex-wrap items-center gap-3">
+  <h1 class="text-xl font-bold">Edit facts.yaml</h1>
+  <span class="font-mono text-xs text-slate-500">{{ path }}</span>
+  <a class="text-sm text-blue-700" href="/facts">← Facts</a>
+</div>
+<p class="mb-2 text-sm text-slate-600">Your contact details, answers and every fact a resume may use. On save the file is validated, the
+previous version is copied to <code>exports\facts-backups</code>, and it is synced (embedded) immediately. Order matters: within a role,
+put your strongest accomplishments first — the scoring prompt uses the first ones.</p>
+{% if problems %}
+<div role="alert" class="mb-2 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-900">
+  <b>Not saved — fix these problems:</b>
+  <ul class="ml-5 list-disc">{% for p in problems %}<li class="whitespace-pre-wrap">{{ p }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+<form method="post" action="/facts/edit">
+  <label for="facts-text" class="sr-only">facts.yaml</label>
+  <textarea id="facts-text" name="text" rows="40" spellcheck="false" class="editor w-full rounded border p-2">{{ text }}</textarea>
+  <div class="mt-2 flex gap-2">
+    <button class="rounded bg-green-700 px-4 py-2 text-white">Validate, save &amp; sync</button>
+    <a class="rounded border bg-white px-4 py-2" href="/facts/edit">Discard changes</a>
+  </div>
+</form>
+{% endblock %}

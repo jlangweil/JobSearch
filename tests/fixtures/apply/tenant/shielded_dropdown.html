@@ -1,0 +1,51 @@
+<!doctype html>
+<!-- Country and Country Phone Code as the real tenant renders them: the button sits under Workday's
+     `click_filter` shield, and its choices are radio buttons in a panel. A plain click is swallowed by the
+     shield, so the menu never opens, no options are found, and the run moves to the next field and back again
+     without ever choosing anything. -->
+<html lang="en">
+<head><meta charset="utf-8"><title>My Information</title>
+<style>
+  .wrap { position: relative; display: inline-block; }
+  .shield { position: absolute; inset: 0; z-index: 5; }   /* eats plain clicks, exactly like click_filter */
+</style></head>
+<body>
+<h2 data-automation-id="pageHeader">My Information</h2>
+
+<div data-automation-id="formField-country">
+  <span id="country-label">Country</span>
+  <span class="wrap">
+    <button id="country-btn" aria-haspopup="listbox" aria-labelledby="country-label"
+            onclick="open_('country')">Select One</button>
+    <span class="shield" data-automation-id="click_filter"></span>
+  </span>
+  <div id="country-panel" hidden>
+    <label><input type="radio" name="country" onchange="chose('country', this)"> United States of America</label>
+    <label><input type="radio" name="country" onchange="chose('country', this)"> Canada</label>
+  </div>
+</div>
+
+<div data-automation-id="formField-countryPhoneCode">
+  <span id="code-label">Country Phone Code</span>
+  <span class="wrap">
+    <button id="code-btn" aria-haspopup="listbox" aria-labelledby="code-label"
+            onclick="open_('code')">Select One</button>
+    <span class="shield" data-automation-id="click_filter"></span>
+  </span>
+  <div id="code-panel" hidden>
+    <label><input type="radio" name="code" onchange="chose('code', this)"> United States of America (+1)</label>
+    <label><input type="radio" name="code" onchange="chose('code', this)"> Canada (+1)</label>
+  </div>
+</div>
+
+<button data-automation-id="pageFooterNextButton">Save and Continue</button>
+
+<script>
+  function open_(which) { document.getElementById(which + '-panel').hidden = false; }
+  function chose(which, radio) {
+    document.getElementById(which + '-btn').textContent = radio.parentElement.textContent.trim();
+    document.getElementById(which + '-panel').hidden = true;
+  }
+</script>
+</body>
+</html>

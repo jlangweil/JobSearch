@@ -1,0 +1,63 @@
+# TEMPLATE for data/apply_profile.yaml (git-ignored). You don't need to copy it: on first use jobhunt creates
+# data/apply_profile.yaml from the contact: block of data/facts.yaml, and Settings -> Auto-apply edits it.
+# Every value below is a PLACEHOLDER.
+#
+# Answers jobhunt types into application forms on your behalf. Nothing here leaves your machine except into
+# the form you are applying on. Passwords are NOT stored here (Settings -> Auto-apply keeps them encrypted).
+#
+# 'questions:' entries win over the built-in matching, so add one whenever a site words something oddly:
+#   - match: "how did you hear"          # substring of the label, or /a regex/
+#     answer: "Company website"
+# Leave an EEO answer as "I do not wish to answer" if you would rather not say.
+
+identity:
+  first_name: Your
+  middle_name: ''
+  last_name: Name
+  preferred_name: ''
+  email: you@example.com
+  phone: 555-555-0100
+  phone_extension: ''
+  phone_type: Mobile
+  country_phone_code: United States of America (+1)
+  address_line_1: 123 Main St
+  address_line_2: ''
+  city: Springfield
+  state: Illinois
+  postal_code: '00000'
+  county: ''
+  country: United States of America
+links:
+  linkedin: https://www.linkedin.com/in/your-profile
+  website: https://github.com/your-name
+  github: ''
+  twitter: ''
+eligibility:
+  authorized_to_work: 'Yes'
+  requires_sponsorship: 'No'
+  at_least_18: 'Yes'
+  former_employee: 'No'
+  related_to_employee: 'No'
+  non_compete: 'No'
+  willing_to_relocate: 'No'
+  willing_to_travel: 'Yes'
+  background_check_consent: 'Yes'
+  drug_test_consent: 'Yes'
+  government_employee: 'No'
+  start_date: Two weeks from offer
+  desired_salary: ''
+  how_did_you_hear: Company website
+  referred_by: ''
+eeo:
+  gender: I do not wish to answer
+  hispanic_or_latino: I do not wish to answer
+  ethnicity: I do not wish to answer
+  veteran_status: I do not wish to answer
+  disability: I do not wish to answer
+  disability_name: ''
+  military_discharge: ''
+signature:
+  full_name: Your Name
+  initials: YN
+  accept_terms: true
+questions: []

@@ -1,0 +1,73 @@
+<!doctype html>
+<!-- Workday's My Experience in its real shape, which broke a run against a live tenant three ways: sections are
+     role="group" wrappers around an <h4> (not data-automation-id="WorkExperienceSection"), the resume input is
+     hidden behind a drop zone, and the LinkedIn field rejects a URL without the www host. -->
+<html lang="en">
+<head><meta charset="utf-8"><title>My Experience</title>
+<style>#cv { display: none; }</style></head>
+<body>
+<h2 data-automation-id="pageHeader">My Experience</h2>
+
+<div role="group" aria-labelledby="Work-Experience-section">
+  <h4 id="Work-Experience-section">Work Experience</h4>
+  <div id="roles"></div>
+  <button data-automation-id="Add" onclick="addRole()">Add</button>
+</div>
+
+<div role="group" aria-labelledby="Education-section">
+  <h4 id="Education-section">Education</h4>
+  <div id="schools"></div>
+  <button onclick="addSchool()">Add</button>
+</div>
+
+<div role="group" aria-labelledby="Resume-section">
+  <h4 id="Resume-section">Resume/CV</h4>
+  <p>Upload a file (5MB max)</p>
+  <div>Drop files here or <a href="#" onclick="pick(); return false;">Select files</a></div>
+  <input id="cv" type="file" data-automation-id="file-upload-input-ref">
+</div>
+
+<div role="group" aria-labelledby="Social-section">
+  <h4 id="Social-section">Social Network URLs</h4>
+  <label for="li">Would you be willing to share your LinkedIn profile with us?</label>
+  <input id="li" type="text" name="linkedin">
+  <div id="li-err" role="alert" hidden>Error: Invalid LinkedIn URL</div>
+</div>
+
+<button data-automation-id="pageFooterNextButton" onclick="saveAndContinue()">Save and Continue</button>
+
+<template id="role-tpl">
+  <div data-automation-id="panel">
+    <label>Job Title<input name="title" type="text"></label>
+    <label>Company<input name="company" type="text"></label>
+    <label>Location<input name="location" type="text"></label>
+    <label>From<input name="from" type="text"></label>
+    <label>To<input name="to" type="text"></label>
+    <label>I currently work here<input name="current" type="checkbox"></label>
+    <label>Role Description<textarea name="desc"></textarea></label>
+  </div>
+</template>
+<template id="school-tpl">
+  <div data-automation-id="panel">
+    <label>School or University<input name="school" type="text"></label>
+    <label>Degree<input name="degree" type="text"></label>
+  </div>
+</template>
+
+<script>
+  function pick() { document.getElementById('cv').click(); }
+  function addRole() {
+    document.getElementById('roles').appendChild(document.getElementById('role-tpl').content.cloneNode(true));
+  }
+  function addSchool() {
+    document.getElementById('schools').appendChild(document.getElementById('school-tpl').content.cloneNode(true));
+  }
+  function saveAndContinue() {
+    var v = document.getElementById('li').value;
+    var ok = v === '' || v.indexOf('https://www.linkedin.com/') === 0;
+    if (!ok) { document.getElementById('li-err').hidden = false; return; }
+    location.href = 'questions.html';
+  }
+</script>
+</body>
+</html>

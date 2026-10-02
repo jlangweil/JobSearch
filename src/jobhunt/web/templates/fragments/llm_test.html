@@ -1,0 +1,10 @@
+<div id="llm-test" {% if test.status == 'running' %}hx-get="/settings/llm/test" hx-trigger="every 2s" hx-swap="outerHTML"{% endif %} class="text-sm">
+  {% if test.status == 'running' %}
+    <p class="text-blue-700">Testing {{ test.model }} at {{ test.base_url }}… (the first request loads the model, which can take 10–30 s)</p>
+  {% elif test.status == 'done' %}
+    <div class="rounded border {{ 'border-green-300 bg-green-50' if test.ok else 'border-red-300 bg-red-50' }} p-2">
+      <b>{{ 'Working' if test.ok else 'Not working' }}:</b> {{ test.message }}
+      {% if test.models %}<div class="mt-1 text-xs text-slate-600">Installed: {{ test.models | join(', ') }}</div>{% endif %}
+    </div>
+  {% endif %}
+</div>

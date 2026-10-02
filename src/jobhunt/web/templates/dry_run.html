@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Dry run #{{ dry.id }}{% endblock %}
+{% block content %}
+<h1 class="mb-1 text-xl font-bold">Dry run #{{ dry.id }}</h1>
+<p class="mb-3 text-sm text-slate-600">Fetch and filter only — nothing is saved and no LLM is called. Use it to check which companies return jobs and whether your filters keep the right ones.</p>
+{% include "fragments/dry_progress.html" %}
+{% endblock %}

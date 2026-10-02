@@ -1,0 +1,62 @@
+{% set next_url = current_url if current_url is defined else '/jobs/' ~ j.id %}
+{% if j.status == 'scored' %}
+<div class="flex flex-col gap-1">
+  <details>
+    <summary class="rounded bg-green-700 px-2 py-0.5 text-white">Shortlist</summary>
+    <form method="post" action="/jobs/{{ j.id }}/shortlist" hx-post="/jobs/{{ j.id }}/shortlist" hx-target="closest tr" hx-swap="outerHTML" class="mt-1 flex flex-col gap-1 w-64">
+      <input type="hidden" name="next" value="{{ next_url }}">
+      <label class="text-xs">Why <input name="reason" class="w-full rounded border px-1"></label>
+      <label class="text-xs">Emphasis for drafting <input name="emphasis" class="w-full rounded border px-1"></label>
+      <label class="text-xs">Company notes (for the cover letter) <textarea name="company_notes" rows="2" class="w-full rounded border px-1"></textarea></label>
+      <button class="rounded bg-green-700 px-2 py-0.5 text-white">Shortlist &amp; start tailoring</button>
+    </form>
+  </details>
+  <details>
+    <summary class="rounded border px-2 py-0.5">Reject</summary>
+    <form method="post" action="/jobs/{{ j.id }}/reject" hx-post="/jobs/{{ j.id }}/reject" hx-target="closest tr" hx-swap="outerHTML" class="mt-1 flex gap-1">
+      <input type="hidden" name="next" value="{{ next_url }}">
+      <label class="sr-only" for="reason-{{ j.id }}">Reason</label>
+      <input id="reason-{{ j.id }}" name="reason" required placeholder="reason (required)" class="rounded border px-1 w-40">
+      <button class="rounded bg-red-700 px-2 text-white">Reject</button>
+    </form>
+  </details>
+  <details>
+    <summary class="rounded border px-2 py-0.5">Snooze</summary>
+    <form method="post" action="/jobs/{{ j.id }}/snooze" hx-post="/jobs/{{ j.id }}/snooze" hx-target="closest tr" hx-swap="outerHTML" class="mt-1 flex gap-1">
+      <input type="hidden" name="next" value="{{ next_url }}">
+      <label class="sr-only" for="until-{{ j.id }}">Until</label>
+      <input id="until-{{ j.id }}" type="date" name="until" required class="rounded border px-1">
+      <button class="rounded bg-slate-700 px-2 text-white">Snooze</button>
+    </form>
+  </details>
+  <a href="{{ j.apply_url or j.url }}" target="_blank" rel="noopener" class="text-xs text-blue-700 hover:underline">Posting ↗</a>
+</div>
+{% elif j.status == 'discovered' %}
+<div class="flex flex-col gap-1">
+  {% if (j.description_text or '')|length < 400 %}
+  <a href="/jobs/new?replace={{ j.id }}" class="rounded bg-slate-800 px-2 py-0.5 text-center text-white" title="This came from an alert email or listing page: paste the posting to score or tailor it">Paste the posting</a>
+  {% else %}
+  <form method="post" action="/jobs/{{ j.id }}/score" hx-post="/jobs/{{ j.id }}/score" hx-target="closest tr" hx-swap="outerHTML">
+    <input type="hidden" name="next" value="{{ next_url }}">
+    <button class="rounded bg-slate-800 px-2 py-0.5 text-white">Score now</button>
+  </form>
+  {% endif %}
+  <details {% if not j.description_text %}hidden{% endif %}>
+    <summary class="rounded border px-2 py-0.5">Tailor without scoring</summary>
+    <form method="post" action="/jobs/{{ j.id }}/shortlist" class="mt-1 flex w-64 flex-col gap-1">
+      <input type="hidden" name="next" value="{{ next_url }}">
+      <input type="hidden" name="reason" value="picked without scoring">
+      <label class="text-xs">Emphasis for drafting <input name="emphasis" class="w-full rounded border px-1"></label>
+      <label class="text-xs">Company notes (for the cover letter) <textarea name="company_notes" rows="2" class="w-full rounded border px-1"></textarea></label>
+      <button class="rounded bg-green-700 px-2 py-0.5 text-white">Start tailoring</button>
+    </form>
+  </details>
+</div>
+  <a href="{{ j.apply_url or j.url }}" target="_blank" rel="noopener" class="text-xs text-blue-700 hover:underline">Posting ↗</a>
+{% elif j.status in ['shortlisted', 'in_workflow', 'ready'] %}
+  <a href="/jobs/{{ j.id }}/workflow" class="rounded bg-blue-700 px-2 py-0.5 text-white">Workflow →</a>
+{% elif j.status in ['applied', 'responded'] %}
+  <a href="/applications" class="rounded border px-2 py-0.5">Applied ✓</a>
+{% else %}
+  <a href="{{ j.apply_url or j.url }}" target="_blank" rel="noopener" class="text-xs text-blue-700 hover:underline">Posting ↗</a>
+{% endif %}

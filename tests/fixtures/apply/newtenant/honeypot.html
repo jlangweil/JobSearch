@@ -1,0 +1,35 @@
+<!doctype html>
+<!-- A create form with the two shapes of bot trap, plus a styled consent checkbox that must NOT be mistaken for
+     one: its real input is at opacity 0 behind a drawn box, exactly as Workday renders its own. -->
+<html lang="en"><head><meta charset="utf-8"><title>Create Account</title>
+<style>
+  .sr { opacity: 0; position: absolute; }
+  #offscreen { position: absolute; left: -2000px; }
+</style></head>
+<body>
+<h2 data-automation-id="pageHeader">Create Account</h2>
+<form onsubmit="submitted(); return false;">
+  <label for="em">Email Address</label><input id="em" data-automation-id="email" type="text">
+  <label for="pw">Password</label><input id="pw" data-automation-id="password" type="password">
+
+  <!-- trap 1: says so in the label, and is perfectly visible -->
+  <label for="hp1">Enter website. This input is for robots only, do not fill it out.</label>
+  <input id="hp1" name="website" type="text">
+
+  <!-- trap 2: no label anyone can read, parked off screen -->
+  <input id="offscreen" name="url_trap" type="text" aria-label="Personal website">
+
+  <!-- a real control that happens to be hidden by CSS, with a label a person can read -->
+  <label for="consent"><input id="consent" class="sr" data-automation-id="createAccountCheckbox" type="checkbox">
+    I consent to the above</label>
+
+  <button data-automation-id="createAccountSubmitButton" type="submit">Create Account</button>
+</form>
+<script>
+  function submitted() {
+    // the form refuses, silently, if a trap was filled — which is what the real one does
+    if (document.getElementById('hp1').value || document.getElementById('offscreen').value) { return; }
+    location.href = 'verify.html';
+  }
+</script>
+</body></html>

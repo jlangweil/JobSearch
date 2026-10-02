@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+{% block title %}Settings{% endblock %}
+{% block content %}
+<nav class="subnav" aria-label="Settings sections">
+  <a href="#llm">Language models</a><a href="#tailoring">Resume tailoring</a><a href="#focus">Scoring focus</a><a href="#adzuna">Adzuna</a><a href="#email">Job alert emails</a><a href="#weights">Scoring weights</a>
+  <a href="#spend">LLM spend</a><a href="#auto-apply">Auto-apply</a><a href="#network">Network access</a><a href="#maintenance">Database &amp; maintenance</a><a href="#config">Configuration</a>
+  <a href="/schedules">Schedules →</a>
+</nav>
+<div class="grid gap-4 lg:grid-cols-3">
+  <section id="llm" class="lg:col-span-3 rounded border bg-white p-3">
+    <h2 class="mb-1 font-semibold">Language models</h2>
+    <p class="mb-2 text-xs text-slate-500">Choose Claude or a model running on this PC for each task. Changes apply to the next scoring call; runs already in progress keep going. Every score records which model produced it, so you can compare on a job's page.</p>
+    <form method="post" action="/settings/llm" class="grid gap-4 lg:grid-cols-3">
+      <fieldset class="space-y-1">
+        <legend class="text-xs font-semibold uppercase text-slate-500">Scoring (every job)</legend>
+        <label class="flex items-start gap-2"><input type="radio" name="scoring_provider" value="anthropic" {% if cfg.scoring.provider == 'anthropic' %}checked{% endif %}>
+          <span>Claude <span class="font-mono text-xs">{{ cfg.scoring.model }}</span><br><span class="text-xs text-slate-500">≈ $0.01 per job{% if not api_key_set %} · <span class="text-red-700">API key not set</span>{% endif %}</span></span></label>
+        <label class="flex items-start gap-2"><input type="radio" name="scoring_provider" value="local" {% if cfg.scoring.provider == 'local' %}checked{% endif %}>
+          <span>Local model <span class="font-mono text-xs">{{ cfg.local_llm.model }}</span><br><span class="text-xs text-slate-500">free; runs on your GPU</span></span></label>
+      </fieldset>
+      <fieldset class="space-y-1">
+        <legend class="text-xs font-semibold uppercase text-slate-500">Tailoring (resume &amp; cover letter)</legend>
+        <label class="flex items-start gap-2"><input type="radio" name="tailoring_provider" value="anthropic" {% if cfg.tailoring.provider == 'anthropic' %}checked{% endif %}>
+          <span>Claude <span class="font-mono text-xs">{{ cfg.tailoring.model }}</span> <span class="rounded bg-green-100 px-1 text-[10px] text-green-800">recommended</span><br><span class="text-xs text-slate-500">≈ $0.10–0.25 per application</span></span></label>
+        <label class="flex items-start gap-2"><input type="radio" name="tailoring_provider" value="local" {% if cfg.tailoring.provider == 'local' %}checked{% endif %}>
+          <span>Local model <span class="rounded bg-amber-100 px-1 text-[10px] text-amber-800">experimental</span><br><span class="text-xs text-slate-500">8B models often fail the fact and ATS checks, so expect more re-drafts</span></span></label>
+      </fieldset>
+      <fieldset class="grid grid-cols-2 gap-2 text-xs">
+        <legend class="col-span-2 text-xs font-semibold uppercase text-slate-500">Local model server</legend>
+        <label>API <select name="local_api" class="block w-full rounded border px-1 py-1">
+          <option value="ollama" {% if cfg.local_llm.api == 'ollama' %}selected{% endif %}>Ollama</option>
+          <option value="openai" {% if cfg.local_llm.api == 'openai' %}selected{% endif %}>OpenAI-compatible (LM Studio, llama.cpp)</option></select></label>
+        <label>Server URL <input name="local_base_url" value="{{ cfg.local_llm.base_url }}" class="block w-full rounded border px-1 py-1"></label>
+        <label>Model <input name="local_model" value="{{ cfg.local_llm.model }}" list="local-models" class="block w-full rounded border px-1 py-1"></label>
+        <datalist id="local-models">{% for m in ['qwen3:8b', 'qwen3:8b-q8_0', 'qwen3:8b-fp16'] + (test.models or []) %}<option value="{{ m }}">{% endfor %}</datalist>
+        <label>Context tokens <input type="number" name="local_num_ctx" min="4096" step="1024" value="{{ cfg.local_llm.num_ctx }}" class="block w-full rounded border px-1 py-1"></label>
+        <label>Parallel requests <input type="number" name="local_concurrency" min="1" max="8" value="{{ cfg.local_llm.concurrency }}" class="block w-full rounded border px-1 py-1"></label>
+        <label>Keep loaded <input name="local_keep_alive" value="{{ cfg.local_llm.keep_alive }}" class="block w-full rounded border px-1 py-1"></label>
+        <label>Timeout (s) <input type="number" name="local_timeout_s" min="10" value="{{ cfg.local_llm.timeout_s|int }}" class="block w-full rounded border px-1 py-1"></label>
+      </fieldset>
+      <div class="lg:col-span-3 flex flex-wrap items-center gap-3">
+        <button class="rounded bg-slate-800 px-3 py-1.5 text-white">Save</button>
+        <span class="text-xs text-slate-500">Saved to config.yaml (validated, previous version backed up).</span>
+      </div>
+    </form>
+    <div class="mt-3 flex flex-wrap items-start gap-3 border-t pt-3">
+      <form method="post" action="/settings/llm/test"><button class="rounded border px-3 py-1.5">Test local model</button></form>
+      <div class="flex-1">{% include "fragments/llm_test.html" %}</div>
+    </div>
+  </section>
+
+  <section id="tailoring" class="lg:col-span-3 rounded border bg-white p-3">
+    <h2 class="mb-1 font-semibold">Resume tailoring</h2>
+    <p class="mb-2 text-xs text-slate-500">How each tailored resume uses your fact bank. Either way, nothing is invented: every bullet comes from one of your facts and every
+      number must match it. The posting's keywords that your facts support lead the Skills section, and bullets are reworded in the posting's terms.</p>
+    <form method="post" action="/settings/tailoring" class="grid gap-4 lg:grid-cols-3">
+      <fieldset class="space-y-2 lg:col-span-2">
+        <label class="flex items-start gap-2 rounded border p-2 {{ 'border-slate-800' if cfg.tailoring.resume_mode == 'complete' }}"><input type="radio" name="resume_mode" value="complete" class="mt-1" {% if cfg.tailoring.resume_mode == 'complete' %}checked{% endif %}>
+          <span><b>Complete</b> <span class="rounded bg-green-100 px-1 text-[10px] text-green-800">recommended</span><br><span class="text-xs text-slate-500">Every role and accomplishment from your fact bank, like your base resume. The most relevant bullets go first in each role and are reworded with the posting's keywords; the rest stay, stated concisely. The validator rejects a draft that leaves an accomplishment out.</span></span></label>
+        <label class="flex items-start gap-2 rounded border p-2 {{ 'border-slate-800' if cfg.tailoring.resume_mode == 'focused' }}"><input type="radio" name="resume_mode" value="focused" class="mt-1" {% if cfg.tailoring.resume_mode == 'focused' %}checked{% endif %}>
+          <span><b>Focused</b><br><span class="text-xs text-slate-500">Only the accomplishments that best match the posting's requirements: a shorter resume.</span></span></label>
+      </fieldset>
+      <fieldset class="grid grid-cols-2 gap-2 text-sm">
+        <label>Max bullets per role <input name="max_bullets_per_role" value="{{ cfg.tailoring.max_bullets_per_role }}" class="block w-full rounded border px-2 py-1"><span class="text-[11px] text-slate-500">0 = no limit</span></label>
+        <label>Max bullet length <input name="max_bullet_chars" value="{{ cfg.tailoring.max_bullet_chars }}" class="block w-full rounded border px-2 py-1"><span class="text-[11px] text-slate-500">characters</span></label>
+        <label>Matches per requirement <input name="facts_per_requirement" value="{{ cfg.tailoring.facts_per_requirement }}" class="block w-full rounded border px-2 py-1"><span class="text-[11px] text-slate-500">focused mode</span></label>
+        <label>Draft attempts <input name="max_draft_attempts" value="{{ cfg.tailoring.max_draft_attempts }}" class="block w-full rounded border px-2 py-1"><span class="text-[11px] text-slate-500">before asking you</span></label>
+        <label class="col-span-2">Default way to tailor <select name="generation_mode" class="block w-full rounded border px-2 py-1">
+          <option value="automated" {% if cfg.tailoring.generation_mode != 'ats_super_match' %}selected{% endif %}>Fully automated: draft straight away</option>
+          <option value="ats_super_match" {% if cfg.tailoring.generation_mode == 'ats_super_match' %}selected{% endif %}>ATS Super Match: tick keywords and headline first; up to three pages to ATS rules</option>
+        </select><span class="text-[11px] text-slate-500">each job page lets you pick either</span></label>
+        <label class="col-span-2">Role headings in the .docx <select name="role_layout" class="block w-full rounded border px-2 py-1">
+          <option value="separate_lines" {% if cfg.tailoring.role_layout == 'separate_lines' %}selected{% endif %}>employer, job title and dates on separate lines (parsers read these)</option>
+          <option value="one_line" {% if cfg.tailoring.role_layout == 'one_line' %}selected{% endif %}>one line: Title | Employer | dates (compact)</option>
+        </select></label>
+        <label class="col-span-2">Claude reasoning effort <select name="effort" class="block w-full rounded border px-2 py-1">
+          {% for v, label in [('low', 'low: fastest, cheapest'), ('medium', 'medium (recommended)'), ('high', 'high: slower; may hit the output limit on long resumes')] %}<option value="{{ v }}" {% if (cfg.tailoring.effort or 'medium') == v %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select></label>
+      </fieldset>
+      <div class="lg:col-span-3 flex flex-wrap items-center gap-3">
+        <button class="rounded bg-slate-800 px-3 py-1.5 text-white">Save</button>
+        <span class="text-xs text-slate-500">To apply this to a resume you already have: <a class="text-blue-700" href="/documents">Resumes &amp; letters</a> → open the workflow → <b>Regenerate</b>.</span>
+      </div>
+    </form>
+  </section>
+
+  <section id="focus" class="lg:col-span-3 rounded border bg-white p-3">
+    <h2 class="mb-1 font-semibold">Scoring focus</h2>
+    <p class="mb-2 text-xs text-slate-500">Tell the scorer what you want and what you don't. Applied in code to every score (the <b>focus fit</b> sub-score) and shown to the model.
+      Saving recomputes all stored totals instantly with no model calls; rescore jobs to also update the model's own sub-scores.</p>
+    <form method="post" action="/settings/focus" hx-post="/settings/focus/preview" hx-trigger="keyup changed delay:600ms, change" hx-target="#focus-preview" class="grid gap-4 lg:grid-cols-3">
+      <label class="text-sm"><b>Boost</b> <span class="text-xs text-slate-500">one per line or comma-separated. Title match +40, each further phrase in the description +10</span>
+        <textarea name="boost" rows="9" class="editor mt-1 block w-full rounded border px-2 py-1">{{ cfg.focus.boost | join('
+') }}</textarea></label>
+      <label class="text-sm"><b>Avoid</b> <span class="text-xs text-slate-500">matched against the job title only</span>
+        <textarea name="avoid" rows="9" class="editor mt-1 block w-full rounded border px-2 py-1">{{ cfg.focus.avoid | join('
+') }}</textarea>
+        <span class="mt-2 flex items-center gap-2">Cap the total of avoided jobs at <input type="number" name="avoid_cap" min="0" max="100" value="{{ cfg.focus.avoid_cap }}" class="w-20 rounded border px-2 py-1"></span>
+        <span class="mt-2 block">Older roles in the scoring prompt
+          <select name="earlier_roles" class="block w-full rounded border px-2 py-1">
+            <option value="full" {% if cfg.scoring.earlier_roles == 'full' %}selected{% endif %}>with their accomplishments (their skills count, e.g. .NET at earlier employers)</option>
+            <option value="titles" {% if cfg.scoring.earlier_roles == 'titles' %}selected{% endif %}>titles only (shorter prompt)</option>
+          </select><span class="text-[11px] text-slate-500">Applies to new scores; rescore to update existing ones.</span></span></label>
+      <div>
+        <div class="mb-1 text-xs font-semibold uppercase text-slate-500">Preview on your scored jobs (unsaved)</div>
+        <div id="focus-preview" class="max-h-72 overflow-y-auto text-sm text-slate-500">Edit a list to see which jobs move.</div>
+      </div>
+      <div class="lg:col-span-3 flex flex-wrap items-center gap-3">
+        <button class="rounded bg-slate-800 px-3 py-1.5 text-white">Save focus &amp; recompute totals</button>
+        <span class="text-xs text-slate-500">Focus weight is <b>{{ weights.get('focus_fit', 0) }}</b> (change it under Scoring weights).</span>
+      </div>
+    </form>
+  </section>
+
+  <section id="adzuna" class="lg:col-span-3 rounded border bg-white p-3">
+    <div class="mb-1 flex flex-wrap items-center gap-2">
+      <h2 class="font-semibold">Adzuna job search</h2>
+      <span class="rounded px-2 py-0.5 text-xs {{ 'bg-green-100 text-green-800' if adzuna.enabled else 'bg-slate-100 text-slate-600' }}">{{ 'on' if adzuna.enabled else 'off' }}</span>
+      <span class="rounded px-2 py-0.5 text-xs {{ 'bg-green-100 text-green-800' if adzuna.keys_set else 'bg-amber-100 text-amber-800' }}">{{ 'keys saved' if adzuna.keys_set else 'no keys yet' }}</span>
+    </div>
+    <p class="mb-2 text-xs text-slate-500">Adzuna collects postings from many job boards and employers, so it finds jobs at companies that aren't in your company list.
+      Free keys: <a class="text-blue-700" href="https://developer.adzuna.com/signup" target="_blank" rel="noopener">developer.adzuna.com</a> → sign up → the dashboard shows your App ID and App key.
+      Results are short snippets: before tailoring one, open the job and use <b>Paste the full posting</b>. Runs limited to chosen companies skip Adzuna.</p>
+    <form method="post" action="/settings/adzuna" class="grid gap-4 lg:grid-cols-3">
+      <fieldset class="space-y-2 text-sm">
+        <legend class="text-xs font-semibold uppercase text-slate-500">Account</legend>
+        <label class="block">App ID <input name="app_id" value="{{ adzuna.app_id }}" autocomplete="off" class="block w-full rounded border px-2 py-1 font-mono"></label>
+        <label class="block">App key <input name="app_key" type="password" autocomplete="new-password" placeholder="{{ adzuna.key_hint or 'paste your key' }}" class="block w-full rounded border px-2 py-1 font-mono">
+          <span class="text-[11px] text-slate-500">Saved to .env on this PC. Leave blank to keep the saved key.</span></label>
+        <label class="flex items-center gap-2"><span class="switch"><input type="checkbox" name="enabled" {% if adzuna.enabled %}checked{% endif %}><span></span></span> <b>Include Adzuna in runs</b></label>
+      </fieldset>
+      <fieldset class="space-y-2 text-sm">
+        <legend class="text-xs font-semibold uppercase text-slate-500">What to search</legend>
+        <label class="block">Search terms <span class="text-[11px] text-slate-500">(one per line; each is a separate search)</span>
+          <textarea name="queries" rows="5" class="editor block w-full rounded border px-2 py-1">{{ adzuna.queries | join('\n') }}</textarea></label>
+        <label class="flex items-center gap-2"><input type="checkbox" name="title_only" {% if adzuna.title_only %}checked{% endif %}> Terms must be in the job title</label>
+        <label class="block">Leave out jobs mentioning <input name="exclude_words" value="{{ adzuna.exclude_words | join(' ') }}" placeholder="e.g. clearance intern" class="block w-full rounded border px-2 py-1"></label>
+      </fieldset>
+      <fieldset class="grid grid-cols-2 gap-2 text-sm">
+        <legend class="col-span-2 text-xs font-semibold uppercase text-slate-500">Where and which</legend>
+        <label class="col-span-2">Near <input name="location" value="{{ adzuna.location }}" placeholder="e.g. Springfield, IL (blank = anywhere in the US)" class="block w-full rounded border px-2 py-1"></label>
+        <label>Within (miles) <input name="distance_miles" value="{{ adzuna.distance_miles }}" class="block w-full rounded border px-2 py-1"></label>
+        <label>Posted in the last (days) <input name="max_days_old" value="{{ adzuna.max_days_old }}" class="block w-full rounded border px-2 py-1"></label>
+        <label>Category <select name="category" class="block w-full rounded border px-2 py-1">{% for k, label in adzuna.categories.items() %}<option value="{{ k }}" {% if adzuna.category == k %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+        <label>Minimum salary ($) <input name="salary_min" value="{{ adzuna.salary_min or '' }}" class="block w-full rounded border px-2 py-1"></label>
+        <label>Pages per term <input name="pages" value="{{ adzuna.pages }}" class="block w-full rounded border px-2 py-1"><span class="text-[11px] text-slate-500">50 results each</span></label>
+        <p class="col-span-2 text-[11px] text-slate-500">Remote jobs elsewhere still come through when "Near" is set only if Adzuna lists them in that area; leave Near blank to search nationally (the location filter still drops out-of-area hybrid and on-site roles).</p>
+      </fieldset>
+      <div class="lg:col-span-3 flex flex-wrap items-center gap-3">
+        <button class="rounded bg-slate-800 px-3 py-1.5 text-white">Save Adzuna settings</button>
+        <button formaction="/settings/adzuna/test" class="rounded border px-3 py-1.5" {% if not adzuna.keys_set %}disabled title="save your keys first"{% endif %}>Test with saved settings</button>
+        <a class="text-sm text-blue-700" href="/runs?mode=fetch">Fetch now →</a>
+      </div>
+    </form>
+    {% if test.adzuna and test.adzuna.samples %}
+    <ul class="mt-2 list-disc pl-5 text-xs text-slate-600">{% for s in test.adzuna.samples %}<li>{{ s }}</li>{% endfor %}</ul>
+    {% endif %}
+  </section>
+
+  <section id="email" class="lg:col-span-3 rounded border bg-white p-3">
+    <div class="mb-1 flex flex-wrap items-center gap-2">
+      <h2 class="font-semibold">Job alert emails (LinkedIn, Indeed and others)</h2>
+      <span class="rounded px-2 py-0.5 text-xs {{ 'bg-green-100 text-green-800' if email.enabled else 'bg-slate-100 text-slate-600' }}">{{ 'on' if email.enabled else 'off' }}</span>
+      <span class="rounded px-2 py-0.5 text-xs {{ 'bg-green-100 text-green-800' if email.account_set else 'bg-amber-100 text-amber-800' }}">{{ 'mailbox saved' if email.account_set else 'not set up' }}</span>
+    </div>
+    <p class="mb-2 text-xs text-slate-500">LinkedIn and Indeed have no API for searching jobs, and their terms forbid crawling them — but the alert emails they send
+      <b>you</b> are yours. Set up job alerts on those sites, and jobhunt reads that mailbox <b>read-only</b>: it never deletes, moves, replies or marks anything as read,
+      and only opens messages from the senders (or in the folder) below. Alerts carry a title, company, location and link but no description, so imported jobs wait in
+      <a class="text-blue-700" href="/queue?status=discovered&sort=seen">Waiting to score</a> with a <b>Paste the posting</b> action; their links often lead to the employer's own
+      careers page, which <a class="text-blue-700" href="/jobs/new">Add a job</a> can read in full.</p>
+    <p class="mb-2 text-xs text-slate-500"><b>Gmail:</b> turn on 2-step verification, create an app password (myaccount.google.com → Security → App passwords) and paste it below;
+      a label such as <code>JobAlerts</code> with a filter keeps jobhunt away from the rest of your mail. An app password grants access to the whole account, so a dedicated
+      address (with alerts forwarded to it) is the tightest option.</p>
+    <form method="post" action="/settings/email" class="grid gap-4 lg:grid-cols-3">
+      <fieldset class="space-y-2 text-sm">
+        <legend class="text-xs font-semibold uppercase text-slate-500">Mailbox</legend>
+        <label class="block">Mail server (IMAP) <input name="host" value="{{ email.host }}" placeholder="imap.gmail.com" class="block w-full rounded border px-2 py-1"></label>
+        <div class="flex gap-2"><label class="flex-1">Email address <input name="user" value="{{ email.user }}" autocomplete="off" class="block w-full rounded border px-2 py-1"></label>
+          <label class="w-24">Port <input name="port" value="{{ email.port }}" class="block w-full rounded border px-2 py-1"></label></div>
+        <label class="block">App password <input name="password" type="password" autocomplete="new-password" placeholder="{{ email.password_hint or 'paste your app password' }}" class="block w-full rounded border px-2 py-1">
+          <span class="text-[11px] text-slate-500">Saved to .env on this PC. Leave blank to keep the saved one.</span></label>
+        <label class="flex items-center gap-2"><span class="switch"><input type="checkbox" name="enabled" {% if email.enabled %}checked{% endif %}><span></span></span> <b>Include alert emails in runs</b></label>
+      </fieldset>
+      <fieldset class="space-y-2 text-sm">
+        <legend class="text-xs font-semibold uppercase text-slate-500">What to read</legend>
+        <label class="block">Folder or label <input name="folder" value="{{ email.folder }}" class="block w-full rounded border px-2 py-1">
+          <span class="text-[11px] text-slate-500">INBOX reads your inbox (filtered by sender). A Gmail label or folder limits it to those messages.</span></label>
+        <label class="block">From these senders <textarea name="senders" rows="5" class="editor block w-full rounded border px-2 py-1">{{ email.senders | join('\n') }}</textarea>
+          <span class="text-[11px] text-slate-500">{{ 'Built-in list (LinkedIn, Indeed, Glassdoor, ZipRecruiter) — edit to change it.' if email.using_defaults else 'Your list.' }}</span></label>
+        <label class="block">Also match subjects containing <input name="subject_patterns" value="{{ email.subject_patterns | join(', ') }}" placeholder="job alert, new jobs" class="block w-full rounded border px-2 py-1"></label>
+      </fieldset>
+      <fieldset class="grid grid-cols-2 gap-2 text-sm">
+        <legend class="col-span-2 text-xs font-semibold uppercase text-slate-500">Limits</legend>
+        <label>Look back (days) <input name="max_age_days" value="{{ email.max_age_days }}" class="block w-full rounded border px-2 py-1"></label>
+        <label>Max messages per run <input name="max_messages" value="{{ email.max_messages }}" class="block w-full rounded border px-2 py-1"></label>
+        <p class="col-span-2 text-[11px] text-slate-500">Each run reads recent messages, files any postings it hasn't seen before, and marks ones it has seen again. Alert jobs
+          are filtered by your title rules like everything else, and are never scored on a title alone.</p>
+      </fieldset>
+      <div class="lg:col-span-3 flex flex-wrap items-center gap-3">
+        <button class="rounded bg-slate-800 px-3 py-1.5 text-white">Save mailbox settings</button>
+        <button formaction="/settings/email/test" class="rounded border px-3 py-1.5">Test (read-only)</button>
+        <a class="text-sm text-blue-700" href="/runs?mode=fetch">Fetch now →</a>
+      </div>
+    </form>
+    {% if test.email and test.email.samples %}
+    <div class="mt-2"><div class="text-xs font-semibold uppercase text-slate-500">Found in your mailbox</div>
+      <ul class="list-disc pl-5 text-xs text-slate-600">{% for s in test.email.samples %}<li>{{ s }}</li>{% endfor %}</ul></div>
+    {% endif %}
+  </section>
+
+  <section id="weights" class="rounded border bg-white p-3">
+    <h2 class="mb-2 font-semibold">Scoring weights</h2>
+    <p class="mb-2 text-xs text-slate-500">Saved to config.yaml. Totals are recomputed from stored subscores — no re-scoring, no LLM spend.</p>
+    <form method="post" action="/settings/weights" class="space-y-1">
+      {% for k in subscores %}
+      <label class="flex items-center justify-between gap-2">{{ k.replace('_', ' ') }}
+        <input type="number" step="0.01" min="0" name="{{ k }}" value="{{ weights.get(k, 0) }}" class="w-24 rounded border px-2 py-1"></label>
+      {% if k == 'focus_fit' %}<p class="-mt-1 text-[10px] text-slate-500">focus fit comes from Scoring focus, not the model</p>{% endif %}
+      {% endfor %}
+      <p class="text-xs text-slate-500">ghost penalty {{ cfg.scoring.ghost_penalty }} · shortlist threshold {{ cfg.scoring.shortlist_threshold }}</p>
+      <button class="rounded bg-slate-800 px-3 py-1.5 text-white">Save weights</button>
+    </form>
+  </section>
+
+  <section id="spend" class="rounded border bg-white p-3">
+    <h2 class="mb-2 font-semibold">LLM spend (last 30 days)</h2>
+    <p class="mb-2">Total to date: <b>${{ '%.4f' % total_spend }}</b> {% if not api_key_set %}<span class="text-red-700">· ANTHROPIC_API_KEY not set</span>{% endif %} <span class="text-xs text-slate-500">(local model calls are logged at $0)</span></p>
+    <table class="w-full text-xs">
+      <thead><tr class="text-left text-slate-500"><th>Day</th><th>Purpose</th><th>Calls</th><th>In</th><th>Out</th><th>$</th></tr></thead>
+      {% for r in spend %}<tr class="border-t"><td>{{ r.day }}</td><td>{{ r.purpose }}</td><td>{{ r.calls }}</td><td>{{ r.input_tokens }}</td><td>{{ r.output_tokens }}</td><td>{{ r.cost_usd }}</td></tr>
+      {% else %}<tr><td colspan="6" class="text-slate-500">No calls yet.</td></tr>{% endfor %}
+    </table>
+    {% if spend_by_day %}<p class="mt-2 text-xs">By day: {% for d, c in spend_by_day.items() %}{{ d }} ${{ c }}{% if not loop.last %} · {% endif %}{% endfor %}</p>{% endif %}
+  </section>
+
+  <section id="auto-apply" class="lg:col-span-3 rounded border bg-white p-3">
+    <h2 class="mb-1 font-semibold">Auto-apply <span class="rounded bg-amber-100 px-1 text-[10px] uppercase text-amber-800">beta</span></h2>
+    <p class="mb-2 text-xs text-slate-500">Fills Workday applications in a real browser from your <a class="underline" href="/apply#profile">apply profile</a> and the tailored resume.
+      Sign-ins and the answers it types live on the <a class="underline" href="/apply">auto-apply page</a>.
+      {% if auto_apply.browser_ready %}<span class="text-red-700">Browser not installed — run <code>{{ auto_apply.browser_ready }}</code>.</span>{% endif %}
+      {% if not auto_apply.can_store %}<span class="text-red-700">This platform cannot encrypt saved passwords; set JOBHUNT_ATS_PASSWORD instead.</span>{% endif %}</p>
+    <form method="post" action="/settings/auto-apply" class="grid gap-4 lg:grid-cols-3">
+      <fieldset class="space-y-1">
+        <legend class="text-xs font-semibold uppercase text-slate-500">Switches</legend>
+        <label class="flex items-start gap-2"><input type="checkbox" name="enabled" {% if auto_apply.enabled %}checked{% endif %}>
+          <span>Enable auto-apply<br><span class="text-xs text-slate-500">adds the button to Workday job pages</span></span></label>
+        <label class="flex items-start gap-2"><input type="checkbox" name="headless" {% if auto_apply.headless %}checked{% endif %}>
+          <span>Headless<br><span class="text-xs text-slate-500">off is recommended: you can watch it and take over</span></span></label>
+        <label class="flex items-start gap-2"><input type="checkbox" name="stop_on_unknown" {% if auto_apply.stop_on_unknown %}checked{% endif %}>
+          <span>Stop on an unanswered question<br><span class="text-xs text-slate-500">off leaves it blank and carries on</span></span></label>
+        <label class="flex items-start gap-2"><input type="checkbox" name="upload_cover_letter" {% if auto_apply.upload_cover_letter %}checked{% endif %}>
+          <span>Upload the cover letter when there is a field for it</span></label>
+        <label class="flex items-start gap-2"><input type="radio" name="apply_mode" value="autofill" {% if auto_apply.apply_mode == 'autofill' %}checked{% endif %}>
+          <span><b>Autofill with Resume</b><br><span class="text-xs text-slate-500">the site reads your tailored resume and fills its own fields; the run then corrects and completes them</span></span></label>
+        <label class="flex items-start gap-2"><input type="radio" name="apply_mode" value="manual" {% if auto_apply.apply_mode != 'autofill' %}checked{% endif %}>
+          <span><b>Apply manually</b><br><span class="text-xs text-slate-500">type every field in from your fact bank — exact, but it depends on matching each field</span></span></label>
+        <label class="flex items-start gap-2"><input type="checkbox" name="fill_work_experience" {% if auto_apply.fill_work_experience %}checked{% endif %}>
+          <span>Type the work history into their fields <span class="rounded bg-green-100 px-1 text-[10px] text-green-800">recommended</span><br>
+            <span class="text-xs text-slate-500">the resume is attached either way; off leaves Work Experience to the site's resume parser, which splits roles and drops employers</span></span></label>
+      </fieldset>
+      <fieldset class="space-y-1">
+        <legend class="text-xs font-semibold uppercase text-slate-500">Sites you have not used before</legend>
+        <label class="flex items-start gap-2"><input type="checkbox" name="create_accounts" {% if auto_apply.create_accounts %}checked{% endif %}>
+          <span>Create the candidate account<br><span class="text-xs text-slate-500">every Workday tenant needs its own; off means a new site stops the run</span></span></label>
+        <label class="flex items-start gap-2"><input type="radio" name="password_mode" value="per_site" {% if auto_apply.password_mode == 'per_site' %}checked{% endif %}>
+          <span>A generated password per site <span class="rounded bg-green-100 px-1 text-[10px] text-green-800">recommended</span><br><span class="text-xs text-slate-500">saved encrypted as the account is created; you never type it</span></span></label>
+        <label class="flex items-start gap-2"><input type="radio" name="password_mode" value="shared" {% if auto_apply.password_mode == 'shared' %}checked{% endif %}>
+          <span>Reuse the password you saved<br><span class="text-xs text-slate-500">a site with a stricter policy will refuse it</span></span></label>
+        <label class="flex items-start gap-2"><input type="checkbox" name="store_passwords" value="plain" {% if auto_apply.store_passwords == 'plain' %}checked{% endif %}>
+          <span>Keep site passwords in plain text<br><span class="text-xs text-slate-500">shown on the Auto-apply page, so a generated password can be read and used by hand;
+            anything that can read the database or reach this page on your network can read them too. Unchecked: encrypted with Windows DPAPI.</span></span></label>
+        <label class="flex items-start gap-2"><input type="checkbox" name="read_verification_email" {% if auto_apply.read_verification_email %}checked{% endif %}>
+          <span>Read the emailed verification code
+            {% if not auto_apply.mailbox_ready %}<span class="rounded bg-amber-100 px-1 text-[10px] text-amber-800">no mailbox</span>{% endif %}
+            <br><span class="text-xs text-slate-500">uses the read-only mailbox from <a class="underline" href="#email">Job alert emails</a>; waits {{ auto_apply.verification_wait_seconds }}s</span></span></label>
+      </fieldset>
+      <fieldset class="space-y-1">
+        <legend class="text-xs font-semibold uppercase text-slate-500">Submitting</legend>
+        <label class="flex items-start gap-2 rounded border p-2 {{ 'border-red-400 bg-red-50' if auto_apply.auto_submit }}">
+          <input type="checkbox" name="auto_submit" {% if auto_apply.auto_submit %}checked{% endif %}>
+          <span><b>Submit automatically</b><br><span class="text-xs text-slate-500">Off (recommended): every run fills the form and stops on the Review page for you to read and submit.
+            On: runs press Submit themselves. Applications cannot be unsent — and a wrong answer goes in under your name.</span></span></label>
+        <label class="text-xs text-slate-500">Account email for new sites
+          <input name="account_email" value="{{ auto_apply.account_email }}" placeholder="(your profile email)" class="block w-full rounded border px-2 py-1 text-sm text-slate-900"></label>
+      </fieldset>
+      <fieldset class="grid grid-cols-2 gap-2 text-xs">
+        <legend class="col-span-2 text-xs font-semibold uppercase text-slate-500">Limits</legend>
+        <label>Roles to enter <input type="number" name="max_work_experience" min="1" max="20" value="{{ auto_apply.max_work_experience }}" class="block w-full rounded border px-1 py-1"></label>
+        <label>Timeout (s) <input type="number" name="timeout_seconds" min="10" max="300" value="{{ auto_apply.timeout_seconds }}" class="block w-full rounded border px-1 py-1"></label>
+        <label>Slow motion (ms) <input type="number" name="slow_mo_ms" min="0" max="2000" value="{{ auto_apply.slow_mo_ms }}" class="block w-full rounded border px-1 py-1"></label>
+        <div class="col-span-2 text-slate-500">{{ auto_apply.credentials|length }} sign-in(s) saved · {{ auto_apply.open_questions }} open question(s)</div>
+      </fieldset>
+      <div class="lg:col-span-3 flex flex-wrap items-center gap-3">
+        <button class="rounded bg-slate-800 px-3 py-1.5 text-white">Save</button>
+        <a class="rounded border px-3 py-1.5" href="/apply">Sign-ins &amp; answers →</a>
+      </div>
+    </form>
+  </section>
+
+  <section id="network" class="rounded border bg-white p-3">
+    <div class="mb-1 flex flex-wrap items-center gap-2">
+      <h2 class="font-semibold">Network access</h2>
+      <span class="rounded px-2 py-0.5 text-xs {{ 'bg-amber-100 text-amber-800' if network.lan else 'bg-slate-100 text-slate-600' }}">{{ 'other devices on your network' if network.lan else 'this PC only' }}</span>
+    </div>
+    <p class="mb-2 text-xs text-slate-500">Off by default: the app listens on 127.0.0.1, which nothing else can reach. Switch this on to open it from a laptop or phone
+      on the same network. Traffic is plain HTTP, so keep it to a network you trust and never forward the port through your router.</p>
+    <form method="post" action="/settings/network" class="space-y-2 text-sm">
+      <label class="flex items-center gap-2"><span class="switch"><input type="checkbox" name="lan" {% if network.lan %}checked{% endif %}><span></span></span> <b>Allow other devices on my network</b></label>
+      <div class="flex flex-wrap items-end gap-2">
+        <label>Password <input name="web_password" type="password" autocomplete="new-password" placeholder="{{ 'saved' if network.password_set else 'at least 8 characters' }}" class="block rounded border px-2 py-1"></label>
+        <label>Port <input name="port" value="{{ network.port }}" class="block w-24 rounded border px-2 py-1"></label>
+        <button class="rounded bg-slate-800 px-3 py-1.5 text-white">Save</button>
+      </div>
+      <p class="text-xs text-slate-500">Any username works; the password is what's checked. It is saved to .env as WEB_PASSWORD.</p>
+    </form>
+    <div class="mt-2 text-xs">
+      <div>On the laptop, open <b>{{ network.url }}</b>{% if network.ips | length > 1 %} <span class="text-slate-500">(also {{ network.ips[1:] | join(', ') }})</span>{% endif %}</div>
+      <div class="mt-1 text-slate-500">Windows asks once to allow the port. If it doesn't, run this in an admin PowerShell:</div>
+      <code class="mt-1 block overflow-x-auto rounded bg-slate-100 px-2 py-1">{{ network.firewall }}</code>
+      <div class="mt-1 text-slate-500">Changes to the host or port need <code>jobhunt serve</code> restarted.</div>
+    </div>
+  </section>
+
+  <section id="maintenance" class="rounded border bg-white p-3">
+    <h2 class="mb-2 font-semibold">Database &amp; maintenance</h2>
+    <p class="mb-2 text-xs text-slate-500">{{ cfg.paths.db }} · {{ db_mb }} MB</p>
+    <div class="flex flex-wrap gap-2">
+      <form method="post" action="/settings/backup"><button class="rounded bg-slate-800 px-3 py-1.5 text-white" title="VACUUM INTO {{ cfg.paths.exports }}">Back up now</button></form>
+      <form method="post" action="/settings/compact"><button class="rounded border px-3 py-1.5" title="reclaims space; refused while runs or workflow steps are in progress">Compact</button></form>
+      <form method="post" action="/companies/sync"><button class="rounded border px-3 py-1.5">Sync companies</button></form>
+      <form method="post" action="/facts/sync"><button class="rounded border px-3 py-1.5">Sync facts</button></form>
+      <form method="post" action="/settings/recheck-filtered"><button class="rounded border px-3 py-1.5" title="Apply today's filters to postings knocked out earlier (e.g. after changing commute towns, accepted states or title rules) and re-open the ones that now pass">Re-check filtered jobs</button></form>
+    </div>
+    <h2 class="mt-4 mb-1 font-semibold">Locks</h2>
+    <ul class="text-xs">{% for l in locks %}<li>{{ l.name }} — pid {{ l.pid }} since {{ l.acquired_at | local }}{% if l.note %} ({{ l.note }}){% endif %}</li>{% else %}<li class="text-slate-500">none held</li>{% endfor %}</ul>
+    <h2 class="mt-4 mb-1 font-semibold">Jobs by status</h2>
+    <ul class="text-xs">{% for k, v in status_counts.items() %}<li><a class="text-blue-700" href="/queue?status={{ k }}&sort=seen">{{ k }}</a>: {{ v }}</li>{% endfor %}</ul>
+    <h2 class="mt-4 mb-1 font-semibold">Jobs by source</h2>
+    <ul class="text-xs">{% for k, v in source_counts.items() %}<li>{{ k }}: {{ v }}</li>{% endfor %}</ul>
+  </section>
+
+  <section id="config" class="lg:col-span-3 rounded border bg-white p-3">
+    <div class="mb-2 flex flex-wrap items-center gap-3">
+      <h2 class="font-semibold">Configuration</h2>
+      <a class="rounded bg-slate-800 px-3 py-1 text-sm text-white" href="/settings/config">Edit config.yaml</a>
+      <a class="rounded border px-3 py-1 text-sm" href="/companies">Companies</a>
+      <a class="rounded border px-3 py-1 text-sm" href="/facts">Facts</a>
+    </div>
+    <div class="grid gap-3 text-xs md:grid-cols-3">
+      <div><b>Profile</b><br>{{ cfg.profile.headline }}<br>base {{ cfg.profile.locations.base }} · accepts {{ cfg.profile.locations.accept | join(', ') }}<br>comp floor ${{ '{:,}'.format(cfg.profile.comp_floor or 0) }} · {{ cfg.profile.employment_types | join(', ') }}<br>seniority {{ cfg.profile.seniority_band | join(', ') }}</div>
+      <div><b>Sources enabled</b><br>{{ enabled_sources | join(', ') }}<br><b>Companies by ATS</b><br>{% for k, v in companies_by_ats.items() %}{{ k }} {{ v }}{% if not loop.last %} · {% endif %}{% endfor %}</div>
+      <div><b>Models</b><br>scoring {{ cfg.scoring.model }} (concurrency {{ cfg.scoring.concurrency }}, max {{ cfg.scoring.max_per_run }}/run)<br>tailoring {{ cfg.tailoring.model }}<br><b>Schedules</b> <a class="text-blue-700" href="/schedules">manage</a>{% if next_scheduled %} · next: {{ next_scheduled[0].schedule.name }} {{ next_scheduled[0].when | when }}{% endif %}</div>
+      <div class="md:col-span-3"><b>Target roles</b> {{ cfg.profile.target_roles | join(', ') or '—' }}<br><b>Role preference</b> {{ cfg.profile.role_preference or '—' }}</div>
+    </div>
+  </section>
+</div>
+{% endblock %}

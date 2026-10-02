@@ -1,0 +1,33 @@
+<!doctype html>
+<!-- Workday's Country and Country Phone Code pickers: the button opens a panel whose choices are radio buttons,
+     not listbox options. Clicking the button and hoping for a [role=option] leaves the panel hanging open with
+     nothing selected, which is where one run got stuck. -->
+<html lang="en">
+<head><meta charset="utf-8"><title>My Information</title></head>
+<body>
+<h2 data-automation-id="pageHeader">My Information</h2>
+
+<div data-automation-id="formField-country">
+  <span id="country-label">Country</span>
+  <button id="country-btn" aria-haspopup="listbox" aria-labelledby="country-label" onclick="toggle()">Select One</button>
+  <div id="country-panel" hidden>
+    <label><input type="radio" name="country" value="US" onchange="chose(this)"> United States of America</label>
+    <label><input type="radio" name="country" value="CA" onchange="chose(this)"> Canada</label>
+    <label><input type="radio" name="country" value="MX" onchange="chose(this)"> Mexico</label>
+  </div>
+</div>
+
+<button data-automation-id="pageFooterNextButton">Save and Continue</button>
+
+<script>
+  function toggle() {
+    var p = document.getElementById('country-panel');
+    p.hidden = !p.hidden;
+  }
+  function chose(radio) {
+    document.getElementById('country-btn').textContent = radio.parentElement.textContent.trim();
+    document.getElementById('country-panel').hidden = true;
+  }
+</script>
+</body>
+</html>

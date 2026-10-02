@@ -1,0 +1,29 @@
+{% for j in rows %}
+<tr id="job-{{ j.id }}" class="border-t align-top hover:bg-slate-50">
+  <td class="px-2 py-2 whitespace-nowrap">
+    <span class="inline-block rounded px-1.5 py-0.5 font-semibold {{ j.total | score_class }}">{{ '%.0f' % j.total if j.total is not none else '—' }}</span>{{ j.score_model | scorer }}
+    {% if j.skill_match is not none %}
+    <span class="subbars ml-1" title="skill {{ j.skill_match }} · role fit {{ j.role_fit if j.role_fit is not none else '—' }} · seniority {{ j.seniority_fit }} · domain {{ j.domain_fit }} · comp {{ j.comp_fit }} · logistics {{ j.logistics_fit }}">
+      {% for v in [j.skill_match, j.role_fit, j.seniority_fit, j.domain_fit, j.comp_fit, j.logistics_fit] %}<span style="height: {{ (v or 0) // 7 + 1 }}px"></span>{% endfor %}
+    </span>{% endif %}
+    {% if j.scored_at %}<div class="mt-0.5 text-[11px] text-slate-500" title="last scored {{ j.scored_at | local }}">{% set a = j.scored_at | age %}scored {{ a }}{{ ' ago' if a != 'today' }}</div>{% endif %}
+    {% if j.low_confidence %}<span class="block text-[10px] text-amber-700">low confidence</span>{% endif %}
+  </td>
+  <td class="px-2 py-2">{{ j.company_name_raw }}<div class="text-[11px] text-slate-400">{{ j.source }}</div></td>
+  <td class="px-2 py-2"><a href="/jobs/{{ j.id }}" class="font-medium text-blue-700 hover:underline">{{ j.title }}</a>
+    <div class="text-[11px] text-slate-500">{{ j.status }}{% if j.status_reason %} · {{ j.status_reason }}{% endif %}</div></td>
+  <td class="px-2 py-2">{{ j.location_raw or '' }}<div class="text-[11px] text-slate-500">{{ j.remote_type }}</div></td>
+  <td class="px-2 py-2 whitespace-nowrap">{{ j | money }}</td>
+  <td class="px-2 py-2">{{ j.employment_type }}</td>
+  <td class="px-2 py-2 whitespace-nowrap">{{ j.posted_at | age }}</td>
+  <td class="px-2 py-2 whitespace-nowrap text-xs text-slate-500" title="{{ j.first_seen_at | local }}">{{ j.first_seen_at | local | truncate(11, true, '') }}</td>
+  <td class="px-2 py-2">{% if j.ghost_score is not none %}<span class="rounded px-1 {{ 'bg-red-100 text-red-800' if j.ghost_score >= 50 else ('bg-amber-50 text-amber-800' if j.ghost_score >= 25 else 'bg-slate-100 text-slate-600') }}">{{ j.ghost_score }}</span>{% endif %}</td>
+  <td class="px-2 py-2 max-w-md text-slate-700">{{ (j.rationale or '')[:160] }}</td>
+  <td class="px-2 py-2 whitespace-nowrap">
+    {% if row_error and row_error_id == j.id %}<div role="alert" class="mb-1 text-xs text-red-700">{{ row_error }}</div>{% endif %}
+    {% include "fragments/job_actions.html" %}
+  </td>
+</tr>
+{% else %}
+<tr><td colspan="10" class="px-3 py-6 text-center text-slate-500">No jobs match these filters.</td></tr>
+{% endfor %}

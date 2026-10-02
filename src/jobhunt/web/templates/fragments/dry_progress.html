@@ -1,0 +1,31 @@
+<div id="dry-progress" {% if dry.status == 'running' %}hx-get="/dryruns/{{ dry.id }}/progress" hx-trigger="every 2s" hx-swap="outerHTML"{% endif %}>
+  <div class="mb-3 flex flex-wrap items-center gap-3 rounded border bg-white p-3">
+    <span class="rounded px-2 py-0.5 {{ 'bg-green-100' if dry.status == 'complete' else ('bg-blue-100' if dry.status == 'running' else 'bg-amber-100') }}">{{ dry.status }}{% if dry.status == 'running' %}…{% endif %}</span>
+    <span class="text-sm">started {{ dry.started_at | local }}{% if dry.finished_at %} · finished {{ dry.finished_at | local }}{% endif %}</span>
+    <span class="text-xs text-slate-500">sources: {{ dry.sources | join(', ') or 'all enabled' }} · companies: {{ dry.companies | join(', ') or 'all active' }}</span>
+    {% if dry.status == 'running' and not dry.stop %}
+    <form method="post" action="/dryruns/{{ dry.id }}/stop" class="ml-auto"><button class="rounded bg-red-700 px-3 py-1.5 text-white">Stop</button></form>
+    {% elif dry.status != 'running' %}
+    <form method="post" action="/runs" class="ml-auto flex flex-wrap items-center gap-2">
+      {% for s in dry.sources %}<input type="hidden" name="sources" value="{{ s }}">{% endfor %}
+      {% for c in dry.companies %}<input type="hidden" name="companies" value="{{ c }}">{% endfor %}
+      <label class="text-xs">Max to score <input type="number" name="max_to_score" min="1" value="10" class="w-16 rounded border px-1"></label>
+      <button name="mode" value="full" class="rounded bg-green-700 px-3 py-1.5 text-white">Do this as a full run</button>
+      <button name="mode" value="fetch" class="rounded border border-green-700 bg-white px-3 py-1.5 text-green-800">Save these without scoring</button>
+    </form>
+    {% endif %}
+  </div>
+  {% if dry.summary %}
+  <div class="mb-3 grid gap-3 md:grid-cols-3">
+    {% for src, s in dry.summary.items() %}
+    <div class="rounded border bg-white p-3 text-sm">
+      <h2 class="font-semibold">{{ src }}</h2>
+      <p>fetched {{ s.counts.fetched or 0 }} · filtered {{ s.counts.filtered or 0 }} · <b>survived {{ s.counts.survived or 0 }}</b> · errors {{ s.errors|length }}</p>
+      <p class="text-xs text-slate-600">{% for k, v in s.reasons.items() %}{{ k }} {{ v }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  <pre class="max-h-[70vh] overflow-auto whitespace-pre-wrap rounded border bg-slate-900 p-3 text-xs text-slate-100">{% for line in dry.lines %}{{ line }}
+{% else %}starting…{% endfor %}</pre>
+</div>

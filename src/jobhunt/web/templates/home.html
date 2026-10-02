@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<div class="mb-4 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+  <a class="stat" href="/queue?status=scored&min_score=70&sort=total"><div class="stat-num">{{ top_total }}</div><div class="stat-label">Top matches (70+)</div></a>
+  <a class="stat" href="/queue?status=discovered&sort=seen"><div class="stat-num">{{ counts.get('discovered', 0) }}</div><div class="stat-label">Waiting to score</div></a>
+  <a class="stat" href="/queue?status=shortlisted&sort=total"><div class="stat-num">{{ counts.get('shortlisted', 0) }}</div><div class="stat-label">Shortlisted</div></a>
+  <a class="stat" href="/queue?status=in_workflow&sort=seen"><div class="stat-num">{{ counts.get('in_workflow', 0) + counts.get('ready', 0) }}</div><div class="stat-label">In workflow / ready</div></a>
+  <a class="stat" href="/applications"><div class="stat-num">{{ applied_recent }}</div><div class="stat-label">Applied</div></a>
+  <a class="stat" href="/queue?status=scored&min_score=0&sort=total"><div class="stat-num">{{ counts.get('scored', 0) }}</div><div class="stat-label">All scored</div></a>
+</div>
+
+<div class="grid gap-4 xl:grid-cols-3">
+  <div class="space-y-4 xl:col-span-2">
+    {% if attention %}
+    <section class="card">
+      <h2 class="mb-2 font-semibold">Next steps</h2>
+      <ul class="divide-y">
+        {% for text, href, label in attention %}
+        <li class="flex items-center justify-between gap-3 py-2"><span>{{ text }}</span><a class="whitespace-nowrap rounded border px-2 py-1 text-xs" href="{{ href }}">{{ label }} →</a></li>
+        {% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+
+    <section class="card">
+      <div class="mb-2 flex items-center gap-2"><h2 class="font-semibold">Best new matches</h2><a class="ml-auto text-xs text-blue-700" href="/queue?status=scored&min_score=70&sort=total">all {{ top_total }} →</a></div>
+      <table class="min-w-full text-sm">
+        <tbody>
+        {% for j in top %}
+        <tr class="border-t">
+          <td class="w-24 whitespace-nowrap py-1.5"><span class="rounded px-1.5 py-0.5 font-semibold {{ j.total | score_class }}">{{ '%.0f' % j.total if j.total is not none else '–' }}</span>{{ j.score_model | scorer }}</td>
+          <td class="py-1.5"><a class="text-blue-700" href="/jobs/{{ j.id }}">{{ j.title }}</a><div class="text-xs text-slate-500">{{ j.company_name_raw }} · {{ j.location_raw or '' }}</div></td>
+          <td class="whitespace-nowrap text-xs text-slate-500">{{ j.first_seen_at | age }}</td>
+        </tr>
+        {% else %}
+        <tr><td class="py-3 text-slate-500">No jobs scored 70+ yet. <a class="text-blue-700" href="/runs">Start a run</a> or score the ones <a class="text-blue-700" href="/queue?status=discovered&sort=seen">waiting</a>.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <div class="mb-2 flex items-center gap-2"><h2 class="font-semibold">Recent runs</h2><a class="ml-auto text-xs text-blue-700" href="/runs">Runs →</a></div>
+      <table class="min-w-full text-sm">
+        {% for x in runs %}
+        <tr class="border-t">
+          <td class="py-1.5"><a class="text-blue-700" href="/runs/{{ x.id }}">#{{ x.id }}</a></td>
+          <td class="text-xs text-slate-500">{{ x.started_at | local }} · {{ x.trigger }}</td>
+          <td><span class="rounded px-1 text-xs {{ 'bg-green-100' if x.status == 'complete' else ('bg-red-100' if x.status == 'failed' else 'bg-blue-100') }}">{{ x.status }}</span></td>
+          <td class="text-xs text-slate-500">{% for k in ['fetched', 'filtered', 'waiting_to_score', 'scored'] %}{% if x.counts[k] is defined %}{{ k.replace('_', ' ') }} {{ x.counts[k] }} · {% endif %}{% endfor %}</td>
+        </tr>
+        {% else %}<tr><td class="py-3 text-slate-500">No runs yet.</td></tr>{% endfor %}
+      </table>
+    </section>
+  </div>
+
+  <aside class="space-y-4">
+    <section class="card">
+      <h2 class="mb-2 font-semibold">Quick actions</h2>
+      <div class="grid gap-2">
+        <a class="flex items-center gap-2 rounded bg-slate-800 px-3 py-2 text-white" href="/runs?mode=fetch">{{ icon('inbox') }} Fetch &amp; save new jobs (free)</a>
+        <a class="flex items-center gap-2 rounded border px-3 py-2" href="/jobs/new">{{ icon('plus') }} Add a job I found</a>
+        <a class="flex items-center gap-2 rounded border px-3 py-2" href="/queue?status=discovered&sort=seen">{{ icon('star') }} Score waiting jobs</a>
+        <a class="flex items-center gap-2 rounded border px-3 py-2" href="/queue?status=scored&min_score=0&sort=total#rescore">{{ icon('refresh') }} Rescore jobs</a>
+        <a class="flex items-center gap-2 rounded border px-3 py-2" href="/schedules/new">{{ icon('clock') }} New schedule</a>
+        <a class="flex items-center gap-2 rounded border px-3 py-2" href="/settings#focus">{{ icon('funnel') }} Scoring focus</a>
+      </div>
+    </section>
+    <section class="card">
+      <div class="mb-2 flex items-center gap-2"><h2 class="font-semibold">Schedules</h2><a class="ml-auto text-xs text-blue-700" href="/schedules">manage →</a></div>
+      {% if paused %}<p class="mb-2 text-amber-700">All schedules are paused.</p>{% endif %}
+      <ul class="space-y-1">
+        {% for u in upcoming %}<li class="flex justify-between gap-2"><span class="truncate">{{ u.schedule.name }}</span><span class="whitespace-nowrap text-xs text-slate-500">{{ u.when | when }}</span></li>
+        {% else %}<li class="text-slate-500">{{ 'Nothing coming up.' if schedule_count else 'No schedules yet.' }} <a class="text-blue-700" href="/schedules/new">Create one</a></li>{% endfor %}
+      </ul>
+    </section>
+  </aside>
+</div>
+{% endblock %}

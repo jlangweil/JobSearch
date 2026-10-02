@@ -1,0 +1,241 @@
+"""SQLAlchemy Core Table objects. Types follow SPEC 4.3: TEXT timestamps, INTEGER booleans, JSON TEXT,
+float32 BLOB embeddings."""
+
+from __future__ import annotations
+
+from sqlalchemy import (
+    BLOB,
+    REAL,
+    Column,
+    ForeignKey,
+    Index,
+    Integer,
+    MetaData,
+    Table,
+    Text,
+    UniqueConstraint,
+)
+
+metadata = MetaData()
+
+companies = Table(
+    "companies",
+    metadata,
+    Column("id", Integer, primary_key=True, autoincrement=True),
+    Column("name", Text, nullable=False),
+    Column("slug", Text, nullable=False, unique=True),
+    Column("ats_type", Text),
+    Column("board_token", Text),
+    Column("active", Integer, server_default="1"),
+    Column("notes", Text),
+)
+
+jobs = Table(
+    "jobs",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("source", Text, nullable=False),
+    Column("source_job_id", Text, nullable=False),
+    Column("company_id", Integer, ForeignKey("companies.id")),
+    Column("company_name_raw", Text, nullable=False),
+    Column("title", Text, nullable=False),
+    Column("location_raw", Text),
+    Column("remote_type", Text),
+    Column("employment_type", Text),
+    Column("description_text", Text, nullable=False),
+    Column("url", Text, nullable=False),
+    Column("apply_url", Text),
+    Column("comp_min", Integer),
+    Column("comp_max", Integer),
+    Column("comp_source", Text),
+    Column("posted_at", Text),
+    Column("first_seen_at", Text, nullable=False),
+    Column("last_seen_at", Text, nullable=False),
+    Column("seen_count", Integer, server_default="1"),
+    Column("content_hash", Text, nullable=False),
+    Column("embedding", BLOB),
+    Column("dedupe_group", Integer),
+    Column("status", Text, nullable=False, server_default="discovered"),
+    Column("status_reason", Text),
+    Column("snooze_until", Text),
+    Column("thread_id", Text),
+    Column("updated_at", Text, nullable=False),
+    UniqueConstraint("source", "source_job_id", name="uq_jobs_source_job"),
+    Index("ix_jobs_status", "status"),
+    Index("ix_jobs_dedupe_group", "dedupe_group"),
+    Index("ix_jobs_posted_at", "posted_at"),
+    Index("ix_jobs_thread_id", "thread_id"),
+)
+
+job_scores = Table(
+    "job_scores",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("job_id", Integer, ForeignKey("jobs.id"), nullable=False, index=True),
+    Column("scored_at", Text, nullable=False),
+    Column("model", Text),
+    Column("rubric_version", Text),
+    Column("total", REAL),
+    Column("skill_match", Integer),
+    Column("role_fit", Integer),
+    Column("domain_fit", Integer),
+    Column("seniority_fit", Integer),
+    Column("comp_fit", Integer),
+    Column("logistics_fit", Integer),
+    Column("red_flags", Text),
+    Column("gaps", Text),
+    Column("evidence", Text),
+    Column("rationale", Text),
+    Column("ghost_score", Integer),
+    Column("low_confidence", Integer, server_default="0"),
+    Column("focus_fit", Integer),
+    Column("focus_hits", Text),
+)
+
+decisions = Table(
+    "decisions",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("job_id", Integer, ForeignKey("jobs.id"), nullable=False, index=True),
+    Column("action", Text, nullable=False),
+    Column("reason", Text),
+    Column("total_at_decision", REAL),
+    Column("created_at", Text, nullable=False),
+)
+
+facts = Table(
+    "facts",
+    metadata,
+    Column("id", Text, primary_key=True),
+    Column("kind", Text, nullable=False),
+    Column("parent_id", Text),
+    Column("text", Text, nullable=False),
+    Column("variants", Text),
+    Column("metrics", Text),
+    Column("tags", Text),
+    Column("org", Text),
+    Column("title", Text),
+    Column("start_date", Text),
+    Column("end_date", Text),
+    Column("embedding", BLOB),
+)
+
+documents = Table(
+    "documents",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("job_id", Integer, ForeignKey("jobs.id"), nullable=False, index=True),
+    Column("kind", Text, nullable=False),
+    Column("version", Integer, nullable=False),
+    Column("markdown", Text, nullable=False),
+    Column("fact_map", Text),
+    Column("fact_ids", Text),
+    Column("coverage", Text),
+    Column("approved", Integer, server_default="0"),
+    Column("file_path", Text),
+    Column("created_at", Text, nullable=False),
+)
+
+answers = Table(
+    "answers",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("question_text", Text, nullable=False),
+    Column("embedding", BLOB),
+    Column("answer_text", Text, nullable=False),
+    Column("kind", Text),
+    Column("last_used_at", Text),
+    Column("use_count", Integer, server_default="0"),
+)
+
+applications = Table(
+    "applications",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("job_id", Integer, ForeignKey("jobs.id"), nullable=False, index=True),
+    Column("method", Text, nullable=False),
+    Column("submitted_at", Text, nullable=False),
+    Column("confirmation_ref", Text),
+    Column("document_ids", Text),
+    Column("follow_up_at", Text),
+    Column("outcome", Text, server_default="none"),
+    Column("notes", Text),
+)
+
+runs = Table(
+    "runs",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("thread_id", Text),
+    Column("started_at", Text, nullable=False),
+    Column("finished_at", Text),
+    Column("trigger", Text, nullable=False),
+    Column("status", Text, nullable=False),
+    Column("sources", Text),
+    Column("counts", Text),
+    Column("errors", Text),
+    Column("current_node", Text),
+    Column("schedule_id", Integer),
+)
+
+schedules = Table(
+    "schedules",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("name", Text, nullable=False),
+    Column("enabled", Integer, nullable=False, server_default="0"),
+    Column("mode", Text, nullable=False, server_default="fetch"),
+    Column("when_kind", Text, nullable=False, server_default="days"),
+    Column("days", Text),
+    Column("times", Text),
+    Column("every_hours", Integer),
+    Column("window_start", Integer),
+    Column("window_end", Integer),
+    Column("cron", Text),
+    Column("timezone", Text, nullable=False),
+    Column("sources", Text),
+    Column("industries", Text),
+    Column("companies", Text),
+    Column("max_to_score", Integer),
+    Column("if_busy", Text, nullable=False, server_default="wait"),
+    Column("catch_up", Integer, nullable=False, server_default="1"),
+    Column("notes", Text),
+    Column("created_at", Text, nullable=False),
+    Column("updated_at", Text, nullable=False),
+    Column("enabled_at", Text),
+    Column("last_fired_at", Text),
+    Column("last_run_id", Integer),
+    Column("last_result", Text),
+)
+
+app_state = Table(
+    "app_state",
+    metadata,
+    Column("key", Text, primary_key=True),
+    Column("value", Text),
+    Column("updated_at", Text, nullable=False),
+)
+
+llm_calls = Table(
+    "llm_calls",
+    metadata,
+    Column("id", Integer, primary_key=True),
+    Column("job_id", Integer),
+    Column("purpose", Text, nullable=False),
+    Column("model", Text, nullable=False),
+    Column("prompt_version", Text),
+    Column("input_tokens", Integer),
+    Column("output_tokens", Integer),
+    Column("cost_usd", REAL),
+    Column("latency_ms", Integer),
+    Column("created_at", Text, nullable=False),
+)
+
+locks = Table(
+    "locks",
+    metadata,
+    Column("name", Text, primary_key=True),
+    Column("acquired_at", Text, nullable=False),
+    Column("pid", Integer, nullable=False),
+    Column("note", Text),
+)

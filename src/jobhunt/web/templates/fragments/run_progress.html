@@ -1,0 +1,113 @@
+<div id="run-progress" {% if run.status == 'running' %}hx-get="/runs/{{ run.id }}/progress" hx-trigger="every 2s" hx-swap="outerHTML"{% endif %}>
+  <div class="mb-3 flex flex-wrap items-center gap-3 rounded border bg-white p-3">
+    <span class="rounded px-2 py-0.5 {{ 'bg-green-100' if run.status == 'complete' else ('bg-red-100' if run.status == 'failed' else 'bg-blue-100') }}">{{ run.status }}</span>
+    <span>trigger {{ run.trigger }} · started {{ run.started_at | local }}{% if run.finished_at %} · finished {{ run.finished_at | local }}{% endif %}</span>
+    <span>current node <b>{{ run.current_node }}</b></span>
+    <span class="text-xs text-slate-500">
+      {{ 'score stored jobs only' if options.skip_fetch else ('fetch & save, no scoring' if options.skip_score else 'full run') }}
+      · sources: {{ options.sources | join(', ') or 'all enabled' }}
+      · companies: {{ options.companies | join(', ') or 'all active' }}
+      {% if options.max_to_score %}· max to score {{ options.max_to_score }}{% endif %}
+    </span>
+    {% if run.status == 'running' %}
+      {% if stop_requested %}<span class="ml-auto text-amber-700">stopping…</span>
+      {% else %}
+      <form method="post" action="/runs/{{ run.id }}/stop" class="ml-auto">
+        <button class="rounded bg-red-700 px-3 py-1.5 text-white">Stop run</button>
+      </form>
+      {% endif %}
+    {% elif run.status == 'failed' %}
+    <form method="post" action="/runs/{{ run.id }}/resume" class="ml-auto">
+      <button class="rounded bg-amber-600 px-3 py-1.5 text-white">Resume from last checkpoint</button>
+    </form>
+    {% endif %}
+  </div>
+  <div class="grid gap-4 lg:grid-cols-3">
+    <div class="rounded border bg-white p-3">
+      <h2 class="mb-2 font-semibold">Node timeline</h2>
+      <ol class="space-y-1">
+        {% set done = timeline | map(attribute='node') | list %}
+        {% for n in nodes %}
+          {% set t = (timeline | selectattr('node', 'equalto', n) | list | first) if n in done else none %}
+          <li class="flex gap-2">
+            <span class="w-24">{{ n }}</span>
+            {% if t and t.finished_at %}<span class="text-green-700">✓ {{ t.seconds }}s</span>
+            {% elif run.current_node == n and run.status == 'running' %}<span class="text-blue-700">running…</span>
+            {% elif t %}<span class="text-amber-700">started, not finished</span>
+            {% else %}<span class="text-slate-400">pending</span>{% endif %}
+          </li>
+        {% endfor %}
+      </ol>
+      {% if run.status == 'complete' and options.skip_score %}
+      <div class="mt-3 rounded border border-green-300 bg-green-50 p-2 text-sm">
+        <p class="mb-2"><b>{{ run.counts.waiting_to_score or 0 }}</b> job{{ '' if (run.counts.waiting_to_score or 0) == 1 else 's' }} saved and waiting to be scored (nothing spent).</p>
+        <div class="flex flex-wrap gap-2">
+          <a class="rounded bg-slate-800 px-2 py-1 text-white" href="/queue?status=discovered&sort=company">Review them →</a>
+          <form method="post" action="/runs" class="flex items-center gap-2">
+            <input type="hidden" name="mode" value="stored">
+            {% for c in options.companies %}<input type="hidden" name="companies" value="{{ c }}">{% endfor %}
+            <label class="text-xs">max <input type="number" name="max_to_score" min="1" value="{{ run.counts.waiting_to_score or 10 }}" class="w-16 rounded border px-1"></label>
+            <button class="rounded bg-green-700 px-2 py-1 text-white">Score them now ({{ scoring_cost() }})</button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+      {% if run.status == 'complete' %}
+      <div class="mt-3 flex flex-wrap gap-2 text-sm">
+        {% if scored_count %}
+        <a class="rounded bg-slate-800 px-2 py-1 text-white" href="/queue?run={{ run.id }}&status=any&min_score=0&sort=total">
+          {{ '{:,}'.format(scored_count) }} job{{ '' if scored_count == 1 else 's' }} scored in this run →</a>
+        {% endif %}
+        <a class="rounded {{ 'border' if scored_count else 'bg-slate-800 px-2 py-1 text-white' }} px-2 py-1" href="/queue?status=scored&min_score=0&sort=total">All scored jobs</a>
+        <a class="rounded border px-2 py-1" href="/queue?status=filtered_out&sort=seen">Filtered out</a>
+      </div>
+      {% endif %}
+    </div>
+    <div class="rounded border bg-white p-3">
+      {% set c = run.counts %}
+      {% set top = [c.fetched or 0, c.processing or 0, 1] | max %}
+      {% set left = c.left_to_score if c.left_to_score is defined else c.waiting_to_score %}
+      <h2 class="mb-2 font-semibold">Funnel</h2>
+      <div class="funnel">
+        {% macro bar(label, value, cls='', note='') %}
+        <div class="funnel-row" {% if note %}title="{{ note }}"{% endif %}><span class="text-slate-600">{{ label }}</span>
+          <span class="funnel-bar {{ cls }}"><span style="width: {{ ((100 * (value or 0) / top) | round(1)) if value else 0 }}%"></span></span>
+          <span class="funnel-num">{{ '{:,}'.format(value) if value is defined and value is not none else '…' }}</span></div>
+        {% endmacro %}
+        {% if not options.skip_fetch %}
+        {{ bar('Postings fetched', c.fetched) }}
+        {{ bar('Already known', c.seen, 'drop', 'seen before; only last-seen date updated') if c.seen }}
+        {{ bar('Posted before your date', c.older_than_date, 'drop', "left out of this run by its 'only jobs posted since' date") if c.older_than_date }}
+        {% endif %}
+        {{ bar('Processing', c.processing, '', 'new or changed postings, plus jobs left waiting by earlier runs') }}
+        {{ bar('Duplicates removed', c.duplicates, 'drop') if c.duplicates is defined }}
+        {{ bar('Filtered out', c.filtered, 'drop') if c.filtered is defined }}
+        {{ bar('Need the posting pasted', c.need_posting_text, 'drop', 'from job alert emails: a link but no description') if c.need_posting_text }}
+        {% if left is defined and left is not none %}
+        <div class="my-1 border-t"></div>
+        {{ bar('Left to score', left, 'good') }}
+        {% if not options.skip_score %}
+        {{ bar('Scored', c.scored, 'good') if c.scored is defined }}
+        {% set remaining = (left or 0) - (c.scored or 0) %}
+        <div class="funnel-row"><span class="font-semibold">Remaining</span><span class="text-xs text-slate-500">{% if run.status == 'running' %}still to score in this run{% elif remaining > 0 %}not scored (max per run, errors or stopped); they wait for the next run{% else %}all scored{% endif %}</span><span class="funnel-num font-semibold">{{ '{:,}'.format([remaining, 0] | max) }}</span></div>
+        {% if c.above_threshold %}<p class="text-xs text-green-700">{{ c.above_threshold }} scored at or above the shortlist threshold</p>{% endif %}
+        {% endif %}
+        {% endif %}
+      </div>
+      <p class="mt-2 text-xs text-slate-500">Waiting to score in the database now: <a class="text-blue-700" href="/queue?status=discovered&sort=seen">{{ '{:,}'.format(waiting_now) }}</a></p>
+      {% set reasons = filter_reasons %}
+      {% if reasons %}<details class="mt-2 text-xs"><summary>Why jobs were filtered</summary>
+        <table>{% for k, v in reasons %}<tr><td class="pr-3 text-slate-600">{{ k }}</td><td>{{ v }}</td></tr>{% endfor %}</table></details>{% endif %}
+      <details class="mt-1 text-xs"><summary>All counters</summary>
+        <table>{% for k, v in c.items() %}<tr><td class="pr-4 text-slate-600">{{ k }}</td><td>{{ v }}</td></tr>{% else %}<tr><td class="text-slate-500">none yet</td></tr>{% endfor %}</table></details>
+    </div>
+    <div class="rounded border bg-white p-3">
+      <h2 class="mb-2 font-semibold">Errors ({{ run.errors | length }})</h2>
+      <ul class="max-h-96 space-y-2 overflow-y-auto text-xs">
+        {% for e in run.errors %}<li><b>{{ e.source or '-' }}/{{ e.node or '-' }}</b>{% if e.company %} [{{ e.company }}]{% endif %}: {{ e.message }}
+          {% if e.traceback_head %}<details><summary>traceback</summary><pre class="whitespace-pre-wrap">{{ e.traceback_head }}</pre></details>{% endif %}</li>
+        {% else %}<li class="text-slate-500">none</li>{% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>

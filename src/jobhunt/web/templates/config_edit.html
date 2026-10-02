@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}config.yaml{% endblock %}
+{% block content %}
+<div class="mb-2 flex flex-wrap items-center gap-3">
+  <h1 class="text-xl font-bold">Edit config.yaml</h1>
+  <span class="font-mono text-xs text-slate-500">{{ path }}</span>
+  <a class="text-sm text-blue-700" href="/settings">← Settings</a>
+</div>
+<p class="mb-2 text-sm text-slate-600">Profile, target roles, filters, scoring, sources, schedule and companies. On save the whole file is
+validated (YAML, field types, every regex, board tokens, weights, cron/timezone). If anything is wrong nothing is written. A copy of
+the previous version goes to <code>exports\config-backups</code>. Most changes apply immediately; paths, the embedding model and web
+settings need a restart of <code>jobhunt serve</code>.</p>
+{% if problems %}
+<div role="alert" class="mb-2 rounded border border-red-300 bg-red-50 p-3 text-sm text-red-900">
+  <b>Not saved — fix these problems:</b>
+  <ul class="ml-5 list-disc">{% for p in problems %}<li class="whitespace-pre-wrap">{{ p }}</li>{% endfor %}</ul>
+</div>
+{% endif %}
+<form method="post" action="/settings/config">
+  <label for="config-text" class="sr-only">config.yaml</label>
+  <textarea id="config-text" name="text" rows="40" spellcheck="false" class="editor w-full rounded border p-2">{{ text }}</textarea>
+  <div class="mt-2 flex gap-2">
+    <button class="rounded bg-green-700 px-4 py-2 text-white">Validate &amp; save</button>
+    <a class="rounded border bg-white px-4 py-2" href="/settings/config">Discard changes</a>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block title %}Run #{{ run.id }}{% endblock %}
+{% block content %}
+<h1 class="mb-3 text-xl font-bold">Discovery run #{{ run.id }}</h1>
+{% include "fragments/run_progress.html" %}
+{% endblock %}

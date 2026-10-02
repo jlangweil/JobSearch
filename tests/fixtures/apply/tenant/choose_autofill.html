@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Start Your Application</title></head>
+<body>
+<h2 data-automation-id="pageHeader">Start Your Application</h2>
+<a data-automation-id="autofillWithResume" href="#" onclick="show(); return false;">Autofill with Resume</a>
+<a data-automation-id="applyManually" href="information.html">Apply Manually</a>
+<div id="drop" hidden>
+  <h4>Resume/CV</h4>
+  <p>Drop files here</p>
+  <input id="cv" type="file" data-automation-id="file-upload-input-ref" onchange="parsed()">
+</div>
+<script>
+  function show() { document.getElementById('drop').hidden = false; }
+  function parsed() { location.href = 'information.html'; }
+</script>
+</body></html>

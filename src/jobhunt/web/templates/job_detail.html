@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}{{ job.title }}{% endblock %}
+{% block content %}
+<div class="mb-3 flex flex-wrap items-start gap-4">
+  <div>
+    <h1 class="text-xl font-bold">{{ job.title }}</h1>
+    <div class="text-slate-600">{{ job.company_name_raw }} · {{ job.location_raw or 'location unknown' }} · {{ job.remote_type }} · {{ job.employment_type }} · {{ job | money or 'comp not posted' }}</div>
+    <div class="text-xs text-slate-500">status <b>{{ job.status }}</b>{% if job.status_reason %} ({{ job.status_reason }}){% endif %} · source {{ job.source }} · posted {{ job.posted_at | local }} · first seen {{ job.first_seen_at | local }} · seen {{ job.seen_count }}×</div>
+  </div>
+  <div class="ml-auto flex gap-2">
+    <a href="{{ job.url }}" target="_blank" rel="noopener" class="rounded border bg-white px-3 py-1.5">View posting ↗</a>
+    <a href="{{ job.apply_url or job.url }}" target="_blank" rel="noopener" class="rounded bg-blue-700 px-3 py-1.5 text-white">Apply link ↗</a>
+    <a href="/jobs/new?replace={{ job.id }}" class="rounded border px-3 py-1.5" title="Replace the stored description with the full posting (e.g. an Adzuna snippet)">{{ 'Paste the full posting' if job.source == 'adzuna' and not job.full_description else 'Replace posting text' }}</a>
+    {% if job.thread_id %}<a href="/jobs/{{ job.id }}/workflow" class="rounded bg-slate-800 px-3 py-1.5 text-white">Workflow →</a>{% endif %}
+    {% if workday %}<a href="/jobs/{{ job.id }}/auto-apply" class="rounded border border-amber-300 bg-amber-50 px-3 py-1.5 text-amber-900" title="Fill this Workday application in a browser">Auto-apply <span class="text-[10px] uppercase">beta</span></a>{% endif %}
+  </div>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-3">
+  <section class="lg:col-span-1 space-y-4">
+    <div class="rounded border bg-white p-3">
+      <h2 class="mb-2 font-semibold">Score</h2>
+      {% if score %}
+      <div class="mb-2 text-3xl font-bold"><span class="rounded px-2 {{ score.total | score_class }}">{{ '%.1f' % score.total }}</span>{{ score.model | scorer('lg') }}
+        <span class="text-sm font-normal text-slate-500">ghost {{ score.ghost_score }}{% if score.low_confidence %} · low confidence{% endif %}</span></div>
+      <table class="w-full text-sm">
+        {% for k in subscores %}{% if score[k] is not none %}<tr><td class="py-0.5 text-slate-600">{{ k.replace('_', ' ') }}{% if k == 'focus_fit' %} <a class="text-[10px] text-blue-700" href="/settings#focus" title="computed from your boost/avoid phrases">(edit)</a>{% endif %}</td><td class="w-2/3"><span class="subbar" style="width: {{ score[k] }}%"></span> {{ score[k] }}</td></tr>{% endif %}{% endfor %}
+      </table>
+      {% if score.focus_hits %}<div class="mt-1 flex flex-wrap gap-1 text-[11px]">
+        {% for h in score.focus_hits.avoid %}<span class="rounded bg-red-100 px-1 text-red-800">avoid: {{ h }}</span>{% endfor %}
+        {% for h in score.focus_hits.title %}<span class="rounded bg-green-100 px-1 text-green-800">title: {{ h }}</span>{% endfor %}
+        {% for h in score.focus_hits.description %}<span class="chip">{{ h }}</span>{% endfor %}
+      </div>{% endif %}
+      <p class="mt-2 text-slate-700">{{ score.rationale }}</p>
+      <div class="mt-1 text-[11px] text-slate-400">{{ score.model }} · rubric {{ score.rubric_version }} · {{ score.scored_at | local }}</div>
+      {% else %}<p class="text-slate-500">Not scored.</p>{% endif %}
+      <div class="mt-3 flex flex-wrap items-center gap-2 border-t pt-2 text-sm">
+        {% if scoring_now %}<span class="text-blue-700">scoring… this page refreshes when the score is in</span>
+        <script>setTimeout(function () { location.reload(); }, 4000);</script>
+        {% elif job.description_text %}
+        <form method="post" action="/jobs/{{ job.id }}/score">
+          <button class="rounded bg-slate-800 px-2 py-1 text-white" {% if not scoring_ready() %}disabled title="set ANTHROPIC_API_KEY in .env or switch scoring to the local model"{% endif %}>{{ 'Re-score' if score else 'Score now' }} ({{ scoring_label() }})</button>
+        </form>
+        <form method="post" action="/jobs/{{ job.id }}/score">
+          {% if cfg.scoring.provider == 'local' %}
+          <input type="hidden" name="provider" value="anthropic">
+          <button class="rounded border px-2 py-1" {% if not api_key_set %}disabled title="set ANTHROPIC_API_KEY in .env"{% endif %}>Score with Claude (≈ $0.01)</button>
+          {% else %}
+          <input type="hidden" name="provider" value="local">
+          <button class="rounded border px-2 py-1" title="compare with the local model">Score with local {{ cfg.local_llm.model }}</button>
+          {% endif %}
+        </form>
+        {% endif %}
+        <a class="rounded border px-2 py-1" href="/jobs/{{ job.id }}/prompt">Show scoring prompt</a>
+      </div>
+      {% if history|length > 1 %}
+      <details class="mt-2 text-xs" open>
+        <summary class="text-slate-600">Score history ({{ history|length }}) — compare models</summary>
+        <table class="mt-1 w-full">
+          <thead><tr class="text-left text-slate-500"><th>When</th><th>Model</th><th>Total</th><th>Role</th><th>Skill</th><th>Sen.</th><th>Dom.</th><th>Ev.</th></tr></thead>
+          {% for h in history %}<tr class="border-t {{ 'font-semibold' if loop.first }}">
+            <td>{{ h.scored_at | local('%m-%d %H:%M') }}</td><td class="whitespace-nowrap">{{ h.model | scorer }} <span class="text-[10px] text-slate-500">{{ h.model.split(':', 1)[1] if h.model and h.model.startswith('local:') else h.model }}</span></td><td>{{ '%.0f' % h.total if h.total is not none else '—' }}</td>
+            <td>{{ h.role_fit if h.role_fit is not none else '—' }}</td><td>{{ h.skill_match }}</td><td>{{ h.seniority_fit }}</td><td>{{ h.domain_fit }}</td>
+            <td title="evidence quotes kept{{ ', low confidence' if h.low_confidence }}">{{ h.evidence|length }}{{ '⚠' if h.low_confidence }}</td></tr>{% endfor %}
+        </table>
+      </details>
+      {% endif %}
+      {% if score_failure %}<div role="alert" class="mt-2 rounded border border-red-300 bg-red-50 px-2 py-1 text-xs text-red-900">Last scoring attempt failed: {{ score_failure }}</div>{% endif %}
+      {% if score_notice %}<div role="status" class="mt-2 rounded border border-blue-200 bg-blue-50 px-2 py-1 text-xs">{{ score_notice }}{% if job.status in ['in_workflow', 'shortlisted', 'ready'] %} <a class="text-blue-700" href="/jobs/{{ job.id }}/workflow">Open workflow →</a>{% endif %}</div>{% endif %}
+      {% if job.status == 'closed' and (job.status_reason or '').startswith('posting closed') %}
+      <form method="post" action="/jobs/{{ job.id }}/shortlist" class="mt-3 space-y-1 rounded border border-amber-300 bg-amber-50 p-2 text-sm">
+        <input type="hidden" name="force" value="1"><input type="hidden" name="reason" value="tailored anyway: the posting looked closed">
+        <div class="font-semibold">This posting looks closed</div>
+        <p class="text-xs">{{ job.status_reason[16:] }}. Check the <a class="text-blue-700" href="{{ job.url }}" target="_blank" rel="noopener">posting ↗</a>; if it's really still open:</p>
+        <button class="w-full rounded border border-amber-400 bg-white px-3 py-1.5">Tailor anyway</button>
+      </form>
+      {% endif %}
+      {% if score and job.status == 'scored' and not scoring_now %}
+      <form method="post" action="/jobs/{{ job.id }}/shortlist" class="mt-3 space-y-1 rounded border border-green-300 bg-green-50 p-2">
+        <input type="hidden" name="next" value="/jobs/{{ job.id }}">
+        <input type="hidden" name="reason" value="tailored after scoring {{ '%.0f' % score.total }}">
+        <div class="text-sm font-semibold">Worth applying?</div>
+        <fieldset class="space-y-1 text-xs">
+          <label class="flex items-start gap-1"><input type="radio" name="generation_mode" value="automated" class="mt-0.5" {% if cfg.tailoring.generation_mode != 'ats_super_match' %}checked{% endif %}>
+            <span><b>Fully automated</b>: draft straight away from your facts.</span></label>
+          <label class="flex items-start gap-1"><input type="radio" name="generation_mode" value="ats_super_match" class="mt-0.5" {% if cfg.tailoring.generation_mode == 'ats_super_match' %}checked{% endif %}>
+            <span><b>ATS Super Match</b>: first tick which of the posting's keywords you really have and the headline to use; then a resume of up to three pages that keeps your major projects, tech stacks and biggest wins, with the posting's keywords throughout, strong verbs and acronyms spelled out.</span></label>
+        </fieldset>
+        <details class="text-xs"><summary class="text-slate-600">add emphasis or company notes (optional)</summary>
+          <label class="mt-1 block">Emphasis for drafting <input name="emphasis" class="block w-full rounded border px-1 py-1"></label>
+          <label class="block">Company notes for the cover letter <textarea name="company_notes" rows="2" class="block w-full rounded border px-1"></textarea></label>
+        </details>
+        <button class="w-full rounded bg-green-700 px-3 py-1.5 text-white">Tailor my resume &amp; cover letter</button>
+      </form>
+      {% endif %}
+    </div>
+
+    {% if job.status == 'scored' %}
+    <div class="rounded border bg-white p-3">
+      <h2 class="mb-2 font-semibold">Triage</h2>
+      {% set j = job %}{% set current_url = '/jobs/' ~ job.id %}
+      {% include "fragments/job_actions.html" %}
+    </div>
+    {% endif %}
+
+    {% if score and score.analysis %}{% set a = score.analysis %}
+    <div class="rounded border bg-white p-3">
+      <h2 class="mb-1 font-semibold">Role</h2>
+      {% if a.role %}
+      <p class="text-sm"><span class="rounded bg-slate-100 px-1">{{ a.role.role_type | replace('_', ' ') }}</span>
+        · {{ a.role.hands_on }} hands-on · role fit <b>{{ a.role.role_fit }}</b>{% if not a.role.verified %} <span class="text-xs text-amber-700" title="the model's quote isn't in the posting, so role fit is capped">(unverified)</span>{% endif %}</p>
+      {% if a.role.quote %}<p class="mt-1 text-xs"><q class="italic text-slate-600">{{ a.role.quote }}</q></p>{% endif %}
+      {% else %}<p class="text-sm text-slate-500">not classified</p>{% endif %}
+      <h2 class="mt-3 mb-1 font-semibold">Technology stack
+        <span class="text-xs font-normal text-slate-500">{% if a.skill_from_stack %}skill match {{ score.skill_match }} from this list{% else %}too few items to score; skill match is the model's estimate{% endif %}</span></h2>
+      <ul class="flex flex-wrap gap-1 text-xs">{% for t in a.stack %}
+        <li class="rounded px-1.5 py-0.5 {{ 'bg-green-100 text-green-800' if t.has == 'recent' else ('bg-amber-100 text-amber-800' if t.has == 'earlier' else 'bg-red-100 text-red-800') }}"
+            title="{{ t.importance }}{% if t.level_required %} · needs {{ t.level_required }} level{% endif %}{% if t.your_level %} · you rated it {{ t.your_level }}/10{% endif %} · {{ {'recent': 'in your recent roles', 'earlier': 'in older roles or skills', 'no': 'not in your background'}[t.has] }}{% if t.claimed != t.has %} (model said {{ t.claimed }}; corrected against your background){% endif %}{% if t.candidate_quote %} — {{ t.candidate_quote }}{% endif %}">
+          {{ '✓' if t.has == 'recent' else ('~' if t.has == 'earlier' else '✗') }} {{ t.technology }}{% if t.importance == 'required' %}<b>*</b>{% endif %}{% if t.level_required in ('advanced', 'expert') %} <span class="opacity-70">({{ t.level_required }}{% if t.your_level %}; you {{ t.your_level }}{% endif %})</span>{% elif t.your_level %} <span class="opacity-70">(you {{ t.your_level }})</span>{% endif %}</li>
+      {% else %}<li class="text-slate-500">none listed</li>{% endfor %}</ul>
+      <p class="mt-1 text-xs text-slate-500">✓ recent · ~ older experience · ✗ missing · <b>*</b> required · rate your skills on <a class="underline" href="/facts/skills">Skill levels</a></p>
+      {% if a.competencies %}
+      <h2 class="mt-3 mb-1 font-semibold">Leadership &amp; delivery</h2>
+      <ul class="space-y-0.5 text-xs">{% for c in a.competencies %}
+        <li><span class="rounded px-1 {{ 'bg-green-100 text-green-800' if c.held else 'bg-red-100 text-red-800' }}">{{ '✓' if c.held else '✗' }}</span>
+          {{ c.competency }}{% if c.importance == 'required' %}<b>*</b>{% endif %}
+          {% if c.evidence %}<q class="block pl-5 italic text-slate-500">{{ c.evidence }}</q>{% endif %}</li>
+      {% endfor %}</ul>
+      <p class="mt-1 text-xs text-slate-500">Each ✓ is backed by the quoted line from your facts. Skill match weighs these {{ 'more' if (a.role or {}).role_type in ('delivery_lead', 'people_manager') else 'alongside the stack' }} for this kind of role.</p>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if score %}
+    <div class="rounded border bg-white p-3">
+      <h2 class="mb-1 font-semibold">Evidence</h2>
+      <ul class="space-y-1">{% for e in score.evidence %}<li><span class="text-xs rounded bg-slate-100 px-1">{{ e.dimension }}</span> {{ e.claim }} — <q class="italic text-slate-600">{{ e.quote }}</q></li>{% else %}<li class="text-slate-500">none</li>{% endfor %}</ul>
+      <h2 class="mt-3 mb-1 font-semibold">Gaps</h2>
+      <ul class="list-disc ml-5">{% for g in score.gaps %}<li>{{ g }}</li>{% else %}<li class="list-none text-slate-500">none</li>{% endfor %}</ul>
+      <h2 class="mt-3 mb-1 font-semibold">Red flags</h2>
+      <ul class="space-y-1">{% for r in score.red_flags %}<li><span class="rounded px-1 text-xs {{ 'bg-red-100' if r.severity == 'high' else 'bg-amber-100' }}">{{ r.severity }}</span> {{ r.flag }}{% if r.quote %} — <q class="italic">{{ r.quote }}</q>{% endif %}</li>{% else %}<li class="text-slate-500">none</li>{% endfor %}</ul>
+    </div>
+    {% endif %}
+
+    <div class="rounded border bg-white p-3">
+      <h2 class="mb-1 font-semibold">Decisions</h2>
+      <ul>{% for d in decisions %}<li>{{ d.created_at | local }} — <b>{{ d.action }}</b>{% if d.reason %}: {{ d.reason }}{% endif %}</li>{% else %}<li class="text-slate-500">none</li>{% endfor %}</ul>
+      <h2 class="mt-3 mb-1 font-semibold">Duplicates of this posting</h2>
+      <ul>{% for s in siblings %}<li><a class="text-blue-700" href="/jobs/{{ s.id }}">#{{ s.id }}</a> {{ s.source }} · {{ s.status }}</li>{% else %}<li class="text-slate-500">none</li>{% endfor %}</ul>
+      {% if applications %}<h2 class="mt-3 mb-1 font-semibold">Applications</h2>
+      <ul>{% for a in applications %}<li>{{ a.submitted_at | local }} via {{ a.method }} · outcome {{ a.outcome }}</li>{% endfor %}</ul>{% endif %}
+      {% if documents %}<h2 class="mt-3 mb-1 font-semibold">Documents</h2>
+      <ul>{% for d in documents %}<li><a class="text-blue-700" href="/documents/{{ d.id }}">{{ d.kind }} v{{ d.version }}</a>{% if d.approved %} ✓{% endif %}</li>{% endfor %}</ul>{% endif %}
+    </div>
+  </section>
+
+  <section class="lg:col-span-2 rounded border bg-white p-4">
+    <h2 class="mb-2 font-semibold">Description</h2>
+    <div class="whitespace-pre-wrap leading-relaxed">{{ job.description_text or '(Description not stored: this posting was filtered out or is a duplicate. Use “View posting”.)' }}</div>
+  </section>
+</div>
+{% endblock %}

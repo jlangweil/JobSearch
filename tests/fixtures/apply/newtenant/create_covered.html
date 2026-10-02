@@ -1,0 +1,27 @@
+<!doctype html>
+<!-- A Create Account form whose button sits under a transparent full-page overlay, the way a lingering consent
+     layer or spinner does. A normal click is refused ("intercepts pointer events"); a *forced* click silently
+     goes to the overlay and reports success. Only dispatching the event on the button itself gets through. -->
+<html lang="en"><head><meta charset="utf-8"><title>Create Account</title>
+<style>
+  #veil { position: fixed; inset: 0; background: rgba(0,0,0,0.01); z-index: 9999; }
+  form { position: relative; z-index: 1; }
+</style></head>
+<body>
+<h2 data-automation-id="pageHeader">Create Account</h2>
+<form onsubmit="return false;">
+  <label for="em">Email Address</label><input id="em" data-automation-id="email" type="text">
+  <label for="pw">Password</label><input id="pw" data-automation-id="password" type="password">
+  <label for="vp">Verify New Password</label><input id="vp" data-automation-id="verifyPassword" type="password">
+  <label><input data-automation-id="createAccountCheckbox" type="checkbox"> I consent to the above</label>
+  <button data-automation-id="createAccountSubmitButton" type="submit" onclick="go()">Create Account</button>
+</form>
+<div id="veil"></div>
+<script>
+  function go() {
+    if (document.getElementById('pw').value && document.getElementById('pw').value === document.getElementById('vp').value) {
+      location.href = 'verify.html';
+    }
+  }
+</script>
+</body></html>

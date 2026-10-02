@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "_icons.html" import icon %}
+{% block title %}Resumes &amp; letters{% endblock %}
+{% block content %}
+<p class="mb-3 max-w-3xl text-slate-600">Every job you've tailored documents for. Files are saved under <code>{{ output_root }}</code>, one folder per job;
+  download them here to upload with your application. To make new versions (for example after the resume changes), open the workflow and use
+  <b>Regenerate</b>.</p>
+<div class="overflow-x-auto rounded border bg-white">
+<table class="min-w-full">
+  <thead class="bg-slate-100 text-left text-xs uppercase text-slate-600">
+    <tr><th class="px-3 py-2">Job</th><th class="px-2">Stage</th><th class="px-2">Resume</th><th class="px-2">Cover letter</th><th class="px-2">Updated</th><th class="px-2 text-right">Actions</th></tr>
+  </thead>
+  <tbody>
+  {% for r in rows %}
+  <tr class="border-t align-top">
+    <td class="px-3 py-2"><a class="font-semibold text-blue-700" href="/jobs/{{ r.job_id }}">{{ r.title }}</a><div class="text-xs text-slate-500">{{ r.company }}</div></td>
+    <td class="px-2 py-2 text-xs">
+      <span class="rounded px-1.5 py-0.5 {{ 'bg-green-100 text-green-800' if r.status == 'ready' else ('bg-blue-100' if r.status == 'in_workflow' else 'bg-slate-100 text-slate-600') }}">{{ {'ready': 'ready to apply', 'in_workflow': 'tailoring', 'applied': 'applied', 'responded': 'responded'}.get(r.status, r.status) }}</span>
+    </td>
+    {% for kind in ['resume', 'cover_letter'] %}
+    <td class="px-2 py-2 text-sm">
+      {% set d = r[kind] %}
+      {% if d %}
+        <a class="text-blue-700" href="/documents/{{ d.id }}">v{{ d.version }}</a>{% if d.approved %} <span class="text-green-700" title="approved">✓</span>{% else %} <span class="text-xs text-slate-500">draft</span>{% endif %}
+        {% for f in d.files %}{% if f.exists %} · <a class="text-blue-700" href="/documents/{{ d.id }}/files/{{ f.index }}" title="{{ f.name }}">{{ f.ext }}</a>{% endif %}{% endfor %}
+      {% else %}<span class="text-slate-400">—</span>{% endif %}
+    </td>
+    {% endfor %}
+    <td class="whitespace-nowrap px-2 py-2 text-xs text-slate-500">{{ r.updated | local }}</td>
+    <td class="px-2 py-2">
+      <div class="flex justify-end gap-1">
+        <a class="rounded bg-slate-800 px-2 py-1 text-xs text-white" href="/jobs/{{ r.job_id }}/workflow">{{ 'Apply / regenerate' if r.status == 'ready' else 'Open workflow' }}</a>
+        {% for kind in ['resume', 'cover_letter'] %}{% if r[kind] and r[kind].files %}<form method="post" action="/documents/{{ r[kind].id }}/rerender"><button class="rounded border px-2 py-1 text-xs" title="Write the {{ kind.replace('_', ' ') }} .docx again with the current template and role layout">Re-render {{ 'resume' if kind == 'resume' else 'letter' }}</button></form>{% endif %}{% endfor %}
+        {% if r.apply_url %}<a class="rounded border px-2 py-1 text-xs" href="{{ r.apply_url }}" target="_blank" rel="noopener">Posting ↗</a>{% endif %}
+      </div>
+    </td>
+  </tr>
+  {% else %}
+  <tr><td colspan="6" class="px-3 py-6 text-center text-slate-500">No tailored documents yet. Shortlist a job (or <a class="text-blue-700" href="/jobs/new">add one</a>) to start.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

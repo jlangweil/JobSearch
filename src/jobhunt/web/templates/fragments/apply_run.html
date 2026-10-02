@@ -1,0 +1,65 @@
+<div id="apply-run" {% if run.status == 'running' %}hx-get="/apply/runs/{{ run.id }}" hx-trigger="every 3s" hx-swap="outerHTML"{% endif %} class="grid gap-4 lg:grid-cols-3">
+  <section class="lg:col-span-2 rounded border bg-white p-3">
+    <div class="flex flex-wrap items-center gap-3">
+      <span class="rounded px-2 py-0.5 text-sm {{ {'submitted': 'bg-green-100 text-green-800', 'review': 'bg-blue-100 text-blue-800', 'needs_input': 'bg-amber-100 text-amber-800', 'failed': 'bg-red-100 text-red-800'}.get(run.status, 'bg-blue-100 text-blue-800') }}">{{ run.status }}</span>
+      <span class="text-sm">{{ run.stage or 'starting' }}</span>
+      <span class="text-xs text-slate-500">{{ run.filled }} filled · {{ run.unknown }} unanswered · started {{ run.started_at|local }}{% if run.finished_at %} · finished {{ run.finished_at|local }}{% endif %}</span>
+      {% if run.status == 'running' %}<span class="text-xs text-blue-700">working… (updates every 3s)</span>{% endif %}
+    </div>
+    {% if run.error %}<div class="mt-2 rounded border border-amber-200 bg-amber-50 p-2 text-sm text-amber-900">{{ run.error }}</div>{% endif %}
+    {% if run.status == 'review' %}
+    <div class="mt-2 rounded border border-blue-200 bg-blue-50 p-2 text-sm text-blue-900">
+      The application is filled in and waiting on the Review page in the open browser. Read it, then submit it yourself —
+      and mark the job applied from <a class="underline" href="/jobs/{{ run.job_id }}/workflow">its workflow page</a>.
+    </div>
+    {% endif %}
+    {% if run.status == 'submitted' %}
+    <div class="mt-2 rounded border border-green-200 bg-green-50 p-2 text-sm text-green-900">
+      Submitted, and recorded in <a class="underline" href="/applications">Applications</a>.
+    </div>
+    {% endif %}
+
+    <h3 class="mt-3 text-xs font-semibold uppercase text-slate-500">What it did</h3>
+    <div class="max-h-96 overflow-y-auto">
+      <table class="w-full text-xs">
+        {% for e in run.events|reverse %}
+        <tr class="border-t">
+          <td class="w-24 py-0.5 text-slate-400">{{ e.at|local }}</td>
+          <td class="w-20"><span class="rounded px-1 {{ {'filled': 'bg-green-100 text-green-800', 'unknown': 'bg-amber-100 text-amber-800', 'no_option': 'bg-amber-100 text-amber-800', 'error': 'bg-red-100 text-red-800', 'stopped': 'bg-red-100 text-red-800'}.get(e.kind, 'bg-slate-100 text-slate-600') }}">{{ e.kind }}</span></td>
+          <td class="pr-2">{{ e.label }}</td>
+          <td class="text-slate-500">{{ e.detail }}</td>
+        </tr>
+        {% else %}<tr><td class="py-2 text-slate-500">nothing yet</td></tr>{% endfor %}
+      </table>
+    </div>
+  </section>
+
+  <aside class="space-y-4">
+    {% if run.open_questions %}
+    <section class="rounded border border-amber-200 bg-amber-50 p-3">
+      <h3 class="mb-1 font-semibold text-amber-900">Needs an answer</h3>
+      {% for q in run.open_questions %}
+      <form method="post" action="/apply/questions/{{ q.id }}" class="border-t border-amber-200 py-2">
+        <div class="text-sm">{{ q.label }}</div>
+        <input type="hidden" name="next" value="/apply/runs/{{ run.id }}">
+        {% if q.options %}
+        <select name="answer" class="mt-1 w-full rounded border px-2 py-1 text-sm text-slate-900">{% for o in q.options %}<option>{{ o }}</option>{% endfor %}</select>
+        {% else %}
+        <input name="answer" class="mt-1 w-full rounded border px-2 py-1 text-sm text-slate-900">
+        {% endif %}
+        <button class="mt-1 rounded bg-slate-800 px-2 py-1 text-xs text-white">Save answer</button>
+      </form>
+      {% endfor %}
+      <p class="mt-2 text-[11px] text-amber-900">Answer these, then start the run again — it will remember them everywhere.</p>
+      <form method="post" action="/jobs/{{ run.job_id }}/auto-apply" class="mt-2"><button class="rounded border border-amber-300 px-2 py-1 text-xs">Run again</button></form>
+    </section>
+    {% endif %}
+
+    <section class="rounded border bg-white p-3">
+      <h3 class="mb-1 font-semibold">Screenshots</h3>
+      {% for s in run.screenshots %}
+      <a href="/apply/runs/{{ run.id }}/shot/{{ loop.index0 }}" target="_blank" rel="noreferrer" class="block border-t py-1 text-xs underline">{{ s.split('\\')[-1] }}</a>
+      {% else %}<p class="text-xs text-slate-500">none yet</p>{% endfor %}
+    </section>
+  </aside>
+</div>

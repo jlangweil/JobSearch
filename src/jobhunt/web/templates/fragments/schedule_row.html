@@ -1,0 +1,41 @@
+{% from "_icons.html" import icon %}
+<tr id="schedule-{{ s.id }}" class="border-t align-top {{ 'bg-blue-50' if request.query_params.get('highlight') == s.id|string }}">
+  <td class="px-3 py-3">
+    <form hx-post="/schedules/{{ s.id }}/toggle" hx-target="#schedule-{{ s.id }}" hx-swap="outerHTML" method="post" action="/schedules/{{ s.id }}/toggle">
+      <input type="hidden" name="enabled" value="{{ '0' if s.enabled else '1' }}">
+      <label class="switch" title="{{ 'Turn off' if s.enabled else 'Turn on' }}">
+        <input type="checkbox" {% if s.enabled %}checked{% endif %} onchange="this.form.requestSubmit()" aria-label="Enabled: {{ s.name }}">
+        <span></span>
+      </label>
+    </form>
+  </td>
+  <td class="px-2 py-2">
+    <a class="font-semibold text-blue-700" href="/schedules/{{ s.id }}">{{ s.name }}</a>
+    <div class="text-xs text-slate-500">{{ s.describe }} · {{ s.timezone }}</div>
+    {% if s.trigger_error %}<div class="text-xs text-red-700">{{ s.trigger_error }}</div>{% endif %}
+  </td>
+  <td class="px-2 py-2">
+    <span class="rounded px-1.5 py-0.5 text-xs {{ 'bg-green-100 text-green-800' if s.mode == 'fetch' else ('bg-amber-100 text-amber-800' if s.mode == 'full' else 'bg-blue-100') }}">{{ s.mode_label }}</span>
+    <div class="mt-0.5 text-xs text-slate-500">{{ s.scope }}{% if s.max_to_score and s.mode != 'fetch' %} · max {{ s.max_to_score }}{% endif %}</div>
+  </td>
+  <td class="whitespace-nowrap px-2 py-2 text-xs">
+    {% if not s.enabled %}<span class="text-slate-400">off</span>
+    {% elif paused %}<span class="text-amber-700">paused</span>
+    {% else %}{{ s.next | when }}{% endif %}
+  </td>
+  <td class="px-2 py-2 text-xs">
+    {% if s.last_result %}
+      <div class="{{ 'text-red-700' if s.last_result.startswith('failed') else ('text-amber-700' if s.last_result.startswith('skipped') or s.last_result.startswith('waiting') else '') }}">{{ s.last_result }}</div>
+      <div class="text-slate-500">{{ s.last_fired_at | local }}
+        {% if s.last_run_id %}· <a class="text-blue-700" href="/runs/{{ s.last_run_id }}">run #{{ s.last_run_id }}</a>{% if s.last_run_status %} {{ s.last_run_status }}{% endif %}{% endif %}</div>
+    {% else %}<span class="text-slate-400">never run</span>{% endif %}
+  </td>
+  <td class="px-2 py-2">
+    <div class="flex justify-end gap-1">
+      <form method="post" action="/schedules/{{ s.id }}/run"><button class="flex items-center gap-1 rounded border px-2 py-1 text-xs" title="Start this run now, even if the schedule is off">{{ icon('play', 'h-3.5 w-3.5') }} Run now</button></form>
+      <a href="/schedules/{{ s.id }}" class="rounded border px-2 py-1 text-xs">Edit</a>
+      <a href="/schedules/new?copy={{ s.id }}" class="rounded border px-2 py-1 text-xs" title="Duplicate">{{ icon('copy', 'h-3.5 w-3.5') }}</a>
+      <form method="post" action="/schedules/{{ s.id }}/delete" onsubmit="return confirm('Delete schedule “{{ s.name|e }}”? Its past runs are kept.')"><button class="rounded border px-2 py-1 text-xs" title="Delete">{{ icon('trash', 'h-3.5 w-3.5') }}</button></form>
+    </div>
+  </td>
+</tr>

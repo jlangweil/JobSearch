@@ -1,0 +1,12 @@
+{% if preview and not errors %}
+<p class="mb-2 font-medium">{{ preview.describe }}</p>
+<p class="mb-1 text-xs uppercase text-slate-500">Next runs</p>
+<ol class="space-y-0.5 text-sm">
+  {% for w in preview.next %}<li>{{ w | when }} <span class="text-xs text-slate-500">{{ w.strftime('%Z') }}</span></li>{% else %}<li class="text-slate-500">never</li>{% endfor %}
+</ol>
+<p class="mt-2 text-xs text-slate-500">{{ modes[v.mode] }} · {{ (v.industries + v.companies) | length and ((v.industries | join(', ')) ~ ((' + ' ~ (v.companies | length) ~ ' companies') if v.companies else '')) or 'all active companies' }}</p>
+{% elif errors %}
+<ul class="list-disc pl-4 text-sm text-red-700">{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
+{% else %}
+<p class="text-slate-500">Pick days and times to see when it runs.</p>
+{% endif %}

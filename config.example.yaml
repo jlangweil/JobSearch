@@ -1,0 +1,535 @@
+# jobhunt configuration TEMPLATE. Committed to git; your own copy, config.yaml, is git-ignored.
+# On first run jobhunt copies this file to config.yaml (or: copy config.example.yaml config.yaml). Edit config.yaml,
+# directly or on the Settings page. No secrets here: API keys and passwords go in .env.
+#
+# >>> PLACEHOLDER VALUES <<<  Everything under profile / must_haves / nice_to_haves /
+# dealbreakers / filters / companies is a worked example. Replace it with YOUR target role,
+# comp floor, location rules and companies before trusting any score. See README.md.
+
+profile:
+  headline: "Senior project technical lead — enterprise integration architecture"   # PLACEHOLDER
+  years_experience: 25                                                    # PLACEHOLDER
+  summary_fact_ids: [summary-primary]
+  locations:
+    base: "Springfield, IL"                                               # PLACEHOLDER: your town
+    accept: [remote, hybrid]      # add "onsite" to allow on-site roles inside the commute area
+    max_commute_miles: 24   # informational only — no geocoding; see filters.local_location_patterns
+  seniority_band: [lead, principal, staff, architect, manager]
+  comp_floor: 150000                                                      # PLACEHOLDER: your minimum base pay
+  employment_types: [fte]
+  # What kind of role you want. Drives the `role_fit` subscore (SPEC §6.6 amendment).
+  target_roles: [technical lead, delivery lead, project lead, solution lead, integration lead, engineering manager, delivery manager, technical program manager, development manager]
+  role_preference: "Leadership roles: leading teams, owning delivery, and directing technical and architecture decisions, with limited hands-on coding. Roles that are mostly individual-contributor development should score low on role_fit."
+
+must_haves:
+  - "Integration or API platform ownership"
+nice_to_haves:
+  - "MuleSoft or equivalent iPaaS"
+  - "AWS"
+  - "Financial services or insurance domain"
+dealbreakers:
+  - "Requires active security clearance"
+  - "Onsite 5 days outside commute radius"
+
+# Scoring focus (Settings → Scoring focus). Applied in code to every score, and shown to the scoring model.
+# boost: phrases that should rank a job higher (in the title counts most). avoid: title phrases for areas you
+# don't want or have no experience in; those jobs' totals are capped at avoid_cap. PROPOSED lists: yours to edit.
+focus:
+  boost: ["mulesoft", "mule", "anypoint", "api", "api-led", "integration", "integrations", "ipaas", "migration", "modernization", "tech lead", "technical lead", "delivery lead", "delivery manager", "solution lead", "engineering manager"]
+  avoid: ["cybersecurity", "cyber", "information security", "infosec", "security architect", "security engineer", "platform security", "application security", "security operations", "GRC", "penetration", "CISO", "SOC analyst"]
+  avoid_cap: 45
+
+filters:
+  max_age_days: 30
+  # What to do with a posting older than that window. "keep" leaves it in and lets scoring judge it: a board
+  # can renew a listing without changing its posted date, and Workday reports anything over a month as the
+  # single bucket "30+ Days Ago". "filter" restores the old behaviour of dropping it.
+  stale_action: keep
+  # Case-insensitive regexes. A title matching any blocklist entry is filtered out.
+  title_blocklist: ['\b(intern|internship|junior|jr\.?|associate|sales|account executive|recruiter|designer|nurse|pharmacist|physician|therapist|underwriter|actuar\w*|claims|agent)\b']
+  # The titles you target. No longer a filter (inexact word matches dropped roles like "Managing Engineer"):
+  # its terms go to the scoring model, which reads each posting's title by meaning.
+  title_allowlist: ['\b(architect|architecture|integration|api|platform|principal|staff|lead|manager|managing|head of|director|delivery|program)\b']
+  # Matched against jobs.employment_type (fte|contract|c2h|unknown). "1099" from the SPEC example
+  # never matches a derived type, so "contract" is used here.
+  employment_blocklist: [contract, "1099"]
+  # Case-insensitive regexes over the description. Deterministic dealbreakers.
+  dealbreaker_patterns: ['active (ts/sci|top secret|secret) clearance', 'clearance (is )?required']
+  # Addition to SPEC: hybrid/onsite/unknown-type jobs survive only if their location matches one of
+  # these — a stand-in for the commute radius, since nothing is geocoded. PLACEHOLDER: replace with the towns
+  # within your commute (one regex per line is easiest to read), and set local_states to their states.
+  local_location_patterns:
+    - 'Springfield|Chatham|Rochester|Sherman|Riverton|Auburn|Petersburg'
+  # Each office in a multi-location posting is checked on its own, and a town only counts when the office names
+  # one of these states (or no state at all) — so "Springfield, MA" doesn't pass for "Springfield, IL".
+  local_states: [IL]
+  # Remote roles restricted to another country are dropped unless the location also looks local/US.
+  excluded_location_patterns: ['\b(India|United Kingdom|UK|Ireland|Canada|Mexico|Brazil|Poland|Philippines|Germany|Spain|Singapore|Japan|China|Australia|Costa Rica|Hungary|Slovakia|Czech)\b']
+  staffing_agency_slugs: []
+  # false: filtered-out and duplicate postings keep title/company/location/link/reason but not the full
+  # description or embedding — the database stays small. true: keep everything.
+  keep_filtered_descriptions: false
+
+scoring:
+  provider: "anthropic"   # anthropic (Claude, ≈ $0.01/job with prompt caching) | local (local_llm below, free)
+  model: claude-haiku-4-5     # benchmarked 2026-09-30 against qwen3 8b/30b/32b and Sonnet 5.5: close to Sonnet, 40% the price
+  rubric_version: v9          # v9: v8 + target titles read by meaning (the title allowlist no longer filters)
+  # PROPOSED weights — yours to tune on /settings (recomputes totals without re-scoring).
+  # role_fit = leadership/delivery vs hands-on; weighted equal to skill_match per your priorities.
+  # The total: the role (integration / technical / delivery leads first), your qualifications, closeness to your
+  # ideal job (ideal_job below), the employer's industry (insurance first: industry_scores below), seniority, and a
+  # little for focus keywords (Scoring focus). Pay and location weigh nothing here (they are hard filters); ghost
+  # signals are shown, not deducted.
+  weights: {role_fit: 0.35, skill_match: 0.30, industry_fit: 0.15, seniority_fit: 0.10, focus_fit: 0.10, ideal_fit: 0, domain_fit: 0, comp_fit: 0, logistics_fit: 0}
+  # Your ideal job: this role in facts.yaml with its accomplishments. ideal_fit = how close a posting is to it by
+  # embedding similarity (`low` or below -> 0, `high` or above -> 100). Shown on each job but weighted 0: the small
+  # embedding model reads mostly a posting's opening, often company boilerplate, so it misjudges e.g. PGIM's roles.
+  ideal_job: {role: role-example-current, low: 0.60, high: 0.80}   # a role id from YOUR data/facts.yaml
+  # industry_fit by the employer's `industry:` under companies. Companies not listed: "insurance"/"assurance" in the
+  # name counts as insurance; otherwise `unknown`.
+  industry_scores: {insurance: 100, insurtech: 95, financial: 75, health: 60, unknown: 50, other: 40}
+  # Employers not under `companies:` (Adzuna, email alerts) or listed there without an industry. Add insurers here.
+  industry_by_employer: {"JPMorgan Chase": financial, "Chubb": insurance, "Veeva Systems": tech, "Snowflake": tech, "Deloitte": services, "Johnson and Johnson": pharma, "J&J": pharma}
+  ghost_penalty: 0          # ghost signals are shown, not deducted
+  heatmap_min_score: 75     # Keyword heatmap (sidebar): what the jobs scoring at least this much ask for
+  shortlist_threshold: 70
+  max_per_run: 150
+  concurrency: 5
+  # The scoring prompt shows your most recent roles with their accomplishments (newest first), older roles as one
+  # line each, plus your certifications and skills from data/facts.yaml.
+  min_description_chars: 400      # shorter postings (alert-email snippets) wait for the full text
+  recent_roles_in_detail: 2
+  earlier_roles: full             # full: older roles with their accomplishments (their skills count) · titles: one line
+  max_achievements_per_role: 20   # in facts.yaml order — put your strongest bullets first
+
+tailoring:
+  provider: "anthropic"   # keep anthropic: small local models often fail the fact/ATS validation for resumes
+  # automated: draft straight away. ats_super_match: first tick which posting keywords and headline may be added,
+  # then draft to ATS rules (up to three pages keeping major projects, tech stacks and big wins; posting keywords
+  # throughout; strong verbs; acronyms spelled out). The job page lets
+  # you pick per job; this is the default.
+  generation_mode: automated
+  model: claude-sonnet-5-5
+  max_draft_attempts: 3
+  # complete: keep every role and accomplishment from your fact bank, reordered and reworded for the posting.
+  # focused: only the accomplishments that best match the posting (shorter). Settings → Resume tailoring.
+  resume_mode: complete
+  effort: medium                # Claude reasoning effort for drafting: low | medium | high
+  # separate_lines: employer / job title / dates each on their own line in the .docx, so Workday and other resume
+  # parsers fill your work history correctly. one_line: the compact "Title | Employer | dates" heading.
+  role_layout: separate_lines
+  max_bullets_per_role: 0       # 0 = no limit
+  max_bullet_chars: 320
+  # Resume sections, in order. ATS parsers recognize these standard headings (see SPEC §7.6).
+  sections: [summary, skills, experience, projects, education, certifications]
+  # The Projects section (kind: project facts), written by code into every tailored resume: projects whose tags (or
+  # their accomplishments' tags) the posting mentions, best match first, with a Technologies: line (posting keywords
+  # first). include: relevant | always | never. Remove `projects` from `sections` to leave the section out.
+  projects:
+    include: relevant
+    max_projects: 3
+    max_bullets_per_project: 2
+  facts_per_requirement: 5
+  fact_match_threshold: 0.6
+
+# A model running on this machine (used when scoring.provider or tailoring.provider is `local`).
+# Setup: install Ollama (https://ollama.com), then `ollama pull qwen3:8b`. Test it on Settings → Language models.
+local_llm:
+  api: "ollama"                          # ollama (native API) | openai (LM Studio, llama.cpp llama-server, vLLM)
+  base_url: "http://127.0.0.1:11434"   # Ollama's default; LM Studio is usually http://127.0.0.1:1234
+  model: "qwen3:8b"                    # qwen3:8b (5.2 GB, Q4) · qwen3:8b-q8_0 (8.9 GB) · qwen3:8b-fp16 (16 GB)
+  num_ctx: 16384                       # context tokens; the scoring prompt plus a long posting is ~6-10k
+  concurrency: 2                       # parallel scoring requests
+  keep_alive: "30m"                    # keep the model loaded between jobs
+  timeout_s: 300.0
+  temperature: 0.0
+  think: false                         # Qwen3 thinking mode: slower, not needed for scoring
+
+# Job-alert emails: LinkedIn, Indeed and others mail you their listings; jobhunt reads that mailbox read-only and
+# files what it finds. Set it up on Settings → Job alert emails (credentials go to .env, never config.yaml).
+email:
+  enabled: false
+  host: "imap.gmail.com"
+  port: 993
+  folder: "INBOX"               # or a Gmail label / mail folder you filter alerts into, e.g. "JobAlerts"
+  senders: []                   # [] = the built-in LinkedIn / Indeed / Glassdoor / ZipRecruiter alert addresses
+  subject_patterns: []          # optional extra matching, e.g. ['job alert']
+  max_age_days: 14
+  max_messages: 200
+
+embeddings:
+  model: "BAAI/bge-small-en-v1.5"
+
+schedule:
+  # Schedules are created, enabled and paused on the Schedules page (stored in the database).
+  # This is only the default time zone for new schedules.
+  timezone: "America/New_York"
+
+# Auto-apply (BETA). Fills Workday applications in a real browser using data/apply_profile.yaml and the
+# sign-in saved on Settings -> Auto-apply (passwords are encrypted with Windows DPAPI, never stored here).
+# auto_submit is the only switch that actually sends an application; with it off a run stops on the Review page.
+auto_apply:
+  enabled: false             # the beta: switch on in Settings -> Auto-apply
+  ats_types: [workday]
+  headless: false            # watch it work, and take over whenever you like
+  auto_submit: false         # OFF: fill everything, then stop on Review for you to check and submit
+  stop_on_unknown: true      # pause rather than leave a question it has no answer for blank
+  create_accounts: true      # a Workday site you have not used before: sign up, then remember the account
+  password_mode: "per_site"    # per_site: a generated password per tenant; shared: reuse the one you saved
+  store_passwords: encrypted   # plain: site passwords are kept as typed and shown on the Auto-apply page,
+                               # so a generated one can be read and used by hand. "encrypted" uses Windows
+                               # DPAPI instead (a copied database then yields nothing).
+  read_verification_email: true   # read the "verify your email" code from the mailbox set up for job alerts
+  verification_wait_seconds: 180
+  wait_for_human_seconds: 300
+  keep_open_minutes: 30      # after a run stops or fails, the window stays open this long so you can see the
+                             # state of the page (the run is already recorded; closing the window ends the wait)  # with a visible browser, pause this long for you to type a verification code
+                               # (or anything else it cannot do) and then carry on by itself
+  upload_cover_letter: true
+  apply_mode: autofill       # autofill: let the site read the resume and then correct what it got wrong.
+                             # manual: type every field in ourselves (exact, but slower and fussier).
+  fill_work_experience: true # type each role into Workday's own fields; false = attach the resume and let their
+                             # parser fill them (it splits roles and drops employers, so true is recommended)
+  account_email: ""          # sign-in used when creating an account on a new tenant (blank = your profile email)
+  timeout_seconds: 45
+  slow_mo_ms: 0
+  keep_screenshots: true
+  max_work_experience: 6
+  max_skills: 15             # skills offered to a "Type to Add Skills" picker, taken from your fact bank
+
+web:
+  host: "127.0.0.1"          # "0.0.0.0" opens it to your network (set WEB_PASSWORD in .env first)
+  port: 8000
+  executor_workers: 4
+
+paths:
+  db: "./data/jobhunt.db"
+  checkpoints: "./data/checkpoints.db"
+  facts: "./data/facts.yaml"
+  output_root: "./output"
+  exports: "./exports"
+  resume_template: "./data/resume_template.docx"
+  soffice: "C:/Program Files/LibreOffice/program/soffice.exe"   # null to skip PDF
+  max_path_chars: 240
+  lock_stale_minutes: 30
+
+sources:
+  # Workday and SuccessFactors are the priority sources. Both are query-driven: each board is searched
+  # with these terms (a company entry may override with its own `queries`). Results from overlapping
+  # queries are de-duplicated per board. After the first run, postings already in the database are
+  # recorded as sightings without re-downloading their descriptions.
+  workday:
+    enabled: true
+    rate_limit_per_sec: 2
+    max_pages_per_query: 3        # 20 postings per page
+    queries: ["integration architect", "enterprise architect", "solutions architect", "api", "integration", "technical lead"]
+    # Source-side narrowing via each tenant's own facets (regexes over the facet value names). Searches only
+    # return postings in matching job categories/families and countries. A tenant without such a facet, or
+    # with no matching value, is left unfiltered on that dimension. A company may override with its own
+    # `category_patterns` ([] = no category filter). See categories with: jobhunt companies probe-workday <url>
+    category_patterns: ['technolog', 'information', '(?-i:\bIT\b)', '\bdata\b', 'digital', 'software', 'engineer', 'architect', 'cyber', 'security', 'cloud', 'infrastructure', 'integration', 'agile', 'analytics']
+    country_patterns: ['united states', '\bUSA?\b']
+  successfactors:
+    enabled: true
+    rate_limit_per_sec: 1
+    max_pages_per_query: 2        # ~25 postings per page
+    queries: ["architect", "integration", "api", "technical lead"]
+  # Phenom and Eightfold career sites (added 2026-09-15). Query-driven like Workday; Phenom also narrows by the
+  # site's own country facet. Many Phenom sites front a Workday tenant: add only ones not already listed as workday.
+  phenom:
+    enabled: true
+    rate_limit_per_sec: 1
+    max_pages_per_query: 3        # 50 postings per page
+    queries: ["architect", "integration", "api", "technical lead", "delivery lead"]
+    country_patterns: ['united states', '\bUSA?\b']
+  eightfold:
+    enabled: true
+    rate_limit_per_sec: 1
+    max_pages_per_query: 5        # 10 postings per page (API maximum)
+    queries: ["architect", "integration", "api", "technical lead", "delivery"]
+  greenhouse: {enabled: true, rate_limit_per_sec: 1}
+  lever: {enabled: true, rate_limit_per_sec: 1}
+  ashby: {enabled: true, rate_limit_per_sec: 1}
+  # Adzuna job search API (Settings → Adzuna). Keys go in .env. The API returns 500-character snippets; before
+  # scoring, the full posting is read from the job's adzuna.com/details page (robots.txt allows it; the API's /land/ad
+  # links are disallowed and never fetched), and a job whose page says it's no longer available is closed.
+  # Company-only runs skip Adzuna (it isn't a company board).
+  adzuna:
+    enabled: false           # needs ADZUNA_APP_ID / ADZUNA_APP_KEY in .env
+    rate_limit_per_sec: 1
+    fetch_full_description: true  # false: score on the snippet and paste full postings by hand
+    queries: ["mulesoft", "integration architect", "technical lead", "delivery lead", "api platform"]
+    location: "Springfield, IL"
+    distance_miles: 22
+    max_days_old: 30
+    pages: 2                      # 50 results per page, per search term
+    category: "it-jobs"           # "" = any category
+    salary_min: 0
+    exclude_words: []
+    title_only: false             # true: search terms must appear in the job title
+
+# Companies. Every board token below was verified reachable on 2026-09-14 (Workday sites are ones the
+# tenant's robots.txt marks Allow). PLACEHOLDER — prune/extend to the companies you actually want.
+#   workday:        board_token = <tenant>.<wdN>.myworkdayjobs.com/<site>
+#                   find sites with: jobhunt companies probe-workday https://<tenant>.<wdN>.myworkdayjobs.com
+#   successfactors: board_token = career-site domain; check with: jobhunt companies probe-successfactors <domain>
+#   phenom:         board_token = <career host>/<country>/<lang>, e.g. careers.marsh.com/global/en (Companies → Check)
+#   eightfold:      board_token = <career host>|<company domain>, e.g. careers.newyorklife.com|newyorklife.com
+#   greenhouse / lever / ashby: board_token = the slug in boards.greenhouse.io/<t>, jobs.lever.co/<t>, jobs.ashbyhq.com/<t>
+companies:
+  # ---------------------------------------------------------------- Workday — verified
+  - {name: "Prudential", ats_type: workday, board_token: pru.wd5.myworkdayjobs.com/Careers, industry: insurance}
+  - {name: "PGIM", ats_type: workday, board_token: pru.wd5.myworkdayjobs.com/PGIM_Careers, industry: financial}
+  - {name: "Travelers", ats_type: workday, board_token: travelers.wd5.myworkdayjobs.com/External, industry: insurance}
+  - {name: "The Hartford", ats_type: workday, board_token: thehartford.wd5.myworkdayjobs.com/Careers_External, industry: insurance}
+  - {name: "AIG", ats_type: workday, board_token: aig.wd1.myworkdayjobs.com/aig, industry: insurance}
+  - {name: "Allstate", ats_type: workday, board_token: allstate.wd5.myworkdayjobs.com/allstate_careers, industry: insurance}
+  - {name: "Nationwide", ats_type: workday, board_token: nationwide.wd1.myworkdayjobs.com/Nationwide_Career, industry: insurance}
+  - {name: "Guardian Life", ats_type: workday, board_token: guardianlife.wd5.myworkdayjobs.com/Guardian-Life-Careers, industry: insurance}
+  - {name: "Unum", ats_type: workday, board_token: unum.wd1.myworkdayjobs.com/External, industry: insurance}
+  - {name: "Arch Insurance", ats_type: workday, board_token: archgroup.wd1.myworkdayjobs.com/Careers, industry: insurance}
+  - {name: "Everest", ats_type: workday, board_token: everestre.wd5.myworkdayjobs.com/careers, industry: insurance}
+  - {name: "NJM Insurance", ats_type: workday, board_token: njm.wd1.myworkdayjobs.com/njm, industry: insurance}
+  - {name: "CNA", ats_type: workday, board_token: cna.wd1.myworkdayjobs.com/CNA_Careers, industry: insurance}
+  - {name: "American Family Insurance", ats_type: workday, board_token: amfam.wd1.myworkdayjobs.com/Careers, industry: insurance}
+  - {name: "USAA", ats_type: workday, board_token: usaa.wd1.myworkdayjobs.com/USAAJOBSWD, industry: insurance}
+  - {name: "Transamerica", ats_type: workday, board_token: transamerica.wd5.myworkdayjobs.com/US, industry: insurance}
+  - {name: "Globe Life", ats_type: workday, board_token: globelife.wd5.myworkdayjobs.com/Globe-Life-Careers, industry: insurance}
+  - {name: "Assurant", ats_type: workday, board_token: assurant.wd1.myworkdayjobs.com/Assurant_Careers, industry: insurance}
+  - {name: "First American", ats_type: workday, board_token: firstam.wd1.myworkdayjobs.com/firstamericancareers, industry: insurance}
+  - {name: "Kemper", ats_type: workday, board_token: kemper.wd5.myworkdayjobs.com/Kemper_Careers, industry: insurance}
+  - {name: "Hiscox", ats_type: workday, board_token: hiscox.wd3.myworkdayjobs.com/Hiscox_External_Site, industry: insurance}
+  - {name: "HUB International", ats_type: workday, board_token: hubinternational.wd1.myworkdayjobs.com/HUBInternational, industry: insurance}
+  - {name: "Athene", ats_type: workday, board_token: athene.wd5.myworkdayjobs.com/athene_careers, industry: insurance}
+  - {name: "Sun Life", ats_type: workday, board_token: sunlife.wd3.myworkdayjobs.com/Experienced, industry: insurance}
+  - {name: "Pacific Life", ats_type: workday, board_token: pacificlife.wd1.myworkdayjobs.com/PacificLifeCareers, industry: insurance}
+  - {name: "Penn Mutual", ats_type: workday, board_token: pennmutual.wd1.myworkdayjobs.com/_penn-careers, industry: insurance}
+  - {name: "Guidewire", ats_type: workday, board_token: guidewire.wd5.myworkdayjobs.com/external, industry: insurtech}
+  - {name: "Duck Creek Technologies", ats_type: workday, board_token: duckcreek.wd1.myworkdayjobs.com/duckcreekcareers, industry: insurtech}
+  - {name: "Mastercard", ats_type: workday, board_token: mastercard.wd1.myworkdayjobs.com/CorporateCareers, industry: financial}
+  - {name: "Capital One", ats_type: workday, board_token: capitalone.wd12.myworkdayjobs.com/Capital_One, industry: financial}
+  - {name: "Bank of America", ats_type: workday, board_token: ghr.wd1.myworkdayjobs.com/Lateral-US, industry: financial}
+  - {name: "State Street", ats_type: workday, board_token: statestreet.wd1.myworkdayjobs.com/Global, industry: financial}
+  - {name: "BlackRock", ats_type: workday, board_token: blackrock.wd1.myworkdayjobs.com/BlackRock_Professional, industry: financial}
+  - {name: "Broadridge", ats_type: workday, board_token: broadridge.wd5.myworkdayjobs.com/Careers, industry: financial}
+  - {name: "Fiserv", ats_type: workday, board_token: fiserv.wd5.myworkdayjobs.com/EXT, industry: financial}
+  - {name: "FIS", ats_type: workday, board_token: fis.wd5.myworkdayjobs.com/SearchJobs, industry: financial}
+  - {name: "PayPal", ats_type: workday, board_token: paypal.wd1.myworkdayjobs.com/jobs, industry: financial}
+  - {name: "TransUnion", ats_type: workday, board_token: transunion.wd5.myworkdayjobs.com/TransUnion, industry: financial}
+  - {name: "Cigna", ats_type: workday, board_token: cigna.wd5.myworkdayjobs.com/cignacareers, industry: health}
+  - {name: "Humana", ats_type: workday, board_token: humana.wd5.myworkdayjobs.com/Humana_External_Career_Site, industry: health}
+  - {name: "CVS Health / Aetna", ats_type: workday, board_token: cvshealth.wd1.myworkdayjobs.com/CVS_Health_Careers, industry: health}
+  - {name: "Elevance Health", ats_type: workday, board_token: elevancehealth.wd1.myworkdayjobs.com/ANT, industry: health}
+  - {name: "Centene", ats_type: workday, board_token: centene.wd5.myworkdayjobs.com/Centene_External, industry: health}
+  - {name: "Highmark Health", ats_type: workday, board_token: highmarkhealth.wd1.myworkdayjobs.com/highmark, industry: health}
+  - {name: "HCSC", ats_type: workday, board_token: hcsc.wd1.myworkdayjobs.com/HCSC_External, industry: health}
+  - {name: "Healthfirst", ats_type: workday, board_token: healthfirst.wd1.myworkdayjobs.com/healthfirst, industry: health}
+  - {name: "Blue Cross NC", ats_type: workday, board_token: bcbsnc.wd5.myworkdayjobs.com/BCBSNC, industry: health}
+  - {name: "Premera Blue Cross", ats_type: workday, board_token: premera.wd5.myworkdayjobs.com/Premera, industry: health}
+  - {name: "CareSource", ats_type: workday, board_token: caresource.wd1.myworkdayjobs.com/CareSource, industry: health}
+  - {name: "Magellan Health", ats_type: workday, board_token: magellanhealth.wd5.myworkdayjobs.com/magellan_health_careers, industry: health}
+  - {name: "Evolent", ats_type: workday, board_token: evolent.wd1.myworkdayjobs.com/External, industry: health}
+  - {name: "Labcorp", ats_type: workday, board_token: labcorp.wd1.myworkdayjobs.com/External, industry: health}
+  - {name: "Cardinal Health", ats_type: workday, board_token: cardinalhealth.wd1.myworkdayjobs.com/EXT, industry: health}
+  - {name: "McKesson", ats_type: workday, board_token: mckesson.wd3.myworkdayjobs.com/External_Careers, industry: health}
+  - {name: "IQVIA", ats_type: workday, board_token: iqvia.wd1.myworkdayjobs.com/IQVIA, industry: health}
+  - {name: "Johnson & Johnson", ats_type: workday, board_token: jj.wd5.myworkdayjobs.com/JJ, industry: pharma}
+  - {name: "Merck", ats_type: workday, board_token: msd.wd5.myworkdayjobs.com/SearchJobs, industry: pharma}
+  - {name: "Pfizer", ats_type: workday, board_token: pfizer.wd1.myworkdayjobs.com/PfizerCareers, industry: pharma}
+  - {name: "Novartis", ats_type: workday, board_token: novartis.wd3.myworkdayjobs.com/Novartis_Careers, industry: pharma}
+  - {name: "Sanofi", ats_type: workday, board_token: sanofi.wd3.myworkdayjobs.com/SanofiCareers, industry: pharma}
+  - {name: "GSK", ats_type: workday, board_token: gsk.wd5.myworkdayjobs.com/GSKCareers, industry: pharma}
+  - {name: "AstraZeneca", ats_type: workday, board_token: astrazeneca.wd3.myworkdayjobs.com/Careers, industry: pharma}
+  - {name: "Organon", ats_type: workday, board_token: organon.wd5.myworkdayjobs.com/SearchJobs, industry: pharma}
+  - {name: "Zoetis", ats_type: workday, board_token: zoetis.wd5.myworkdayjobs.com/zoetis, industry: pharma}
+  - {name: "Becton Dickinson (BD)", ats_type: workday, board_token: bdx.wd1.myworkdayjobs.com/EXTERNAL_CAREER_SITE_USA, industry: medtech}
+  - {name: "Regeneron", ats_type: workday, board_token: regeneron.wd1.myworkdayjobs.com/Careers, industry: pharma}
+  - {name: "Amgen", ats_type: workday, board_token: amgen.wd1.myworkdayjobs.com/Careers, industry: pharma}
+  - {name: "Gilead", ats_type: workday, board_token: gilead.wd1.myworkdayjobs.com/gileadcareers, industry: pharma}
+  - {name: "Viatris", ats_type: workday, board_token: viatris.wd5.myworkdayjobs.com/External, industry: pharma}
+  - {name: "Medtronic", ats_type: workday, board_token: medtronic.wd1.myworkdayjobs.com/MedtronicCareers, industry: medtech}
+  - {name: "Stryker", ats_type: workday, board_token: stryker.wd1.myworkdayjobs.com/StrykerCareers, industry: medtech}
+  - {name: "Baxter", ats_type: workday, board_token: baxter.wd1.myworkdayjobs.com/baxter, industry: medtech}
+  - {name: "Salesforce", ats_type: workday, board_token: salesforce.wd12.myworkdayjobs.com/External_Career_Site, industry: tech}
+  - {name: "MuleSoft (Salesforce)", ats_type: workday, board_token: salesforce.wd12.myworkdayjobs.com/Mulesoft_Careersite, industry: tech, queries: [""]}
+  - {name: "Workday", ats_type: workday, board_token: workday.wd5.myworkdayjobs.com/Workday, industry: tech}
+  - {name: "Adobe", ats_type: workday, board_token: adobe.wd5.myworkdayjobs.com/external_experienced, industry: tech}
+  - {name: "Red Hat", ats_type: workday, board_token: redhat.wd5.myworkdayjobs.com/Jobs, industry: tech}
+  - {name: "CrowdStrike", ats_type: workday, board_token: crowdstrike.wd5.myworkdayjobs.com/crowdstrikecareers, industry: tech}
+  - {name: "Gartner", ats_type: workday, board_token: gartner.wd5.myworkdayjobs.com/EXT, industry: tech}
+  - {name: "RELX / LexisNexis", ats_type: workday, board_token: relx.wd3.myworkdayjobs.com/relx, industry: tech}
+  - {name: "Unisys", ats_type: workday, board_token: unisys.wd5.myworkdayjobs.com/External, industry: tech}
+  - {name: "PwC (US)", ats_type: workday, board_token: pwc.wd3.myworkdayjobs.com/US_Experienced_Careers, industry: services}
+  - {name: "Genpact", ats_type: workday, board_token: genpact.wd108.myworkdayjobs.com/External_Careers, industry: services}
+  - {name: "Bristol Myers Squibb", ats_type: workday, board_token: bristolmyerssquibb.wd5.myworkdayjobs.com/BMS, industry: pharma}
+  - {name: "Boeing", ats_type: workday, board_token: boeing.wd1.myworkdayjobs.com/EXTERNAL_CAREERS, industry: aerospace}
+  - {name: "NVIDIA", ats_type: workday, board_token: nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite, industry: tech}
+  - {name: "Target", ats_type: workday, board_token: target.wd5.myworkdayjobs.com/targetcareers, industry: retail}
+  - {name: "General Motors", ats_type: workday, board_token: generalmotors.wd5.myworkdayjobs.com/Careers_GM, industry: automotive}
+  - {name: "Northrop Grumman", ats_type: workday, board_token: ngc.wd1.myworkdayjobs.com/Northrop_Grumman_External_Site, industry: aerospace}
+  - {name: "Leidos", ats_type: workday, board_token: leidos.wd5.myworkdayjobs.com/External, industry: services}
+  - {name: "CACI", ats_type: workday, board_token: caci.wd1.myworkdayjobs.com/External, industry: services}
+  - {name: "Sabre", ats_type: workday, board_token: sabre.wd1.myworkdayjobs.com/SabreJobs, industry: tech}
+  - {name: "Amadeus", ats_type: workday, board_token: amadeus.wd502.myworkdayjobs.com/jobs, industry: tech}
+  - {name: "Cengage", ats_type: workday, board_token: cengage.wd5.myworkdayjobs.com/CengageNorthAmericaCareers, industry: tech}
+  - {name: "Visa", ats_type: workday, board_token: visa.wd5.myworkdayjobs.com/Visa, industry: financial}
+  - {name: "U.S. Bank", ats_type: workday, board_token: usbank.wd1.myworkdayjobs.com/US_Bank_Careers, industry: financial}
+  - {name: "Synchrony", ats_type: workday, board_token: synchronyfinancial.wd5.myworkdayjobs.com/careers, industry: financial}
+  - {name: "Discover Financial Services", ats_type: workday, board_token: discover.wd5.myworkdayjobs.com/Discover, industry: financial}
+  - {name: "Raymond James", ats_type: workday, board_token: raymondjames.wd1.myworkdayjobs.com/RaymondJamesCareers, industry: financial}
+  - {name: "TD Bank", ats_type: workday, board_token: td.wd3.myworkdayjobs.com/TD_Bank_Careers, industry: financial}
+  # ---------------------------------------------------------------- SuccessFactors — verified
+  - {name: "Lincoln Financial", ats_type: successfactors, board_token: jobs.lincolnfinancial.com, industry: insurance}
+  - {name: "Swiss Re", ats_type: successfactors, board_token: careers.swissre.com, industry: insurance}
+  - {name: "Bayer", ats_type: successfactors, board_token: jobs.bayer.com, industry: pharma}
+  - {name: "Novo Nordisk", ats_type: successfactors, board_token: careers.novonordisk.com, industry: pharma}
+  - {name: "Boehringer Ingelheim", ats_type: successfactors, board_token: jobs.boehringer-ingelheim.com, industry: pharma}
+  - {name: "Coloplast", ats_type: successfactors, board_token: careers.coloplast.com, industry: medtech}
+  - {name: "SAP", ats_type: successfactors, board_token: jobs.sap.com, industry: tech}
+  - {name: "EY", ats_type: successfactors, board_token: careers.ey.com, industry: services}
+  - {name: "Capgemini", ats_type: successfactors, board_token: careers.capgemini.com, industry: services}
+  - {name: "BioNTech", ats_type: successfactors, board_token: jobs.biontech.com, industry: pharma, active: false}
+  - {name: "MAPFRE", ats_type: successfactors, board_token: jobs.mapfre.com, industry: insurance, active: false}
+  # ---------------------------------------------------------------- Phenom / Eightfold — verified 2026-09-15
+  - {name: "Marsh McLennan", ats_type: phenom, board_token: careers.marsh.com/global/en, industry: insurance}
+  - {name: "Cencora", ats_type: phenom, board_token: careers.cencora.com/us/en, industry: health}
+  - {name: "New York Life", ats_type: eightfold, board_token: careers.newyorklife.com|newyorklife.com, industry: insurance}
+
+  # ---------------------------------------------------------------- Greenhouse — verified
+  - {name: "Oscar Health", ats_type: greenhouse, board_token: oscar, industry: health}
+  - {name: "Zocdoc", ats_type: greenhouse, board_token: zocdoc, industry: health}
+  - {name: "Chime", ats_type: greenhouse, board_token: chime, industry: financial}
+  - {name: "Affirm", ats_type: greenhouse, board_token: affirm, industry: financial}
+  - {name: "SoFi", ats_type: greenhouse, board_token: sofi, industry: financial}
+  - {name: "MongoDB", ats_type: greenhouse, board_token: mongodb, industry: tech}
+  - {name: "Datadog", ats_type: greenhouse, board_token: datadog, industry: tech}
+  - {name: "Twilio", ats_type: greenhouse, board_token: twilio, industry: tech}
+  - {name: "Postman", ats_type: greenhouse, board_token: postman, industry: tech}
+  - {name: "Celigo", ats_type: greenhouse, board_token: celigo, industry: tech}
+  - {name: "Brex", ats_type: greenhouse, board_token: brex, industry: financial}
+  - {name: "Mercury", ats_type: greenhouse, board_token: mercury, industry: financial}
+  - {name: "Carta", ats_type: greenhouse, board_token: carta, industry: financial}
+  - {name: "HubSpot", ats_type: greenhouse, board_token: hubspotjobs, industry: tech}
+  - {name: "Elastic", ats_type: greenhouse, board_token: elastic, industry: tech}
+  - {name: "GitLab", ats_type: greenhouse, board_token: gitlab, industry: tech}
+  - {name: "Discord", ats_type: greenhouse, board_token: discord, industry: tech}
+  - {name: "Twitch", ats_type: greenhouse, board_token: twitch, industry: tech}
+  - {name: "Scale AI", ats_type: greenhouse, board_token: scaleai, industry: ai}
+  - {name: "xAI", ats_type: greenhouse, board_token: xai, industry: ai}
+  - {name: "Anduril", ats_type: greenhouse, board_token: andurilindustries, industry: ai}
+  - {name: "Checkr", ats_type: greenhouse, board_token: checkr, industry: tech}
+  - {name: "Anthropic", ats_type: greenhouse, board_token: anthropic, industry: ai}
+  - {name: "At-Bay", ats_type: greenhouse, board_token: atbayjobs, industry: insurtech}
+  - {name: "Next Insurance", ats_type: greenhouse, board_token: nextinsurance66, industry: insurtech}
+  - {name: "Pie Insurance", ats_type: greenhouse, board_token: pieinsurance, industry: insurtech}
+  - {name: "Authentic", ats_type: greenhouse, board_token: authenticinsurance, industry: insurtech}
+  - {name: "Integrated Specialty Coverages", ats_type: greenhouse, board_token: isccareers, industry: insurtech}
+  - {name: "Trellis", ats_type: greenhouse, board_token: trellis, industry: insurtech}
+  - {name: "Attune", ats_type: greenhouse, board_token: attune, industry: insurtech}
+  - {name: "WithCoverage", ats_type: greenhouse, board_token: withcoverage, industry: insurtech}
+  # ---------------------------------------------------------------- Lever — verified
+  - {name: "JumpCloud", ats_type: lever, board_token: jumpcloud, industry: tech}
+  # ---------------------------------------------------------------- Ashby — verified
+  - {name: "Ramp", ats_type: ashby, board_token: ramp, industry: financial}
+  - {name: "Zapier", ats_type: ashby, board_token: zapier, industry: tech}
+  - {name: "OpenAI", ats_type: ashby, board_token: openai, industry: ai}
+  - {name: "Perplexity", ats_type: ashby, board_token: perplexity, industry: ai}
+  - {name: "Cursor", ats_type: ashby, board_token: cursor, industry: ai}
+  - {name: "Notion", ats_type: ashby, board_token: notion, industry: tech}
+  - {name: "Vercel", ats_type: ashby, board_token: vercel, industry: tech}
+  - {name: "Replit", ats_type: ashby, board_token: replit, industry: tech}
+  - {name: "Docker", ats_type: ashby, board_token: docker, industry: tech}
+  - {name: "Linear", ats_type: ashby, board_token: linear, industry: tech}
+  - {name: "PostHog", ats_type: ashby, board_token: posthog, industry: tech}
+  - {name: "Deel", ats_type: ashby, board_token: deel, industry: tech}
+  - {name: "Hopper", ats_type: ashby, board_token: hopper, industry: tech}
+  - {name: "Column", ats_type: ashby, board_token: column, industry: financial}
+  - {name: "Dave", ats_type: ashby, board_token: dave, industry: financial}
+  - {name: "Mistral AI", ats_type: ashby, board_token: mistral.ai, industry: ai}
+
+  # ---------------------------------------------------------------- Harvested lists — verified 2026-09-17
+  # Tokens checked live: each Workday site is one its tenant's robots.txt marks Allow and that returned postings;
+  # Greenhouse/Lever/Ashby boards returned open jobs. Names corrected from the boards themselves.
+
+  # Workday
+  - {name: "3M", ats_type: workday, board_token: 3m.wd1.myworkdayjobs.com/Search, industry: industrial}
+  - {name: "Abbott", ats_type: workday, board_token: abbott.wd5.myworkdayjobs.com/abbottcareers, industry: medtech}
+  - {name: "Accenture", ats_type: workday, board_token: accenture.wd103.myworkdayjobs.com/AccentureCareers, industry: services}
+  - {name: "Applied Materials", ats_type: workday, board_token: amat.wd1.myworkdayjobs.com/External, industry: tech}
+  - {name: "Analog Devices", ats_type: workday, board_token: analogdevices.wd1.myworkdayjobs.com/External, industry: tech}
+  - {name: "Bloomberg Industry Group", ats_type: workday, board_token: bloomberg.wd1.myworkdayjobs.com/Bloombergindustrygroup_External_Career_Site, industry: financial}
+  - {name: "Bloom Energy", ats_type: workday, board_token: bloomenergy.wd1.myworkdayjobs.com/BloomEnergyCareers, industry: industrial}
+  - {name: "Boston Dynamics", ats_type: workday, board_token: bostondynamics.wd1.myworkdayjobs.com/Boston_Dynamics, industry: tech}
+  - {name: "Cadence Design Systems", ats_type: workday, board_token: cadence.wd1.myworkdayjobs.com/External_Careers, industry: tech}
+  - {name: "Ciena", ats_type: workday, board_token: ciena.wd5.myworkdayjobs.com/Careers, industry: tech}
+  - {name: "Cognex", ats_type: workday, board_token: cognex.wd1.myworkdayjobs.com/External_Career_Site, industry: tech}
+  - {name: "Copart", ats_type: workday, board_token: copart.wd12.myworkdayjobs.com/copart, industry: services}
+  - {name: "Dexcom", ats_type: workday, board_token: dexcom.wd1.myworkdayjobs.com/Dexcom, industry: medtech}
+  - {name: "Disney", ats_type: workday, board_token: disney.wd5.myworkdayjobs.com/disneycareer, industry: media}
+  - {name: "FactSet", ats_type: workday, board_token: factset.wd108.myworkdayjobs.com/FactSetCareers, industry: financial}
+  - {name: "Teledyne FLIR", ats_type: workday, board_token: flir.wd1.myworkdayjobs.com/flircareers, industry: industrial}
+  - {name: "FTI Consulting", ats_type: workday, board_token: fticonsulting.wd108.myworkdayjobs.com/FTIConsultingCareers, industry: services}
+  - {name: "GEICO", ats_type: workday, board_token: geico.wd1.myworkdayjobs.com/External, industry: insurance}
+  - {name: "HP", ats_type: workday, board_token: hp.wd5.myworkdayjobs.com/ExternalCareerSite, industry: tech}
+  - {name: "Hewlett Packard Enterprise", ats_type: workday, board_token: hpe.wd5.myworkdayjobs.com/Jobsathpe, industry: tech}
+  - {name: "ICF", ats_type: workday, board_token: icf.wd5.myworkdayjobs.com/ICFExternal_Career_Site, industry: services}
+  - {name: "Intel", ats_type: workday, board_token: intel.wd1.myworkdayjobs.com/External, industry: tech}
+  - {name: "KLA", ats_type: workday, board_token: kla.wd1.myworkdayjobs.com/Search, industry: tech}
+  - {name: "Manulife John Hancock", ats_type: workday, board_token: manulife.wd3.myworkdayjobs.com/MFCJH_Jobs, industry: insurance}
+  - {name: "Motorola Solutions", ats_type: workday, board_token: motorolasolutions.wd5.myworkdayjobs.com/Careers, industry: tech}
+  - {name: "Nightwing", ats_type: workday, board_token: nwis.wd12.myworkdayjobs.com/NW, industry: services}
+  - {name: "NXP Semiconductors", ats_type: workday, board_token: nxp.wd3.myworkdayjobs.com/careers, industry: tech}
+  - {name: "Roche", ats_type: workday, board_token: roche.wd3.myworkdayjobs.com/roche-ext, industry: pharma}
+  - {name: "Samsung Electronics America", ats_type: workday, board_token: sec.wd3.myworkdayjobs.com/Samsung_Careers, industry: tech}
+  - {name: "Schweitzer Engineering Laboratories", ats_type: workday, board_token: selinc.wd1.myworkdayjobs.com/SEL, industry: industrial}
+  - {name: "Shell", ats_type: workday, board_token: shell.wd3.myworkdayjobs.com/shellcareers, industry: industrial}
+  - {name: "Snap", ats_type: workday, board_token: snapchat.wd1.myworkdayjobs.com/snap, industry: tech}
+  - {name: "Stellantis", ats_type: workday, board_token: stellantis.wd3.myworkdayjobs.com/External_Career_Site_ID01, industry: automotive}
+  - {name: "Warner Bros. Discovery", ats_type: workday, board_token: warnerbros.wd5.myworkdayjobs.com/global, industry: media}
+  - {name: "Zendesk", ats_type: workday, board_token: zendesk.wd1.myworkdayjobs.com/zendesk, industry: tech}
+
+  # Greenhouse
+  - {name: "Capco", ats_type: greenhouse, board_token: capco, industry: services}
+  - {name: "Appian", ats_type: greenhouse, board_token: appian, industry: tech}
+  - {name: "DRW", ats_type: greenhouse, board_token: drweng, industry: financial}
+  - {name: "Figma", ats_type: greenhouse, board_token: figma, industry: tech}
+  - {name: "The Nuclear Company", ats_type: greenhouse, board_token: thenuclearcompany, industry: industrial}
+  - {name: "Freeform", ats_type: greenhouse, board_token: freeformfuturecorp, industry: tech}
+  - {name: "Neuralink", ats_type: greenhouse, board_token: neuralink, industry: medtech}
+  - {name: "DV Trading", ats_type: greenhouse, board_token: dvtrading, industry: financial}
+  - {name: "NewsBreak", ats_type: greenhouse, board_token: newsbreak, industry: tech}
+  - {name: "Virtu Financial", ats_type: greenhouse, board_token: virtu, industry: financial}
+  - {name: "Stevens Capital Management", ats_type: greenhouse, board_token: scm, industry: financial}
+  - {name: "Perpay", ats_type: greenhouse, board_token: perpay, industry: financial}
+  - {name: "Five Rings", ats_type: greenhouse, board_token: fiveringsllc, industry: financial}
+  - {name: "RVO Health", ats_type: greenhouse, board_token: rvohealth, industry: health}
+  - {name: "EMARKETER", ats_type: greenhouse, board_token: emarketer, industry: media}
+  - {name: "Hyannis Port Research", ats_type: greenhouse, board_token: hyannisportresearch, industry: financial}
+  - {name: "PDT Partners", ats_type: greenhouse, board_token: pdtpartners, industry: financial}
+  - {name: "Aquatic Capital Management", ats_type: greenhouse, board_token: aquaticcapitalmanagement, industry: financial}
+  - {name: "B12", ats_type: greenhouse, board_token: b12, industry: tech}
+  - {name: "Seesaw", ats_type: greenhouse, board_token: seesaw, industry: tech}
+
+  # Lever
+  - {name: "Palantir", ats_type: lever, board_token: palantir, industry: tech}
+  - {name: "Belvedere Trading", ats_type: lever, board_token: belvederetrading, industry: financial}
+  - {name: "BDG Media", ats_type: lever, board_token: BDG, industry: media}
+  - {name: "Immuta", ats_type: lever, board_token: immuta, industry: tech}
+  - {name: "Galatea Associates", ats_type: lever, board_token: galatea-associates, industry: services}
+
+  # Ashby
+  - {name: "Crusoe", ats_type: ashby, board_token: Crusoe, industry: tech}
+  - {name: "Apex Technology", ats_type: ashby, board_token: apex-technology-inc, industry: tech}
+  - {name: "Etched", ats_type: ashby, board_token: Etched, industry: ai}
+  - {name: "Vanta", ats_type: ashby, board_token: vanta, industry: tech}
+  - {name: "Deepgram", ats_type: ashby, board_token: deepgram, industry: ai}
+  - {name: "Exa", ats_type: ashby, board_token: exa, industry: ai}
+  - {name: "Modal", ats_type: ashby, board_token: modal, industry: ai}
+  - {name: "Poshmark", ats_type: ashby, board_token: poshmark, industry: retail}
+  - {name: "Homebase", ats_type: ashby, board_token: homebase, industry: tech}
+  - {name: "Kastle", ats_type: ashby, board_token: kastle, industry: tech}
+  - {name: "Heliux", ats_type: ashby, board_token: heliux, industry: tech}
+  - {name: "Melius", ats_type: ashby, board_token: melius, industry: tech}
+  - {name: "Quadrillion Labs", ats_type: ashby, board_token: quadrillion-labs, industry: tech}
+  - {name: "Hypercubic", ats_type: ashby, board_token: hypercubic, industry: tech}
+  - {name: "Conduit", ats_type: ashby, board_token: Conduit, industry: financial}

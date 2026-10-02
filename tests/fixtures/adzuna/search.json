@@ -1,0 +1,30 @@
+{
+ "_comment": "SYNTHETIC fixture shaped like the Adzuna /jobs/us/search response (no API key was available to record a real one). Replace with a recorded response once ADZUNA_APP_ID/KEY are set.",
+ "count": 2,
+ "results": [
+  {
+   "id": "4876543210",
+   "title": "Integration Architect – Hybrid",
+   "company": {"display_name": "Garden State Mutual"},
+   "location": {"display_name": "Morristown, Morris County"},
+   "description": "We are seeking an Integration Architect to lead our API and MuleSoft platform… Salary $170,000 – $195,000.",
+   "redirect_url": "https://www.adzuna.com/land/ad/4876543210",
+   "created": "2026-09-10T14:03:22Z",
+   "salary_min": 170000,
+   "salary_max": 195000,
+   "salary_is_predicted": "0",
+   "contract_type": "permanent",
+   "contract_time": "full_time"
+  },
+  {
+   "id": "4876543211",
+   "title": "Technical Lead, API Services",
+   "company": {"display_name": "Northeast Health Partners"},
+   "location": {"display_name": "Newark, Essex County"},
+   "description": "Lead a team building API services for a regional health plan…",
+   "redirect_url": "https://www.adzuna.com/land/ad/4876543211",
+   "created": "2026-09-12T09:00:00Z",
+   "contract_type": "contract"
+  }
+ ]
+}

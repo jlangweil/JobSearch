@@ -1,0 +1,68 @@
+<!doctype html>
+<!-- Dates as this tenant really behaves: a job's From/To is one masked MM/YYYY box — you type six digits and
+     it writes the slash itself — while education's From/To are year-only boxes. Typing "09/2018" into the mask
+     produces rubbish, and typing a month into a year box is simply wrong. -->
+<html lang="en">
+<head><meta charset="utf-8"><title>My Experience</title></head>
+<body>
+<h2 data-automation-id="pageHeader">My Experience</h2>
+
+<div role="group" aria-labelledby="Work-Experience-section">
+  <h4 id="Work-Experience-section">Work Experience</h4>
+  <div id="roles"></div>
+  <button data-automation-id="Add Another" onclick="addRole()">Add Another</button>
+</div>
+
+<div role="group" aria-labelledby="Education-section">
+  <h4 id="Education-section">Education</h4>
+  <div id="schools"></div>
+  <button data-automation-id="Add" onclick="addSchool()">Add</button>
+</div>
+
+<button data-automation-id="pageFooterNextButton">Save and Continue</button>
+
+<script>
+  var r = 0, e = 0;
+
+  // the mask: digits only, and a slash appears after the month
+  function mask(el) {
+    var digits = el.value.replace(/\D/g, '').slice(0, 6);
+    el.value = digits.length > 2 ? digits.slice(0, 2) + '/' + digits.slice(2) : digits;
+  }
+
+  function addRole() {
+    r += 1;
+    var wrap = document.createElement('div');
+    wrap.innerHTML =
+      '<h5>Work Experience ' + r + '</h5>' +
+      '<label for="t' + r + '">Job Title</label><input id="t' + r + '" name="title-' + r + '">' +
+      '<label for="c' + r + '">Company</label><input id="c' + r + '" name="company-' + r + '">' +
+      '<div class="date"><span>From</span>' +
+        '<input name="from-' + r + '" placeholder="MM/YYYY" oninput="mask(this)"></div>' +
+      '<div class="date"><span>To</span>' +
+        '<input name="to-' + r + '" placeholder="MM/YYYY" oninput="mask(this)"></div>';
+    document.getElementById('roles').appendChild(wrap);
+  }
+
+  function addSchool() {
+    e += 1;
+    var wrap = document.createElement('div');
+    wrap.innerHTML =
+      '<h5>Education ' + e + '</h5>' +
+      '<label for="s' + e + '">School or University</label><input id="s' + e + '" name="school-' + e + '">' +
+      '<label for="dg' + e + '">Degree</label>' +
+      '<select id="dg' + e + '" name="degree-' + e + '">' +
+        '<option value="">Select One</option>' +
+        '<option>Bachelor of Science (B.S.)</option>' +
+        '<option>Master of Arts (M.A.)</option>' +
+        '<option>Master of Science (M.S.)</option>' +
+      '</select>' +
+      '<div class="date"><span>From</span>' +
+        '<input name="efrom-' + e + '" placeholder="YYYY" maxlength="4"></div>' +
+      '<div class="date"><span>To</span>' +
+        '<input name="eto-' + e + '" placeholder="YYYY" maxlength="4"></div>';
+    document.getElementById('schools').appendChild(wrap);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,3157 @@
+{
+ "pru": {
+  "total": 182,
+  "facets": [
+   {
+    "facetParameter": "CF-EEB-Job_classification_ID_Extended",
+    "descriptor": "Job Classification Category",
+    "values": [
+     {
+      "descriptor": "Technology",
+      "id": "85d85ed78e3e1036118fd403466d0000",
+      "count": 55
+     },
+     {
+      "descriptor": "Investment Management",
+      "id": "85d85ed78e3e1036118fd403466d0001",
+      "count": 48
+     },
+     {
+      "descriptor": "Sales",
+      "id": "85d85ed78e3e1036118fd36987530002",
+      "count": 23
+     },
+     {
+      "descriptor": "Corporate",
+      "id": "85d85ed78e3e1036118fd2cfd07b0001",
+      "count": 12
+     },
+     {
+      "descriptor": "Finance & Accounting",
+      "id": "85d85ed78e3e1036118fd2cfd07b0000",
+      "count": 11
+     },
+     {
+      "descriptor": "Operations",
+      "id": "85d85ed78e3e1036118fd36987530000",
+      "count": 9
+     },
+     {
+      "descriptor": "Marketing & Communications",
+      "id": "85d85ed78e3e1036118fd403466d0003",
+      "count": 8
+     },
+     {
+      "descriptor": "Actuarial",
+      "id": "85d85ed78e3e1036118fd234b6d20000",
+      "count": 6
+     },
+     {
+      "descriptor": "Project Mgmt, Transformation & Strategy",
+      "id": "85d85ed78e3e1036118fd36987530001",
+      "count": 5
+     },
+     {
+      "descriptor": "Product Management",
+      "id": "85d85ed78e3e1036118fd49ddd2f0000",
+      "count": 3
+     },
+     {
+      "descriptor": "Data Science & Analytics",
+      "id": "85d85ed78e3e1036118fd403466d0002",
+      "count": 2
+     }
+    ]
+   },
+   {
+    "facetParameter": "CF-EEB-Job_classification_Description_Extended",
+    "descriptor": "Job Classification Sub-category",
+    "values": [
+     {
+      "descriptor": "Investments",
+      "id": "85d85ed78e3e1036118f4092c81c0001",
+      "count": 33
+     },
+     {
+      "descriptor": "Sales",
+      "id": "85d85ed78e3e1036118f3ff91c0e0000",
+      "count": 23
+     },
+     {
+      "descriptor": "Engineering & Cloud",
+      "id": "85d85ed78e3e1036118f4395bf9f0000",
+      "count": 23
+     },
+     {
+      "descriptor": "Information Security",
+      "id": "85d85ed78e3e1036118f4092c81c0000",
+      "count": 15
+     },
+     {
+      "descriptor": "Investment Operations",
+      "id": "85d85ed78e3e1036118f3f5f2bc90002",
+      "count": 14
+     },
+     {
+      "descriptor": "Finance & Accounting",
+      "id": "85d85ed78e3e1036118f3e24c6ea0001",
+      "count": 11
+     },
+     {
+      "descriptor": "Insurance Operations",
+      "id": "85d85ed78e3e1036118f3f5f2bc90001",
+      "count": 9
+     },
+     {
+      "descriptor": "Marketing",
+      "id": "85d85ed78e3e1036118f41c6b4f50002",
+      "count": 7
+     },
+     {
+      "descriptor": "Agile, Delivery, & Product",
+      "id": "85d85ed78e3e1036118f3ff91c0e0001",
+      "count": 7
+     },
+     {
+      "descriptor": "Actuarial",
+      "id": "85d85ed78e3e1036118f3e24c6ea0000",
+      "count": 6
+     },
+     {
+      "descriptor": "Software Development/Quality Engineering",
+      "id": "85d85ed78e3e1036118f442fdcce0001",
+      "count": 5
+     },
+     {
+      "descriptor": "Risk",
+      "id": "85d85ed78e3e1036118f3ebf7d480002",
+      "count": 5
+     },
+     {
+      "descriptor": "Project Mgmt, Transformation & Strategy",
+      "id": "85d85ed78e3e1036118f3f5f2bc90003",
+      "count": 5
+     },
+     {
+      "descriptor": "Administration",
+      "id": "85d85ed78e3e1036118f3f5f2bc90000",
+      "count": 4
+     },
+     {
+      "descriptor": "Product Management",
+      "id": "85d85ed78e3e1036118f4260d16a0000",
+      "count": 3
+     },
+     {
+      "descriptor": "Other",
+      "id": "85d85ed78e3e1036118f3cefad3f0000",
+      "count": 3
+     },
+     {
+      "descriptor": "Admin & Support",
+      "id": "85d85ed78e3e1036118f4260d16a0001",
+      "count": 3
+     },
+     {
+      "descriptor": "Data Science & Analytics",
+      "id": "85d85ed78e3e1036118f412cc1410001",
+      "count": 2
+     },
+     {
+      "descriptor": "Data Analytics & Management",
+      "id": "85d85ed78e3e1036118f42fac3ec0001",
+      "count": 2
+     },
+     {
+      "descriptor": "Portfolio Research",
+      "id": "85d85ed78e3e1036118f41c6b4f50000",
+      "count": 1
+     },
+     {
+      "descriptor": "Communications",
+      "id": "85d85ed78e3e1036118f41c6b4f50001",
+      "count": 1
+     }
+    ]
+   },
+   {
+    "facetParameter": "CF-EEB-Job_Posting_Company_Extended",
+    "descriptor": "Company",
+    "values": [
+     {
+      "descriptor": "Prudential",
+      "id": "85d85ed78e3e1036118f79c42b760002",
+      "count": 97
+     },
+     {
+      "descriptor": "PGIM",
+      "id": "85d85ed78e3e1036118f79c42b760001",
+      "count": 85
+     }
+    ]
+   },
+   {
+    "facetParameter": "Skills",
+    "descriptor": "Skills",
+    "values": [
+     {
+      "descriptor": "Finance Strategy",
+      "id": "dad13d17d39a10019ef29a5121940001",
+      "count": 39
+     },
+     {
+      "descriptor": "Financial Analysis",
+      "id": "5176c03a9d0b10019d24a7e5b4530000",
+      "count": 35
+     },
+     {
+      "descriptor": "Leadership",
+      "id": "5176c03a9d0b10019e31e55697b10000",
+      "count": 32
+     },
+     {
+      "descriptor": "Portfolio Management",
+      "id": "dad13d17d39a10019eeebc2aa3de0001",
+      "count": 31
+     },
+     {
+      "descriptor": "Agile Methodology",
+      "id": "dad13d17d39a10019ef359aef5980001",
+      "count": 30
+     }
+    ]
+   },
+   {
+    "facetParameter": "CF-EE-Recruiting_Instructions_on_Job_posting_anchor_Extended",
+    "descriptor": "Experience Level",
+    "values": [
+     {
+      "descriptor": "Experienced",
+      "id": "85d85ed78e3e1036118f0a327f3c0000",
+      "count": 169
+     },
+     {
+      "descriptor": "Summer Internships",
+      "id": "85d85ed78e3e1036118f0a327f3c0002",
+      "count": 9
+     },
+     {
+      "descriptor": "Other Programs",
+      "id": "85d85ed78e3e1036118f0acd70080000",
+      "count": 2
+     },
+     {
+      "descriptor": "Full-Time Early Careers",
+      "id": "85d85ed78e3e1036118f0a327f3c0001",
+      "count": 2
+     }
+    ]
+   },
+   {
+    "facetParameter": "locationMainGroup",
+    "values": [
+     {
+      "facetParameter": "locationCountry",
+      "descriptor": "Location Country",
+      "values": [
+       {
+        "descriptor": "Brazil",
+        "id": "1a29bb1357b240ab99a2fa755cc87c0e",
+        "count": 10
+       },
+       {
+        "descriptor": "France",
+        "id": "54c5b6971ffb4bf0b116fe7651ec789a",
+        "count": 1
+       },
+       {
+        "descriptor": "Germany",
+        "id": "dcc5b7608d8644b3a93716604e78e995",
+        "count": 4
+       },
+       {
+        "descriptor": "Ireland",
+        "id": "04a05835925f45b3a59406a2a6b72c8a",
+        "count": 29
+       },
+       {
+        "descriptor": "Luxembourg",
+        "id": "328b82f597514643a7683a78fc67c3f1",
+        "count": 1
+       },
+       {
+        "descriptor": "Mexico",
+        "id": "e2adff9272454660ac4fdb56fc70bb51",
+        "count": 6
+       },
+       {
+        "descriptor": "United Kingdom",
+        "id": "29247e57dbaf46fb855b224e03170bc7",
+        "count": 5
+       },
+       {
+        "descriptor": "United States of America",
+        "id": "bc33aa3152ec42d4995f4791a106ed09",
+        "count": 126
+       }
+      ]
+     },
+     {
+      "facetParameter": "locationRegionStateProvince",
+      "descriptor": "Location Region/State/Province",
+      "values": [
+       {
+        "descriptor": "Alabama",
+        "id": "31475924e5494080a8a458bf4fa293ed",
+        "count": 10
+       },
+       {
+        "descriptor": "Alaska",
+        "id": "c8891443252c4c4ea9427be64d755b9f",
+        "count": 6
+       },
+       {
+        "descriptor": "Arizona",
+        "id": "c7b20b0d4bc04711a00900569e9afabd",
+        "count": 11
+       },
+       {
+        "descriptor": "Arkansas",
+        "id": "cea6c5355e1b4983b5fd0640310385b5",
+        "count": 8
+       },
+       {
+        "descriptor": "California",
+        "id": "ec3d210e4240442e99a28fa70419aec5",
+        "count": 15
+       },
+       {
+        "descriptor": "Colorado",
+        "id": "a83d6eabae3b49718c4ce09eeb66fd0b",
+        "count": 11
+       },
+       {
+        "descriptor": "Connecticut",
+        "id": "bffb3e4c9a4a4542bc6bd075a4c26247",
+        "count": 17
+       },
+       {
+        "descriptor": "Delaware",
+        "id": "18b4cf9ddb4e4542a39614cb55b4dde7",
+        "count": 10
+       },
+       {
+        "descriptor": "District of Columbia",
+        "id": "0d2bcd0308f541938f3ae29e7cc69ae0",
+        "count": 9
+       },
+       {
+        "descriptor": "Florida",
+        "id": "9c1a239b35bd4598856e5393b249b8a1",
+        "count": 14
+       },
+       {
+        "descriptor": "Georgia",
+        "id": "dec8eabbb13d45bdb159b8e25d896110",
+        "count": 14
+       },
+       {
+        "descriptor": "Hawaii",
+        "id": "e7634111501844fe83a0b316b16beb08",
+        "count": 3
+       },
+       {
+        "descriptor": "Idaho",
+        "id": "b1c017b8f6294b0e82773aaca1dce33e",
+        "count": 9
+       },
+       {
+        "descriptor": "Illinois",
+        "id": "d8bb292ed9fe44a2899a990ad569538c",
+        "count": 18
+       },
+       {
+        "descriptor": "Indiana",
+        "id": "28489665bcac44028a70d0642c932be4",
+        "count": 9
+       },
+       {
+        "descriptor": "Iowa",
+        "id": "a9be12393ccd460ea46d08c249ce6c8b",
+        "count": 13
+       },
+       {
+        "descriptor": "Kansas",
+        "id": "975ef5fd66c048909a4d64b64b762836",
+        "count": 8
+       },
+       {
+        "descriptor": "Kentucky",
+        "id": "66d386e70a2946b695835e59cebcd7b2",
+        "count": 10
+       },
+       {
+        "descriptor": "Louisiana",
+        "id": "777facb47a8442bfba79628424812d64",
+        "count": 8
+       },
+       {
+        "descriptor": "Maine",
+        "id": "b6d5367355b64eebb870b465d2e72205",
+        "count": 12
+       },
+       {
+        "descriptor": "Maryland",
+        "id": "586509e6daa741808206b095fee97e8f",
+        "count": 10
+       },
+       {
+        "descriptor": "Massachusetts",
+        "id": "c66d738416b74fb180376cf59cc7ec8f",
+        "count": 12
+       },
+       {
+        "descriptor": "Michigan",
+        "id": "b8372eef6b5341a39cdc95ac32790cba",
+        "count": 11
+       },
+       {
+        "descriptor": "Minas Gerais",
+        "id": "91a7d1a582224337b1b9a96456250622",
+        "count": 1
+       },
+       {
+        "descriptor": "Minnesota",
+        "id": "02f3984b69ba450080e456fe733f6741",
+        "count": 12
+       },
+       {
+        "descriptor": "Mississippi",
+        "id": "7c552cab901d4a1aa359a9cfc62850a7",
+        "count": 8
+       },
+       {
+        "descriptor": "Missouri",
+        "id": "790e3c3ddfaa4123905237a05f1df9e9",
+        "count": 10
+       },
+       {
+        "descriptor": "Montana",
+        "id": "d649a916a12e4680887c98d5836d0647",
+        "count": 9
+       },
+       {
+        "descriptor": "Nebraska",
+        "id": "3a652942d5f84071a48bc94a2b17d331",
+        "count": 9
+       },
+       {
+        "descriptor": "Nevada",
+        "id": "33e7c3874e0e4d28a8047926aa4a1d21",
+        "count": 8
+       },
+       {
+        "descriptor": "New Hampshire",
+        "id": "9efc91fd842142a0b0bf455e723b65a0",
+        "count": 9
+       },
+       {
+        "descriptor": "New Jersey",
+        "id": "9b56fe16bdf74b2cbad8b644cdf6015a",
+        "count": 101
+       },
+       {
+        "descriptor": "New Mexico",
+        "id": "32c182efea294964a9000772bc740672",
+        "count": 9
+       },
+       {
+        "descriptor": "New York",
+        "id": "9819bf0148e54f89adb255aa7bead635",
+        "count": 18
+       },
+       {
+        "descriptor": "North Carolina",
+        "id": "1486a0a4a8464c3b9ec482d4038deb99",
+        "count": 12
+       },
+       {
+        "descriptor": "North Dakota",
+        "id": "0567a9c4e90340e192aa655d387323c6",
+        "count": 8
+       },
+       {
+        "descriptor": "Nuevo León",
+        "id": "e24ca71036f84293989b87e79a5ab4a2",
+        "count": 1
+       },
+       {
+        "descriptor": "Ohio",
+        "id": "41493c81d9214eb190fd14067c7d974d",
+        "count": 11
+       },
+       {
+        "descriptor": "Oklahoma",
+        "id": "205ef21c556342268847466c48ec5a8c",
+        "count": 8
+       },
+       {
+        "descriptor": "Oregon",
+        "id": "6fcc4198762c4a7c807486c849fe94dd",
+        "count": 8
+       },
+       {
+        "descriptor": "Pennsylvania",
+        "id": "f620a79f2dc44473828b42881312de2b",
+        "count": 17
+       },
+       {
+        "descriptor": "Rhode Island",
+        "id": "4c2f08af9b834f13bf4c2d41679d222d",
+        "count": 9
+       },
+       {
+        "descriptor": "Rio de Janeiro",
+        "id": "e88c3d7cdb2b4a8b8120ede0b16e2186",
+        "count": 8
+       },
+       {
+        "descriptor": "São Paulo",
+        "id": "6177762425c54ca8aa31aac74fb08fad",
+        "count": 1
+       },
+       {
+        "descriptor": "South Carolina",
+        "id": "1d2632a43d204a2799bcd38b57e8a26e",
+        "count": 12
+       },
+       {
+        "descriptor": "South Dakota",
+        "id": "745d76f06d2b41738aecee630c5888a0",
+        "count": 7
+       },
+       {
+        "descriptor": "Tennessee",
+        "id": "00044a0287144032bca6973ac0eedb3e",
+        "count": 11
+       },
+       {
+        "descriptor": "Texas",
+        "id": "fc77e3a1ab36487f9646d14f7242dd77",
+        "count": 19
+       },
+       {
+        "descriptor": "Utah",
+        "id": "9bf006cfb5a44c51b84138e1a0e7d805",
+        "count": 8
+       },
+       {
+        "descriptor": "Vermont",
+        "id": "7df7a0cb48724af7891cb70410546897",
+        "count": 7
+       },
+       {
+        "descriptor": "Virginia",
+        "id": "e0889a76c58d4fff9b54b80dadc49000",
+        "count": 12
+       },
+       {
+        "descriptor": "Washington",
+        "id": "de9b48948ef8421db97ddf4ea206e931",
+        "count": 8
+       },
+       {
+        "descriptor": "West Virginia",
+        "id": "dc5bc08fd91446bdbd108d98a19ac0ff",
+        "count": 8
+       },
+       {
+        "descriptor": "Wisconsin",
+        "id": "96f29b3353ac4653b1a860751618e36b",
+        "count": 10
+       },
+       {
+        "descriptor": "Wyoming",
+        "id": "0022bee925f740b0a078f707a1868642",
+        "count": 7
+       }
+      ]
+     },
+     {
+      "facetParameter": "primaryLocation",
+      "descriptor": "Primary Location",
+      "values": [
+       {
+        "descriptor": "150 North Riverside, Chicago, IL",
+        "id": "97f37b1e975c1001f41d720724b80000",
+        "count": 1
+       },
+       {
+        "descriptor": "1646 North California Boulevard, Walnut Creek, CA",
+        "id": "0628cb331608011931b44f8e4426ec85",
+        "count": 1
+       },
+       {
+        "descriptor": "Ann Arbor, MI, USA",
+        "id": "cd5c3d703ba51001f1b4ed5fd9c00000",
+        "count": 1
+       },
+       {
+        "descriptor": "Arlington, VA, USA",
+        "id": "a42a5c7bd30a01329306582bf9001d50",
+        "count": 1
+       },
+       {
+        "descriptor": "Atlanta, GA, USA",
+        "id": "a42a5c7bd30a01731b15702bf900c350",
+        "count": 1
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "cigna": {
+  "total": 554,
+  "facets": [
+   {
+    "facetParameter": "Location_Country",
+    "descriptor": "Country",
+    "values": [
+     {
+      "descriptor": "United States of America",
+      "id": "bc33aa3152ec42d4995f4791a106ed09",
+      "count": 320
+     },
+     {
+      "descriptor": "India",
+      "id": "c4f78be1a8f14da0ab49ce1162348a5e",
+      "count": 126
+     },
+     {
+      "descriptor": "Spain",
+      "id": "bd34c524a6a04ae6915f5d96fa086199",
+      "count": 33
+     },
+     {
+      "descriptor": "Malaysia",
+      "id": "972dc4ba8d454bc0b893ff84b1529077",
+      "count": 15
+     },
+     {
+      "descriptor": "Hong Kong",
+      "id": "d4afdeb461d446e4babd204bd102dba8",
+      "count": 14
+     },
+     {
+      "descriptor": "Canada",
+      "id": "a30a87ed25634629aa6c3958aa2b91ea",
+      "count": 13
+     },
+     {
+      "descriptor": "Saudi Arabia",
+      "id": "50423b5190ad49bb89e94cd58dfaad69",
+      "count": 12
+     },
+     {
+      "descriptor": "United Kingdom",
+      "id": "29247e57dbaf46fb855b224e03170bc7",
+      "count": 10
+     },
+     {
+      "descriptor": "United Arab Emirates",
+      "id": "7b4fa1f369bd4604ba3692682fcbe345",
+      "count": 9
+     },
+     {
+      "descriptor": "Kenya",
+      "id": "9e684fd7be1e469d9ee955a4c3b754be",
+      "count": 6
+     },
+     {
+      "descriptor": "Singapore",
+      "id": "80938777cac5440fab50d729f9634969",
+      "count": 4
+     },
+     {
+      "descriptor": "Australia",
+      "id": "d903bb3fedad45039383f6de334ad4db",
+      "count": 1
+     },
+     {
+      "descriptor": "Belgium",
+      "id": "a04ea128f43a42e59b1e6a19e8f0b374",
+      "count": 1
+     },
+     {
+      "descriptor": "China",
+      "id": "6cb77610a8a543aea2d6bc10457e35d4",
+      "count": 1
+     }
+    ]
+   },
+   {
+    "facetParameter": "jobFamilyGroup",
+    "descriptor": "Job Category",
+    "values": [
+     {
+      "descriptor": "Information Technology",
+      "id": "b7947bbbfff20176f0ee1016390c8d16",
+      "count": 119
+     },
+     {
+      "descriptor": "Clinical",
+      "id": "b7947bbbfff201ef25630616390c8716",
+      "count": 91
+     },
+     {
+      "descriptor": "Sales / Sales Support",
+      "id": "b7947bbbfff2011ce193945a390ccd16",
+      "count": 62
+     },
+     {
+      "descriptor": "Customer Advocacy",
+      "id": "b7947bbbfff201d625446f5a390cc016",
+      "count": 39
+     },
+     {
+      "descriptor": "Process Improvement",
+      "id": "b7947bbbfff201559db69d5a390cd316",
+      "count": 32
+     },
+     {
+      "descriptor": "Administration",
+      "id": "b7947bbbfff201823cb6625a390cb816",
+      "count": 30
+     },
+     {
+      "descriptor": "Data & Analytics",
+      "id": "b7947bbbfff201d41a750216390c8516",
+      "count": 27
+     },
+     {
+      "descriptor": "Medical Management",
+      "id": "b7947bbbfff2013bd2441e16390c9516",
+      "count": 26
+     },
+     {
+      "descriptor": "Finance",
+      "id": "b7947bbbfff2012176fc0916390c8916",
+      "count": 26
+     },
+     {
+      "descriptor": "Provider",
+      "id": "b7947bbbfff201aa2a7e2916390c9916",
+      "count": 20
+     },
+     {
+      "descriptor": "Business Operations",
+      "id": "b7947bbbfff201ca05266c5a390cbe16",
+      "count": 18
+     },
+     {
+      "descriptor": "Product",
+      "id": "b7947bbbfff201f0c3a02116390c9716",
+      "count": 13
+     },
+     {
+      "descriptor": "Strategic Planning",
+      "id": "b7947bbbfff201ece3ed975a390ccf16",
+      "count": 11
+     },
+     {
+      "descriptor": "Human Resources",
+      "id": "b7947bbbfff2010767860d16390c8b16",
+      "count": 11
+     },
+     {
+      "descriptor": "Underwriting",
+      "id": "b7947bbbfff2010f34cd9a5a390cd116",
+      "count": 7
+     },
+     {
+      "descriptor": "Legal",
+      "id": "b7947bbbfff201c799881716390c9116",
+      "count": 7
+     },
+     {
+      "descriptor": "Marketing",
+      "id": "b7947bbbfff201d34bdd1a16390c9316",
+      "count": 6
+     },
+     {
+      "descriptor": "Investments",
+      "id": "b7947bbbfff20113d67b1416390c8f16",
+      "count": 5
+     },
+     {
+      "descriptor": "Corporate Services",
+      "id": "b7947bbbfff2016e79a5655a390cba16",
+      "count": 4
+     }
+    ]
+   },
+   {
+    "facetParameter": "workerSubType",
+    "descriptor": "Job Type",
+    "values": [
+     {
+      "descriptor": "Regular",
+      "id": "b7947bbbfff201736e93f98c340c7608",
+      "count": 505
+     },
+     {
+      "descriptor": "CoOp / Intern (Seasonal) (Trainee)",
+      "id": "b7947bbbfff2018a3282f98c340c7508",
+      "count": 19
+     },
+     {
+      "descriptor": "Per Diem/ On-call",
+      "id": "b7947bbbfff20116fd63f98c340c7408",
+      "count": 15
+     },
+     {
+      "descriptor": "Casual",
+      "id": "fd07634bf096017a5a9b90e412003902",
+      "count": 7
+     },
+     {
+      "descriptor": "Fixed Term Contract (Fixed Term)",
+      "id": "b7947bbbfff2018346dff98c340c7a08",
+      "count": 7
+     },
+     {
+      "descriptor": "Expatriate",
+      "id": "b7947bbbfff2016bf0a3f98c340c7708",
+      "count": 1
+     }
+    ]
+   },
+   {
+    "facetParameter": "Location_Region_State_Province",
+    "descriptor": "State/Region/Province",
+    "values": [
+     {
+      "descriptor": "Connecticut",
+      "id": "bffb3e4c9a4a4542bc6bd075a4c26247",
+      "count": 125
+     },
+     {
+      "descriptor": "Missouri",
+      "id": "790e3c3ddfaa4123905237a05f1df9e9",
+      "count": 82
+     },
+     {
+      "descriptor": "Karnātaka",
+      "id": "701eb5584934425d930bc84b9e8b04eb",
+      "count": 69
+     },
+     {
+      "descriptor": "New Jersey",
+      "id": "9b56fe16bdf74b2cbad8b644cdf6015a",
+      "count": 46
+     },
+     {
+      "descriptor": "Pennsylvania",
+      "id": "f620a79f2dc44473828b42881312de2b",
+      "count": 45
+     },
+     {
+      "descriptor": "Telangāna",
+      "id": "3cfc61cd0cf4100004b86c8483b80007",
+      "count": 42
+     },
+     {
+      "descriptor": "Tennessee",
+      "id": "00044a0287144032bca6973ac0eedb3e",
+      "count": 29
+     },
+     {
+      "descriptor": "Texas",
+      "id": "fc77e3a1ab36487f9646d14f7242dd77",
+      "count": 26
+     },
+     {
+      "descriptor": "Minnesota",
+      "id": "02f3984b69ba450080e456fe733f6741",
+      "count": 24
+     },
+     {
+      "descriptor": "Florida",
+      "id": "9c1a239b35bd4598856e5393b249b8a1",
+      "count": 19
+     },
+     {
+      "descriptor": "Andhra Pradesh",
+      "id": "6422b80614484e959dbf3e672eb838fb",
+      "count": 15
+     },
+     {
+      "descriptor": "Wilayah Persekutuan Kuala Lumpur",
+      "id": "d05fe10b38264230958a4167487a6d60",
+      "count": 15
+     },
+     {
+      "descriptor": "Arizona",
+      "id": "c7b20b0d4bc04711a00900569e9afabd",
+      "count": 15
+     },
+     {
+      "descriptor": "New York",
+      "id": "9819bf0148e54f89adb255aa7bead635",
+      "count": 14
+     },
+     {
+      "descriptor": "Kowloon",
+      "id": "95671a3f43864351b821d30c65a36c66",
+      "count": 14
+     },
+     {
+      "descriptor": "Indiana",
+      "id": "28489665bcac44028a70d0642c932be4",
+      "count": 14
+     },
+     {
+      "descriptor": "Colorado",
+      "id": "a83d6eabae3b49718c4ce09eeb66fd0b",
+      "count": 13
+     },
+     {
+      "descriptor": "Riyadh",
+      "id": "a9b4429766264ac88ba45046ce44b654",
+      "count": 12
+     },
+     {
+      "descriptor": "Illinois",
+      "id": "d8bb292ed9fe44a2899a990ad569538c",
+      "count": 12
+     },
+     {
+      "descriptor": "Ontario",
+      "id": "218a720b28a74c67b5c6d42c00bdadfa",
+      "count": 12
+     },
+     {
+      "descriptor": "Massachusetts",
+      "id": "c66d738416b74fb180376cf59cc7ec8f",
+      "count": 10
+     },
+     {
+      "descriptor": "Delaware",
+      "id": "18b4cf9ddb4e4542a39614cb55b4dde7",
+      "count": 9
+     },
+     {
+      "descriptor": "Dubai",
+      "id": "1db225a7cdc64df8b1dda64a09ec71f0",
+      "count": 9
+     },
+     {
+      "descriptor": "North Carolina",
+      "id": "1486a0a4a8464c3b9ec482d4038deb99",
+      "count": 8
+     },
+     {
+      "descriptor": "Lanarkshire",
+      "id": "b50aee6181184c2681920548b39fac9d",
+      "count": 7
+     },
+     {
+      "descriptor": "Ohio",
+      "id": "41493c81d9214eb190fd14067c7d974d",
+      "count": 6
+     },
+     {
+      "descriptor": "Nairobi Municipality",
+      "id": "3068c971a0e34ce08e4d388f34c371f5",
+      "count": 6
+     },
+     {
+      "descriptor": "Virginia",
+      "id": "e0889a76c58d4fff9b54b80dadc49000",
+      "count": 5
+     },
+     {
+      "descriptor": "Washington",
+      "id": "de9b48948ef8421db97ddf4ea206e931",
+      "count": 4
+     },
+     {
+      "descriptor": "Central Singapore",
+      "id": "f9826c11d56f47b68b9e31b4cba4819f",
+      "count": 4
+     },
+     {
+      "descriptor": "Maryland",
+      "id": "586509e6daa741808206b095fee97e8f",
+      "count": 4
+     },
+     {
+      "descriptor": "Georgia",
+      "id": "dec8eabbb13d45bdb159b8e25d896110",
+      "count": 4
+     },
+     {
+      "descriptor": "Quebec",
+      "id": "ef8a53af14534128b795fd55d75ec08b",
+      "count": 4
+     },
+     {
+      "descriptor": "California",
+      "id": "ec3d210e4240442e99a28fa70419aec5",
+      "count": 4
+     },
+     {
+      "descriptor": "Wisconsin",
+      "id": "96f29b3353ac4653b1a860751618e36b",
+      "count": 3
+     },
+     {
+      "descriptor": "New Hampshire",
+      "id": "9efc91fd842142a0b0bf455e723b65a0",
+      "count": 3
+     },
+     {
+      "descriptor": "District of Columbia",
+      "id": "0d2bcd0308f541938f3ae29e7cc69ae0",
+      "count": 3
+     },
+     {
+      "descriptor": "Madrid",
+      "id": "0321ceabe7ca4740bd2d5f2e2e6e5d68",
+      "count": 3
+     },
+     {
+      "descriptor": "Rhode Island",
+      "id": "4c2f08af9b834f13bf4c2d41679d222d",
+      "count": 2
+     },
+     {
+      "descriptor": "Oregon",
+      "id": "6fcc4198762c4a7c807486c849fe94dd",
+      "count": 2
+     },
+     {
+      "descriptor": "Alabama",
+      "id": "31475924e5494080a8a458bf4fa293ed",
+      "count": 2
+     },
+     {
+      "descriptor": "Hawaii",
+      "id": "e7634111501844fe83a0b316b16beb08",
+      "count": 2
+     },
+     {
+      "descriptor": "South Carolina",
+      "id": "1d2632a43d204a2799bcd38b57e8a26e",
+      "count": 1
+     },
+     {
+      "descriptor": "Oklahoma",
+      "id": "205ef21c556342268847466c48ec5a8c",
+      "count": 1
+     },
+     {
+      "descriptor": "Nevada",
+      "id": "33e7c3874e0e4d28a8047926aa4a1d21",
+      "count": 1
+     },
+     {
+      "descriptor": "New Mexico",
+      "id": "32c182efea294964a9000772bc740672",
+      "count": 1
+     },
+     {
+      "descriptor": "Manitoba",
+      "id": "8a973097230449ff9c006a64a8957db0",
+      "count": 1
+     },
+     {
+      "descriptor": "North Dakota",
+      "id": "0567a9c4e90340e192aa655d387323c6",
+      "count": 1
+     },
+     {
+      "descriptor": "Michigan",
+      "id": "b8372eef6b5341a39cdc95ac32790cba",
+      "count": 1
+     },
+     {
+      "descriptor": "Maine",
+      "id": "b6d5367355b64eebb870b465d2e72205",
+      "count": 1
+     },
+     {
+      "descriptor": "Louisiana",
+      "id": "777facb47a8442bfba79628424812d64",
+      "count": 1
+     },
+     {
+      "descriptor": "Kansas",
+      "id": "975ef5fd66c048909a4d64b64b762836",
+      "count": 1
+     },
+     {
+      "descriptor": "Iowa",
+      "id": "a9be12393ccd460ea46d08c249ce6c8b",
+      "count": 1
+     },
+     {
+      "descriptor": "New South Wales",
+      "id": "c7cff0e46d864ae49ef40b4ba71e7e5c",
+      "count": 1
+     },
+     {
+      "descriptor": "Shanghai",
+      "id": "12022932d53e4131959783deec185438",
+      "count": 1
+     }
+    ]
+   },
+   {
+    "facetParameter": "timeType",
+    "descriptor": "Time Type",
+    "values": [
+     {
+      "descriptor": "Full time",
+      "id": "4886bc508ff0016547defe15cc085300",
+      "count": 504
+     },
+     {
+      "descriptor": "Part time",
+      "id": "4886bc508ff001c3fccafe15cc085200",
+      "count": 50
+     }
+    ]
+   }
+  ]
+ },
+ "aig": {
+  "total": 495,
+  "facets": [
+   {
+    "facetParameter": "jobFamilyGroup",
+    "descriptor": "Job Category",
+    "values": [
+     {
+      "descriptor": "UW - Underwriting",
+      "id": "4505f2e89cf54079a3ab2f6003354b4b",
+      "count": 170
+     },
+     {
+      "descriptor": "CL - Claims",
+      "id": "bd607f12f723407fbfa85a9bfee93d69",
+      "count": 91
+     },
+     {
+      "descriptor": "SM - Sales & Marketing",
+      "id": "fba3226e22a14be7beaeed742d7107ec",
+      "count": 40
+     },
+     {
+      "descriptor": "IT - Information Technology",
+      "id": "e4908cb6c4854e3a9f3654dbc2e7087c",
+      "count": 39
+     },
+     {
+      "descriptor": "TH - Other",
+      "id": "6a1a41ffb5cf10207b8d457e88bb5505",
+      "count": 31
+     },
+     {
+      "descriptor": "FA - Finance",
+      "id": "44e0b32eb5724d198688c8596447def0",
+      "count": 26
+     },
+     {
+      "descriptor": "DT - Data",
+      "id": "a017906ff53f010156479f116aa70000",
+      "count": 22
+     },
+     {
+      "descriptor": "OP - Operations",
+      "id": "2b8060a0abe1415dab563125251bc2ea",
+      "count": 19
+     },
+     {
+      "descriptor": "AC - Actuarial",
+      "id": "5caf1d9e570242c2ac9b666d8deef596",
+      "count": 15
+     },
+     {
+      "descriptor": "RK - Risk",
+      "id": "f62699b5b4dc4c46afcb1b6540ba9a50",
+      "count": 11
+     },
+     {
+      "descriptor": "LG - Legal, Regulatory & Gov't Affairs",
+      "id": "0172dda19348427ea12b32d6de4d45ef",
+      "count": 8
+     },
+     {
+      "descriptor": "CS - Corporate Services",
+      "id": "08d369c1e67046569b72ce1c26c52851",
+      "count": 5
+     },
+     {
+      "descriptor": "CM - Communications",
+      "id": "f3ada7b38c6f4e8cb080b79d2b9a220c",
+      "count": 5
+     },
+     {
+      "descriptor": "IA - Internal Audit",
+      "id": "4a37171d3aac405eab30b0f0bf7f1537",
+      "count": 4
+     },
+     {
+      "descriptor": "HR - Human Resources",
+      "id": "8c936e30af5a489db26e635a5c7bd1e8",
+      "count": 4
+     },
+     {
+      "descriptor": "SC - Sales Commission",
+      "id": "2888bcc50498100d9f2c35bd24dda6e5",
+      "count": 2
+     },
+     {
+      "descriptor": "CP - Compliance",
+      "id": "2cedb350c20f4f7b818beaef5859cd15",
+      "count": 1
+     },
+     {
+      "descriptor": "AS - Administrative Support",
+      "id": "b47e3b61d2394272beb71c07ea13e21b",
+      "count": 1
+     }
+    ]
+   },
+   {
+    "facetParameter": "timeType",
+    "descriptor": "Time Type",
+    "values": [
+     {
+      "descriptor": "Full time",
+      "id": "69d5951d2cef4f08b79d6fd3973500b6",
+      "count": 494
+     },
+     {
+      "descriptor": "Part time",
+      "id": "7c8b089c246f4580b269c68020515da7",
+      "count": 1
+     }
+    ]
+   },
+   {
+    "facetParameter": "locationMainGroup",
+    "values": [
+     {
+      "facetParameter": "locationCountry",
+      "descriptor": "Country",
+      "values": [
+       {
+        "descriptor": "Australia",
+        "id": "d903bb3fedad45039383f6de334ad4db",
+        "count": 9
+       },
+       {
+        "descriptor": "Belgium",
+        "id": "a04ea128f43a42e59b1e6a19e8f0b374",
+        "count": 4
+       },
+       {
+        "descriptor": "Bermuda",
+        "id": "fa7b4f891d1446858bc693997ae9ea53",
+        "count": 2
+       },
+       {
+        "descriptor": "Brazil",
+        "id": "1a29bb1357b240ab99a2fa755cc87c0e",
+        "count": 7
+       },
+       {
+        "descriptor": "Canada",
+        "id": "a30a87ed25634629aa6c3958aa2b91ea",
+        "count": 29
+       },
+       {
+        "descriptor": "China",
+        "id": "6cb77610a8a543aea2d6bc10457e35d4",
+        "count": 8
+       },
+       {
+        "descriptor": "Colombia",
+        "id": "e8106cd6a3534f2dba6fdee2d41db89d",
+        "count": 2
+       },
+       {
+        "descriptor": "Cyprus",
+        "id": "db69c370446c11de98360015c5e6daf6",
+        "count": 1
+       },
+       {
+        "descriptor": "Denmark",
+        "id": "49ab063f422741e2aef271de00efeac8",
+        "count": 2
+       },
+       {
+        "descriptor": "Ecuador",
+        "id": "2752bce253374948a6bad7ed2059e054",
+        "count": 4
+       },
+       {
+        "descriptor": "France",
+        "id": "54c5b6971ffb4bf0b116fe7651ec789a",
+        "count": 5
+       },
+       {
+        "descriptor": "Germany",
+        "id": "dcc5b7608d8644b3a93716604e78e995",
+        "count": 13
+       },
+       {
+        "descriptor": "Greece",
+        "id": "566388c1eb974c42bd9e3da4c2f57d60",
+        "count": 1
+       },
+       {
+        "descriptor": "Hong Kong",
+        "id": "d4afdeb461d446e4babd204bd102dba8",
+        "count": 6
+       },
+       {
+        "descriptor": "Ireland",
+        "id": "04a05835925f45b3a59406a2a6b72c8a",
+        "count": 19
+       },
+       {
+        "descriptor": "Italy",
+        "id": "8cd04a563fd94da7b06857a79faaf815",
+        "count": 4
+       },
+       {
+        "descriptor": "Japan",
+        "id": "8b705da2becf43cfaccc091da0988ab2",
+        "count": 23
+       },
+       {
+        "descriptor": "Malaysia",
+        "id": "972dc4ba8d454bc0b893ff84b1529077",
+        "count": 10
+       },
+       {
+        "descriptor": "Mexico",
+        "id": "e2adff9272454660ac4fdb56fc70bb51",
+        "count": 38
+       },
+       {
+        "descriptor": "Netherlands",
+        "id": "9696868b09c64d52a62ee13b052383cc",
+        "count": 1
+       },
+       {
+        "descriptor": "New Zealand",
+        "id": "55273a1b49934d97ae15342ef51f6b95",
+        "count": 1
+       },
+       {
+        "descriptor": "Philippines",
+        "id": "e56f1daf83e04bacae794ba5c5593560",
+        "count": 3
+       },
+       {
+        "descriptor": "Puerto Rico",
+        "id": "0a076377c3d94bc1b4ed46b4e7d82a50",
+        "count": 8
+       },
+       {
+        "descriptor": "Singapore",
+        "id": "80938777cac5440fab50d729f9634969",
+        "count": 25
+       },
+       {
+        "descriptor": "Spain",
+        "id": "bd34c524a6a04ae6915f5d96fa086199",
+        "count": 12
+       },
+       {
+        "descriptor": "Sweden",
+        "id": "6a800a4736884df5826858d435650f45",
+        "count": 3
+       },
+       {
+        "descriptor": "Switzerland",
+        "id": "187134fccb084a0ea9b4b95f23890dbe",
+        "count": 4
+       },
+       {
+        "descriptor": "Thailand",
+        "id": "873d0f604e3b458c990cb4d83a5c0f14",
+        "count": 8
+       },
+       {
+        "descriptor": "United Arab Emirates",
+        "id": "7b4fa1f369bd4604ba3692682fcbe345",
+        "count": 6
+       },
+       {
+        "descriptor": "United Kingdom",
+        "id": "29247e57dbaf46fb855b224e03170bc7",
+        "count": 45
+       },
+       {
+        "descriptor": "United States of America",
+        "id": "bc33aa3152ec42d4995f4791a106ed09",
+        "count": 215
+       }
+      ]
+     },
+     {
+      "facetParameter": "locationRegionStateProvince",
+      "descriptor": "Region/State/Province",
+      "values": [
+       {
+        "descriptor": "Aichi",
+        "id": "9d9ed12bc82a454da2b507f5ee39b7d6",
+        "count": 2
+       },
+       {
+        "descriptor": "Aomori",
+        "id": "812202ac87a142b183e898582ceb924e",
+        "count": 1
+       },
+       {
+        "descriptor": "Arizona",
+        "id": "c7b20b0d4bc04711a00900569e9afabd",
+        "count": 7
+       },
+       {
+        "descriptor": "Attiki",
+        "id": "1b095f8857b542da9067813b62669847",
+        "count": 1
+       },
+       {
+        "descriptor": "Auckland",
+        "id": "3ee128e099f3417fb64d6bfde4072001",
+        "count": 1
+       },
+       {
+        "descriptor": "Baden-Wurttemberg",
+        "id": "fc63a555e1d541379dde6e260bfad7d2",
+        "count": 8
+       },
+       {
+        "descriptor": "Bangkok",
+        "id": "9f7476048d3b4903a0af3f257bfc6d2c",
+        "count": 8
+       },
+       {
+        "descriptor": "Bavaria",
+        "id": "bd89fff5ffa6440a9abeaf2c5c1dc37c",
+        "count": 9
+       },
+       {
+        "descriptor": "British Columbia",
+        "id": "cb76ca97a13347548a188f23caa96b17",
+        "count": 2
+       },
+       {
+        "descriptor": "Brussels-Capital Region",
+        "id": "ca9a1a8ff42f47daa68feec7a17f333a",
+        "count": 4
+       },
+       {
+        "descriptor": "California",
+        "id": "ec3d210e4240442e99a28fa70419aec5",
+        "count": 15
+       },
+       {
+        "descriptor": "Central Singapore",
+        "id": "f9826c11d56f47b68b9e31b4cba4819f",
+        "count": 25
+       },
+       {
+        "descriptor": "Chiba",
+        "id": "d8f48c79d5ee496fbab723a4461ab264",
+        "count": 1
+       },
+       {
+        "descriptor": "Colorado",
+        "id": "a83d6eabae3b49718c4ce09eeb66fd0b",
+        "count": 4
+       },
+       {
+        "descriptor": "Connecticut",
+        "id": "bffb3e4c9a4a4542bc6bd075a4c26247",
+        "count": 14
+       },
+       {
+        "descriptor": "District of Columbia",
+        "id": "0d2bcd0308f541938f3ae29e7cc69ae0",
+        "count": 4
+       },
+       {
+        "descriptor": "Distrito Capital de Bogotá",
+        "id": "a2b67cd4a7c742abb74218ef226aef4d",
+        "count": 2
+       },
+       {
+        "descriptor": "Distrito Federal",
+        "id": "c6bb3bccb5c54883b38f2be6e44c3b77",
+        "count": 1
+       },
+       {
+        "descriptor": "Distrito Federal",
+        "id": "94732184ab0c413c9c7ab98e55ad7f30",
+        "count": 1
+       },
+       {
+        "descriptor": "Dubai",
+        "id": "1db225a7cdc64df8b1dda64a09ec71f0",
+        "count": 6
+       },
+       {
+        "descriptor": "Dublin",
+        "id": "deaadda0e7dc4726a28d1221725f3de5",
+        "count": 19
+       },
+       {
+        "descriptor": "Ehime",
+        "id": "6fd091e16ada4bf4acdf9cb95b948bc5",
+        "count": 1
+       },
+       {
+        "descriptor": "Florida",
+        "id": "9c1a239b35bd4598856e5393b249b8a1",
+        "count": 7
+       },
+       {
+        "descriptor": "Fukui",
+        "id": "c27e9b7a17534eb1935c1b5a605ad58e",
+        "count": 1
+       },
+       {
+        "descriptor": "Fukuoka",
+        "id": "032ff20543634752ad9c5dad0051da60",
+        "count": 3
+       },
+       {
+        "descriptor": "Georgia",
+        "id": "dec8eabbb13d45bdb159b8e25d896110",
+        "count": 95
+       },
+       {
+        "descriptor": "Glasgow City",
+        "id": "5b674bd2e39741b3a9a8b9911dc226bb",
+        "count": 2
+       },
+       {
+        "descriptor": "Guangdong",
+        "id": "9171988616764d5ba2a87a518af470d6",
+        "count": 3
+       },
+       {
+        "descriptor": "Hamburg",
+        "id": "8752d71cfdcb46cc91bf90d40cebd42d",
+        "count": 6
+       },
+       {
+        "descriptor": "Hauts-de-Seine",
+        "id": "976ef07781e545349758f90170bf3166",
+        "count": 4
+       },
+       {
+        "descriptor": "Hesse",
+        "id": "6cc156ba5cce4b9587306688ce202df9",
+        "count": 11
+       },
+       {
+        "descriptor": "Hiroshima",
+        "id": "89f2b4498bae46b98057f7bc936719d4",
+        "count": 1
+       },
+       {
+        "descriptor": "Hokkaido",
+        "id": "782eec4ac6fe4dbe9afc7cf4a4af1cbb",
+        "count": 2
+       },
+       {
+        "descriptor": "Hong Kong Island",
+        "id": "babac0c144424375a4d9fec322aa0176",
+        "count": 6
+       },
+       {
+        "descriptor": "Hyogo",
+        "id": "55bec148b49643aab30807a40333e377",
+        "count": 1
+       },
+       {
+        "descriptor": "Ibaraki",
+        "id": "3c467354c1a742d3ab2e2dce3ffdb4b8",
+        "count": 1
+       },
+       {
+        "descriptor": "Illinois",
+        "id": "d8bb292ed9fe44a2899a990ad569538c",
+        "count": 55
+       },
+       {
+        "descriptor": "Indiana",
+        "id": "28489665bcac44028a70d0642c932be4",
+        "count": 7
+       },
+       {
+        "descriptor": "Ishikawa",
+        "id": "85704d86fb8e482e8b72c4e80c48f5dd",
+        "count": 1
+       },
+       {
+        "descriptor": "Iwate",
+        "id": "2aaaaf1cfb774730b751825f54f21669",
+        "count": 1
+       },
+       {
+        "descriptor": "Jiangsu",
+        "id": "8ad3cfa8b4f04b74aff60dbef3b1f9e2",
+        "count": 1
+       },
+       {
+        "descriptor": "Johor",
+        "id": "e86b0fc2d75940a5ace0e97ddd886ab8",
+        "count": 1
+       },
+       {
+        "descriptor": "Kagoshima",
+        "id": "c28ba86d008b407996703dbf37ec20dc",
+        "count": 1
+       },
+       {
+        "descriptor": "Kanagawa",
+        "id": "a44690fae5834b4b895b859b8301b02f",
+        "count": 1
+       },
+       {
+        "descriptor": "Kansas",
+        "id": "975ef5fd66c048909a4d64b64b762836",
+        "count": 15
+       },
+       {
+        "descriptor": "Kyoto",
+        "id": "da7f67f005c643be87ea47a9fdbfafe8",
+        "count": 2
+       },
+       {
+        "descriptor": "London",
+        "id": "d9bbc5c4067649ecbf64c920864362a9",
+        "count": 34
+       },
+       {
+        "descriptor": "Madrid",
+        "id": "0321ceabe7ca4740bd2d5f2e2e6e5d68",
+        "count": 12
+       },
+       {
+        "descriptor": "Manchester",
+        "id": "38c97a0780af4c0da71986435063dc84",
+        "count": 8
+       },
+       {
+        "descriptor": "Maryland",
+        "id": "586509e6daa741808206b095fee97e8f",
+        "count": 1
+       },
+       {
+        "descriptor": "Massachusetts",
+        "id": "c66d738416b74fb180376cf59cc7ec8f",
+        "count": 25
+       },
+       {
+        "descriptor": "México",
+        "id": "85d60fd3574542f8be5c31f6fb5ae313",
+        "count": 36
+       },
+       {
+        "descriptor": "Milano",
+        "id": "15666db5b54343c1ac41344d81e951eb",
+        "count": 4
+       },
+       {
+        "descriptor": "Minnesota",
+        "id": "02f3984b69ba450080e456fe733f6741",
+        "count": 1
+       },
+       {
+        "descriptor": "Miyagi",
+        "id": "633cff44c8984f6d83f484dc5f912cd3",
+        "count": 2
+       },
+       {
+        "descriptor": "Miyazaki",
+        "id": "b55e63cfc7884f8fa255542b87eaa913",
+        "count": 1
+       },
+       {
+        "descriptor": "Nara",
+        "id": "9d71c52a59294511a39586284721aa05",
+        "count": 1
+       },
+       {
+        "descriptor": "National Capital Region",
+        "id": "aa699087f7cd4868b3e3e1d3d94fc4f6",
+        "count": 3
+       },
+       {
+        "descriptor": "New Jersey",
+        "id": "9b56fe16bdf74b2cbad8b644cdf6015a",
+        "count": 67
+       },
+       {
+        "descriptor": "New South Wales",
+        "id": "c7cff0e46d864ae49ef40b4ba71e7e5c",
+        "count": 7
+       },
+       {
+        "descriptor": "New York",
+        "id": "9819bf0148e54f89adb255aa7bead635",
+        "count": 85
+       },
+       {
+        "descriptor": "North Carolina",
+        "id": "1486a0a4a8464c3b9ec482d4038deb99",
+        "count": 26
+       },
+       {
+        "descriptor": "Nuevo León",
+        "id": "e24ca71036f84293989b87e79a5ab4a2",
+        "count": 1
+       },
+       {
+        "descriptor": "Ontario",
+        "id": "218a720b28a74c67b5c6d42c00bdadfa",
+        "count": 24
+       },
+       {
+        "descriptor": "Osaka",
+        "id": "90d84369498c480895f7c7f495000381",
+        "count": 1
+       },
+       {
+        "descriptor": "Pennsylvania",
+        "id": "f620a79f2dc44473828b42881312de2b",
+        "count": 34
+       },
+       {
+        "descriptor": "Pichincha",
+        "id": "67a13380ebdc4ab0889c8a9c2ffb35a1",
+        "count": 4
+       },
+       {
+        "descriptor": "Quebec",
+        "id": "ef8a53af14534128b795fd55d75ec08b",
+        "count": 6
+       },
+       {
+        "descriptor": "Saitama",
+        "id": "ddf3a50bfc5e4ea6b1f2de2d8fac94f9",
+        "count": 2
+       },
+       {
+        "descriptor": "São Paulo",
+        "id": "6177762425c54ca8aa31aac74fb08fad",
+        "count": 6
+       },
+       {
+        "descriptor": "Selangor",
+        "id": "1cd0701fc5b0456399ccf4865051a8e5",
+        "count": 1
+       },
+       {
+        "descriptor": "Shanghai",
+        "id": "12022932d53e4131959783deec185438",
+        "count": 3
+       },
+       {
+        "descriptor": "Shizuoka",
+        "id": "0cc639d04abd4ffd836c7c462f20d57d",
+        "count": 1
+       },
+       {
+        "descriptor": "South Carolina",
+        "id": "1d2632a43d204a2799bcd38b57e8a26e",
+        "count": 1
+       },
+       {
+        "descriptor": "South Holland",
+        "id": "95b62c109b4a46338c2825f7e1743360",
+        "count": 1
+       },
+       {
+        "descriptor": "Stockholm County",
+        "id": "e6ba1942c53645958c2958bbd17e1d1d",
+        "count": 2
+       },
+       {
+        "descriptor": "Surrey",
+        "id": "5ad2b6c96a6743c58622695ae445584b",
+        "count": 2
+       },
+       {
+        "descriptor": "Texas",
+        "id": "fc77e3a1ab36487f9646d14f7242dd77",
+        "count": 47
+       },
+       {
+        "descriptor": "Tokyo",
+        "id": "6534030e79d54ac897646438ed66ac9a",
+        "count": 20
+       },
+       {
+        "descriptor": "Vermont",
+        "id": "7df7a0cb48724af7891cb70410546897",
+        "count": 3
+       },
+       {
+        "descriptor": "Victoria",
+        "id": "ab28d9dc175e444fa11c7c0f28f52e2c",
+        "count": 7
+       },
+       {
+        "descriptor": "Virginia",
+        "id": "e0889a76c58d4fff9b54b80dadc49000",
+        "count": 5
+       },
+       {
+        "descriptor": "Warwickshire",
+        "id": "c8d76d6413f944568de455667fab5f17",
+        "count": 1
+       },
+       {
+        "descriptor": "Washington",
+        "id": "de9b48948ef8421db97ddf4ea206e931",
+        "count": 2
+       },
+       {
+        "descriptor": "West Virginia",
+        "id": "dc5bc08fd91446bdbd108d98a19ac0ff",
+        "count": 1
+       },
+       {
+        "descriptor": "Wilayah Persekutuan Kuala Lumpur",
+        "id": "d05fe10b38264230958a4167487a6d60",
+        "count": 8
+       },
+       {
+        "descriptor": "Zhejiang",
+        "id": "10ae0aa3144f4d1e9e3cf7b723439a3c",
+        "count": 1
+       },
+       {
+        "descriptor": "Zurich",
+        "id": "1d92a4308677476480ec390b58b2cad3",
+        "count": 4
+       }
+      ]
+     },
+     {
+      "facetParameter": "locations",
+      "descriptor": "City",
+      "values": [
+       {
+        "descriptor": "1271 Avenue of the Americas, New York, NY, USA",
+        "id": "aae313361c0401cb8264377dac009d09",
+        "count": 3
+       },
+       {
+        "descriptor": "130 North 18th Street - One Logan Square, Philadelphia, PA, USA",
+        "id": "e3a387fafa66100145b5d9a9fd7e0000",
+        "count": 3
+       },
+       {
+        "descriptor": "1 Montgomery Street (120 Kearny Street), San Francisco, CA, USA",
+        "id": "ead45c7ad6ac10358cf672470df87ed5",
+        "count": 1
+       },
+       {
+        "descriptor": "1 Passerelle Des Reflets, Courbevoie, FRA",
+        "id": "513bcecae53801a8d07974f93901d28f",
+        "count": 1
+       },
+       {
+        "descriptor": "2002 Summit Boulevard NE, Atlanta, GA, USA",
+        "id": "8665234509cd100165d06b1bb32e0000",
+        "count": 6
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "humana": {
+  "total": 387,
+  "facets": [
+   {
+    "facetParameter": "jobFamilyGroup",
+    "descriptor": "Job Category",
+    "values": [
+     {
+      "descriptor": "Sales - Sales",
+      "id": "fbb60995c9990145ceb3ae4915c57ec6",
+      "count": 134
+     },
+     {
+      "descriptor": "Integrated Care & Care Operations - Care Management",
+      "id": "fbb60995c99901824e53604715c50cc6",
+      "count": 76
+     },
+     {
+      "descriptor": "Technology - Product & Solution Delivery",
+      "id": "fbb60995c999011d23ea024a15c58ec6",
+      "count": 34
+     },
+     {
+      "descriptor": "Marketing & Communications - Content Development",
+      "id": "fbb60995c999010bc2dd264915c564c6",
+      "count": 15
+     },
+     {
+      "descriptor": "Product Development & Pricing - Product",
+      "id": "fbb60995c99901e47c1c8d4915c578c6",
+      "count": 10
+     },
+     {
+      "descriptor": "Member Quality & Financials - Utilization Management",
+      "id": "fbb60995c999018c18a3114915c560c6",
+      "count": 10
+     },
+     {
+      "descriptor": "Integrated Care & Care Operations - Therapy",
+      "id": "fbb60995c99901fcbf27214a15c594c6",
+      "count": 9
+     },
+     {
+      "descriptor": "Enterprise Development - Strategy",
+      "id": "fbb60995c9990160f45cd44815c554c6",
+      "count": 7
+     },
+     {
+      "descriptor": "Human Resources - Organizational Effectiveness",
+      "id": "fbb60995c999016f8f9f504915c56cc6",
+      "count": 6
+     },
+     {
+      "descriptor": "Business Services - Business Services",
+      "id": "fbb60995c999015e14fa9e4715c518c6",
+      "count": 6
+     },
+     {
+      "descriptor": "Member Quality & Financials - Quality Operations",
+      "id": "fbb60995c99901de83033e4b15c5ccc6",
+      "count": 5
+     },
+     {
+      "descriptor": "Business Services - Intern/Temp",
+      "id": "fbb60995c99901c52b0c6e4815c540c6",
+      "count": 5
+     },
+     {
+      "descriptor": "Analytics & Business Intelligence - Data Analytics",
+      "id": "fbb60995c999015ce05ca94715c51ac6",
+      "count": 5
+     },
+     {
+      "descriptor": "Technology - Architecture",
+      "id": "fbb60995c99901e15cebc24915c582c6",
+      "count": 4
+     },
+     {
+      "descriptor": "Member Quality & Financials - Risk Adjustment & Stars operations",
+      "id": "fbb60995c999012fa5703b4915c568c6",
+      "count": 4
+     },
+     {
+      "descriptor": "Integrated Care & Care Operations - Pharmacy",
+      "id": "fbb60995c99901cf7326824815c544c6",
+      "count": 4
+     },
+     {
+      "descriptor": "Business Services - Administrative Services",
+      "id": "fbb60995c99901cf464d784815c542c6",
+      "count": 4
+     },
+     {
+      "descriptor": "Market Strategy - Business Management",
+      "id": "fbb60995c999013351f18a4715c514c6",
+      "count": 4
+     },
+     {
+      "descriptor": "Risk & Compliance - Compliance",
+      "id": "fbb60995c9990104ccb1634a15c5a0c6",
+      "count": 3
+     },
+     {
+      "descriptor": "Product Development & Pricing - Actuarial",
+      "id": "fbb60995c99901caeffe834915c576c6",
+      "count": 3
+     },
+     {
+      "descriptor": "Corporate Affairs - Government Affairs",
+      "id": "fbb60995c999013f03fc2b4a15c596c6",
+      "count": 2
+     },
+     {
+      "descriptor": "Technology - CyberSecurity Management",
+      "id": "fbb60995c99901ebd9a7d74915c586c6",
+      "count": 2
+     },
+     {
+      "descriptor": "Technology - Cloud Service Offerings",
+      "id": "fbb60995c99901ad81e1cd4915c584c6",
+      "count": 2
+     },
+     {
+      "descriptor": "Member Quality & Financials - Submissions",
+      "id": "fbb60995c999016f361d664915c570c6",
+      "count": 2
+     },
+     {
+      "descriptor": "Market Strategy - Contracting",
+      "id": "fbb60995c99901e1b091594815c53cc6",
+      "count": 2
+     },
+     {
+      "descriptor": "Enterprise Development - Corporate Development",
+      "id": "fbb60995c9990135fa50f04715c528c6",
+      "count": 2
+     },
+     {
+      "descriptor": "Analytics & Business Intelligence - Business Intelligence & Reporting",
+      "id": "fbb60995c9990180a257d34715c522c6",
+      "count": 2
+     },
+     {
+      "descriptor": "Finance - Internal Audit",
+      "id": "fbb60995c99901382d1b554715c50ac6",
+      "count": 2
+     },
+     {
+      "descriptor": "Integrated Care & Care Operations - Behavioral Health",
+      "id": "a0509a3e91730101b6c5e991a3950000",
+      "count": 1
+     },
+     {
+      "descriptor": "Business Services - Workplace Solutions",
+      "id": "fbb60995c99901e3a4b1284b15c5c8c6",
+      "count": 1
+     },
+     {
+      "descriptor": "ICO - Enterprise Leadership",
+      "id": "fbb60995c99901b5e99ef94a15c5c0c6",
+      "count": 1
+     },
+     {
+      "descriptor": "Technology - Innovation & Exploration",
+      "id": "fbb60995c99901de12ced94a15c5bac6",
+      "count": 1
+     },
+     {
+      "descriptor": "Risk & Compliance - Investigation",
+      "id": "fbb60995c9990168d61cc44a15c5b6c6",
+      "count": 1
+     },
+     {
+      "descriptor": "STR - Enterprise Leadership",
+      "id": "fbb60995c99901283479ad4a15c5aec6",
+      "count": 1
+     },
+     {
+      "descriptor": "Risk & Compliance - Accreditation",
+      "id": "fbb60995c99901df6006594a15c59ec6",
+      "count": 1
+     },
+     {
+      "descriptor": "Technology - Technology Vision & Agenda Setting",
+      "id": "fbb60995c999019d8a70164a15c592c6",
+      "count": 1
+     },
+     {
+      "descriptor": "Technology - Service Management",
+      "id": "fbb60995c99901ef292b0c4a15c590c6",
+      "count": 1
+     },
+     {
+      "descriptor": "Technology - Platform & Infrastructure Management",
+      "id": "fbb60995c99901c989eaf74915c58cc6",
+      "count": 1
+     },
+     {
+      "descriptor": "Human Resources - Human Resources",
+      "id": "fbb60995c999018808867a4915c574c6",
+      "count": 1
+     },
+     {
+      "descriptor": "Member Quality & Financials - Medical Coding",
+      "id": "fbb60995c99901c3e10c5b4915c56ec6",
+      "count": 1
+     },
+     {
+      "descriptor": "Market Strategy - Engagement",
+      "id": "fbb60995c9990112f0f71c4915c562c6",
+      "count": 1
+     },
+     {
+      "descriptor": "Marketing & Communications - Marketing & Audience Engagement",
+      "id": "fbb60995c999015eff1c074915c55ec6",
+      "count": 1
+     },
+     {
+      "descriptor": "Marketing & Communications - Brand Management & Consumer Experience",
+      "id": "fbb60995c99901506a56f24815c55ac6",
+      "count": 1
+     },
+     {
+      "descriptor": "Market Strategy - Operations",
+      "id": "fbb60995c99901d5de1ede4815c556c6",
+      "count": 1
+     },
+     {
+      "descriptor": "Integrated Care & Care Operations - Clinical",
+      "id": "fbb60995c99901b8664ca14815c54ac6",
+      "count": 1
+     },
+     {
+      "descriptor": "Consumer Service Operations - Claims",
+      "id": "fbb60995c9990125cb35974815c548c6",
+      "count": 1
+     },
+     {
+      "descriptor": "Consumer Service Operations - Consumer Experience",
+      "id": "fbb60995c999018c37d04e4815c53ac6",
+      "count": 1
+     },
+     {
+      "descriptor": "Integrated Care & Care Operations - Clinic/Center Administration",
+      "id": "fbb60995c9990178638e234815c532c6",
+      "count": 1
+     },
+     {
+      "descriptor": "Consumer Service Operations - Claims Audit/Financials",
+      "id": "fbb60995c999013fb25c0e4815c52ec6",
+      "count": 1
+     },
+     {
+      "descriptor": "Finance - Accounting",
+      "id": "fbb60995c99901d151e5044815c52cc6",
+      "count": 1
+     },
+     {
+      "descriptor": "Business Services - Procurement",
+      "id": "fbb60995c999015ce71c954715c516c6",
+      "count": 1
+     }
+    ]
+   },
+   {
+    "facetParameter": "workerSubType",
+    "descriptor": "Job Type",
+    "values": [
+     {
+      "descriptor": "Regular",
+      "id": "fbb60995c9990107470f1034a7c4d106",
+      "count": 363
+     },
+     {
+      "descriptor": "Per Diem",
+      "id": "fbb60995c99901b661dbe933a7c4cf06",
+      "count": 14
+     },
+     {
+      "descriptor": "VSP",
+      "id": "fbb60995c99901c73ec40534a7c4d006",
+      "count": 10
+     }
+    ]
+   },
+   {
+    "facetParameter": "timeType",
+    "descriptor": "Time Type",
+    "values": [
+     {
+      "descriptor": "Full time",
+      "id": "0757333be977014cd461e76976c34500",
+      "count": 363
+     },
+     {
+      "descriptor": "Part time",
+      "id": "0757333be97701f36646e76976c34400",
+      "count": 24
+     }
+    ]
+   },
+   {
+    "facetParameter": "locationMainGroup",
+    "values": [
+     {
+      "facetParameter": "locations",
+      "descriptor": "City",
+      "values": [
+       {
+        "descriptor": "1812 N Moore",
+        "id": "119dce746e4c01bc12a0c6da2e42bf31",
+        "count": 2
+       },
+       {
+        "descriptor": "Aiken, SC",
+        "id": "43a99a3a6ae5012e9398cad1d2007fc2",
+        "count": 1
+       },
+       {
+        "descriptor": "Albany, GA",
+        "id": "27e75daef1eb01b15b7b89a3a6218710",
+        "count": 1
+       },
+       {
+        "descriptor": "Allentown, PA",
+        "id": "8c53d3c51fcf01015878606e8db10000",
+        "count": 1
+       },
+       {
+        "descriptor": "Altamonte Springs, FL",
+        "id": "27e75daef1eb011ec5685ca1a621ad0e",
+        "count": 1
+       }
+      ]
+     },
+     {
+      "facetParameter": "locationRegionStateProvince",
+      "descriptor": "State",
+      "values": [
+       {
+        "descriptor": "Alabama",
+        "id": "31475924e5494080a8a458bf4fa293ed",
+        "count": 6
+       },
+       {
+        "descriptor": "Alaska",
+        "id": "c8891443252c4c4ea9427be64d755b9f",
+        "count": 1
+       },
+       {
+        "descriptor": "Arizona",
+        "id": "c7b20b0d4bc04711a00900569e9afabd",
+        "count": 5
+       },
+       {
+        "descriptor": "Arkansas",
+        "id": "cea6c5355e1b4983b5fd0640310385b5",
+        "count": 6
+       },
+       {
+        "descriptor": "California",
+        "id": "ec3d210e4240442e99a28fa70419aec5",
+        "count": 7
+       },
+       {
+        "descriptor": "Colorado",
+        "id": "a83d6eabae3b49718c4ce09eeb66fd0b",
+        "count": 3
+       },
+       {
+        "descriptor": "Connecticut",
+        "id": "bffb3e4c9a4a4542bc6bd075a4c26247",
+        "count": 2
+       },
+       {
+        "descriptor": "Delaware",
+        "id": "18b4cf9ddb4e4542a39614cb55b4dde7",
+        "count": 4
+       },
+       {
+        "descriptor": "District of Columbia",
+        "id": "0d2bcd0308f541938f3ae29e7cc69ae0",
+        "count": 27
+       },
+       {
+        "descriptor": "Florida",
+        "id": "9c1a239b35bd4598856e5393b249b8a1",
+        "count": 70
+       },
+       {
+        "descriptor": "Georgia",
+        "id": "dec8eabbb13d45bdb159b8e25d896110",
+        "count": 24
+       },
+       {
+        "descriptor": "Hawaii",
+        "id": "e7634111501844fe83a0b316b16beb08",
+        "count": 1
+       },
+       {
+        "descriptor": "Idaho",
+        "id": "b1c017b8f6294b0e82773aaca1dce33e",
+        "count": 3
+       },
+       {
+        "descriptor": "Illinois",
+        "id": "d8bb292ed9fe44a2899a990ad569538c",
+        "count": 60
+       },
+       {
+        "descriptor": "Indiana",
+        "id": "28489665bcac44028a70d0642c932be4",
+        "count": 25
+       },
+       {
+        "descriptor": "Iowa",
+        "id": "a9be12393ccd460ea46d08c249ce6c8b",
+        "count": 6
+       },
+       {
+        "descriptor": "Kansas",
+        "id": "975ef5fd66c048909a4d64b64b762836",
+        "count": 5
+       },
+       {
+        "descriptor": "Kentucky",
+        "id": "66d386e70a2946b695835e59cebcd7b2",
+        "count": 145
+       },
+       {
+        "descriptor": "Louisiana",
+        "id": "777facb47a8442bfba79628424812d64",
+        "count": 8
+       },
+       {
+        "descriptor": "Maine",
+        "id": "b6d5367355b64eebb870b465d2e72205",
+        "count": 4
+       },
+       {
+        "descriptor": "Maryland",
+        "id": "586509e6daa741808206b095fee97e8f",
+        "count": 5
+       },
+       {
+        "descriptor": "Massachusetts",
+        "id": "c66d738416b74fb180376cf59cc7ec8f",
+        "count": 24
+       },
+       {
+        "descriptor": "Michigan",
+        "id": "b8372eef6b5341a39cdc95ac32790cba",
+        "count": 15
+       },
+       {
+        "descriptor": "Minnesota",
+        "id": "02f3984b69ba450080e456fe733f6741",
+        "count": 4
+       },
+       {
+        "descriptor": "Mississippi",
+        "id": "7c552cab901d4a1aa359a9cfc62850a7",
+        "count": 7
+       },
+       {
+        "descriptor": "Missouri",
+        "id": "790e3c3ddfaa4123905237a05f1df9e9",
+        "count": 10
+       },
+       {
+        "descriptor": "Montana",
+        "id": "d649a916a12e4680887c98d5836d0647",
+        "count": 3
+       },
+       {
+        "descriptor": "Nebraska",
+        "id": "3a652942d5f84071a48bc94a2b17d331",
+        "count": 3
+       },
+       {
+        "descriptor": "Nevada",
+        "id": "33e7c3874e0e4d28a8047926aa4a1d21",
+        "count": 3
+       },
+       {
+        "descriptor": "New Hampshire",
+        "id": "9efc91fd842142a0b0bf455e723b65a0",
+        "count": 4
+       },
+       {
+        "descriptor": "New Jersey",
+        "id": "9b56fe16bdf74b2cbad8b644cdf6015a",
+        "count": 7
+       },
+       {
+        "descriptor": "New Mexico",
+        "id": "32c182efea294964a9000772bc740672",
+        "count": 3
+       },
+       {
+        "descriptor": "New York",
+        "id": "9819bf0148e54f89adb255aa7bead635",
+        "count": 34
+       },
+       {
+        "descriptor": "North Carolina",
+        "id": "1486a0a4a8464c3b9ec482d4038deb99",
+        "count": 23
+       },
+       {
+        "descriptor": "North Dakota",
+        "id": "0567a9c4e90340e192aa655d387323c6",
+        "count": 2
+       },
+       {
+        "descriptor": "Ohio",
+        "id": "41493c81d9214eb190fd14067c7d974d",
+        "count": 9
+       },
+       {
+        "descriptor": "Oklahoma",
+        "id": "205ef21c556342268847466c48ec5a8c",
+        "count": 8
+       },
+       {
+        "descriptor": "Oregon",
+        "id": "6fcc4198762c4a7c807486c849fe94dd",
+        "count": 3
+       },
+       {
+        "descriptor": "Pennsylvania",
+        "id": "f620a79f2dc44473828b42881312de2b",
+        "count": 19
+       },
+       {
+        "descriptor": "Puerto Rico",
+        "id": "23c0c7a08b674337bd67252e3648f2a9",
+        "count": 2
+       },
+       {
+        "descriptor": "Rhode Island",
+        "id": "4c2f08af9b834f13bf4c2d41679d222d",
+        "count": 4
+       },
+       {
+        "descriptor": "South Carolina",
+        "id": "1d2632a43d204a2799bcd38b57e8a26e",
+        "count": 10
+       },
+       {
+        "descriptor": "South Dakota",
+        "id": "745d76f06d2b41738aecee630c5888a0",
+        "count": 2
+       },
+       {
+        "descriptor": "Tennessee",
+        "id": "00044a0287144032bca6973ac0eedb3e",
+        "count": 30
+       },
+       {
+        "descriptor": "Texas",
+        "id": "fc77e3a1ab36487f9646d14f7242dd77",
+        "count": 58
+       },
+       {
+        "descriptor": "Utah",
+        "id": "9bf006cfb5a44c51b84138e1a0e7d805",
+        "count": 5
+       },
+       {
+        "descriptor": "Vermont",
+        "id": "7df7a0cb48724af7891cb70410546897",
+        "count": 4
+       },
+       {
+        "descriptor": "Virginia",
+        "id": "e0889a76c58d4fff9b54b80dadc49000",
+        "count": 19
+       },
+       {
+        "descriptor": "Washington",
+        "id": "de9b48948ef8421db97ddf4ea206e931",
+        "count": 6
+       },
+       {
+        "descriptor": "West Virginia",
+        "id": "dc5bc08fd91446bdbd108d98a19ac0ff",
+        "count": 5
+       },
+       {
+        "descriptor": "Wisconsin",
+        "id": "96f29b3353ac4653b1a860751618e36b",
+        "count": 26
+       },
+       {
+        "descriptor": "Wyoming",
+        "id": "0022bee925f740b0a078f707a1868642",
+        "count": 3
+       }
+      ]
+     },
+     {
+      "facetParameter": "locationHierarchy1",
+      "descriptor": "Work Style",
+      "values": [
+       {
+        "descriptor": "Office",
+        "id": "27e75daef1eb01c80016e3c6af212744",
+        "count": 258
+       },
+       {
+        "descriptor": "Work at Home",
+        "id": "27e75daef1eb01317ed530d1af213e44",
+        "count": 149
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "jj": {
+  "total": 1786,
+  "facets": [
+   {
+    "facetParameter": "timeType",
+    "descriptor": "Full/Part-time",
+    "values": [
+     {
+      "descriptor": "Full time",
+      "id": "271e40c8a7e64a348e563254278a6779",
+      "count": 1774
+     },
+     {
+      "descriptor": "Part time",
+      "id": "5c519acff6a545619010d7e76ee4d06d",
+      "count": 12
+     }
+    ]
+   },
+   {
+    "facetParameter": "workerSubType",
+    "descriptor": "Job Type",
+    "values": [
+     {
+      "descriptor": "Apprentice",
+      "id": "44b3e9c90c00011f612472408882bb32",
+      "count": 12
+     },
+     {
+      "descriptor": "College Recruit",
+      "id": "c8cdc206cb9101f2bf2c6cb30f801568",
+      "count": 16
+     },
+     {
+      "descriptor": "Co-Op (Fixed Term)",
+      "id": "c8cdc206cb91013d31d96bb30f801468",
+      "count": 45
+     },
+     {
+      "descriptor": "Fixed Term Employee (Non-Intern) (Fixed Term)",
+      "id": "fefc533227a447fea93bdad826d0e83e",
+      "count": 100
+     },
+     {
+      "descriptor": "Global Mobility Employee",
+      "id": "eb94da1666b640d89fb571d6e845879b",
+      "count": 1
+     },
+     {
+      "descriptor": "Indefinite Term Contract Employees",
+      "id": "d47e0adf5d480199e63e5ca34ba17955",
+      "count": 3
+     },
+     {
+      "descriptor": "Intern (Fixed Term)",
+      "id": "ca32b336cc4a472a863c62c03f6e63b6",
+      "count": 57
+     },
+     {
+      "descriptor": "Regular",
+      "id": "a6a0d308752c44c78512478a6b330aa3",
+      "count": 1538
+     },
+     {
+      "descriptor": "Temporary Agency Worker",
+      "id": "4e1466dcd227106b5dd111f9feb529cd",
+      "count": 14
+     }
+    ]
+   },
+   {
+    "facetParameter": "jobFamilyGroup",
+    "descriptor": "Job Category",
+    "values": [
+     {
+      "descriptor": "Business Support",
+      "id": "604dc786859810010c31c07ce4ef0000",
+      "count": 9
+     },
+     {
+      "descriptor": "Career Programs",
+      "id": "604dc786859810010c31cac940da0000",
+      "count": 137
+     },
+     {
+      "descriptor": "Communications & Corporate/External Affairs",
+      "id": "604dc786859810010c31d3cfd9560000",
+      "count": 11
+     },
+     {
+      "descriptor": "Customer Management",
+      "id": "604dc786859810010c31e55af9c40000",
+      "count": 30
+     },
+     {
+      "descriptor": "Data Analytics & Computational Sciences",
+      "id": "604dc786859810010c31edc949e30000",
+      "count": 79
+     },
+     {
+      "descriptor": "Digital Marketing",
+      "id": "604dc786859810010c31f63be30d0000",
+      "count": 8
+     },
+     {
+      "descriptor": "Discovery & Pre-Clinical/Clinical Development",
+      "id": "604dc786859810010c31feafcd920000",
+      "count": 51
+     },
+     {
+      "descriptor": "Enterprise Management",
+      "id": "604dc786859810010c32068988660000",
+      "count": 6
+     },
+     {
+      "descriptor": "Environmental Health, Safety (EH&S) and Facilities Services (FS)",
+      "id": "604dc786859810010c320efe3a000000",
+      "count": 22
+     },
+     {
+      "descriptor": "Finance",
+      "id": "604dc786859810010c321770e5660000",
+      "count": 134
+     },
+     {
+      "descriptor": "Human Resources",
+      "id": "604dc786859810010c321fe647250000",
+      "count": 28
+     },
+     {
+      "descriptor": "Legal & Compliance",
+      "id": "604dc786859810010c32285c85670000",
+      "count": 21
+     },
+     {
+      "descriptor": "Market Access",
+      "id": "604dc786859810010c3230da4ca90000",
+      "count": 37
+     },
+     {
+      "descriptor": "Marketing",
+      "id": "604dc786859810010c3238b8954c0000",
+      "count": 62
+     },
+     {
+      "descriptor": "Medical Affairs Group",
+      "id": "604dc786859810010c3241cd1fbe0000",
+      "count": 83
+     },
+     {
+      "descriptor": "MedTech Sales",
+      "id": "604dc786859810010c324ae16ec90000",
+      "count": 302
+     },
+     {
+      "descriptor": "Non-Standard",
+      "id": "604dc786859810010c32daded0410000",
+      "count": 35
+     },
+     {
+      "descriptor": "Pharmaceutical Sales",
+      "id": "604dc786859810010c32535ce4950000",
+      "count": 165
+     },
+     {
+      "descriptor": "Procurement",
+      "id": "604dc786859810010c325c6fd3100000",
+      "count": 23
+     },
+     {
+      "descriptor": "Product Safety",
+      "id": "604dc786859810010c32e2b80e690000",
+      "count": 10
+     },
+     {
+      "descriptor": "Project/Program Management Group",
+      "id": "604dc786859810010c3264e690c30000",
+      "count": 20
+     },
+     {
+      "descriptor": "Quality",
+      "id": "604dc786859810010c326df88db60000",
+      "count": 71
+     },
+     {
+      "descriptor": "R&D Operations",
+      "id": "604dc786859810010c3277a8e7e80000",
+      "count": 18
+     },
+     {
+      "descriptor": "R&D Product Development",
+      "id": "604dc786859810010c328b0460c80000",
+      "count": 63
+     },
+     {
+      "descriptor": "Regulatory Affairs Group",
+      "id": "604dc786859810010c3292e41b5d0000",
+      "count": 29
+     },
+     {
+      "descriptor": "Sales Enablement",
+      "id": "604dc786859810010c329b5a25ee0000",
+      "count": 45
+     },
+     {
+      "descriptor": "Strategy & Corporate Development",
+      "id": "604dc786859810010c32a336fafa0000",
+      "count": 12
+     },
+     {
+      "descriptor": "Supply Chain Deliver",
+      "id": "604dc786859810010c32abafd4b50000",
+      "count": 33
+     },
+     {
+      "descriptor": "Supply Chain Engineering",
+      "id": "604dc786859810010c32b390add90000",
+      "count": 76
+     },
+     {
+      "descriptor": "Supply Chain Manufacturing",
+      "id": "604dc786859810010c32bb6c41dc0000",
+      "count": 82
+     },
+     {
+      "descriptor": "Supply Chain Planning",
+      "id": "604dc786859810010c32c34a2e590000",
+      "count": 23
+     },
+     {
+      "descriptor": "Technology Enterprise Strategy & Security",
+      "id": "604dc786859810010c32cb26337f0000",
+      "count": 6
+     },
+     {
+      "descriptor": "Technology Product & Platform Management",
+      "id": "604dc786859810010c32d302146a0000",
+      "count": 55
+     }
+    ]
+   },
+   {
+    "facetParameter": "locationMainGroup",
+    "values": [
+     {
+      "facetParameter": "locations",
+      "descriptor": "Locations",
+      "values": [
+       {
+        "descriptor": "Aachen, North Rhine-Westphalia, Germany",
+        "id": "a453930323781001cb1c0586a8250000",
+        "count": 9
+       },
+       {
+        "descriptor": "Adelaide, South Australia, Australia",
+        "id": "22c0964533ff1001cb191d3833810000",
+        "count": 2
+       },
+       {
+        "descriptor": "Ahmedabad, Gujarat, India",
+        "id": "a453930323781001ccb3f86614f60000",
+        "count": 1
+       },
+       {
+        "descriptor": "Alabama (Any City)",
+        "id": "a551939e29c41001ef637b44c2900000",
+        "count": 2
+       },
+       {
+        "descriptor": "Alajuela, Costa Rica",
+        "id": "107461f07f161001cb1d43933ba40000",
+        "count": 4
+       }
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "travelers": {
+  "total": 341,
+  "facets": [
+   {
+    "facetParameter": "jobFamilyGroup",
+    "descriptor": "Job Category",
+    "values": [
+     {
+      "descriptor": "Account Executive",
+      "id": "89aa261a3abf01e4a8d49a556a2ca919",
+      "count": 59
+     },
+     {
+      "descriptor": "Claim Handling",
+      "id": "8dbb59b0878f015ed770df940301d43e",
+      "count": 50
+     },
+     {
+      "descriptor": "Counsel",
+      "id": "89aa261a3abf01cc13cd8a596a2cdf1a",
+      "count": 47
+     },
+     {
+      "descriptor": "Software Engineering",
+      "id": "89aa261a3abf01dd822f41576a2c211a",
+      "count": 30
+     },
+     {
+      "descriptor": "Data & Analytics",
+      "id": "02adfa27e78e1001b4e3c12d490e0000",
+      "count": 21
+     },
+     {
+      "descriptor": "Not Categorized",
+      "id": "89aa261a3abf014e9a30d4586a2ca31a",
+      "count": 19
+     },
+     {
+      "descriptor": "Risk Management",
+      "id": "89aa261a3abf01ee4ef9c2576a2c4d1a",
+      "count": 16
+     },
+     {
+      "descriptor": "Agile",
+      "id": "0edc9609f9d3013b3d67ffe51635ccd0",
+      "count": 14
+     },
+     {
+      "descriptor": "Architecture",
+      "id": "89aa261a3abf0164ad01bf566a2cf519",
+      "count": 12
+     },
+     {
+      "descriptor": "Claim Operations",
+      "id": "1cb8928dc85201cf2acec6fffe00a016",
+      "count": 7
+     },
+     {
+      "descriptor": "Field Sales",
+      "id": "8dbb59b0878f018d4dab71950301fa3e",
+      "count": 7
+     },
+     {
+      "descriptor": "Product",
+      "id": "89aa261a3abf0192e8c258586a2c7f1a",
+      "count": 6
+     },
+     {
+      "descriptor": "Accounting",
+      "id": "8dbb59b0878f0173b40113940301a43e",
+      "count": 5
+     },
+     {
+      "descriptor": "Cybersecurity",
+      "id": "89aa261a3abf01b3bb16285b6a2c4d1b",
+      "count": 4
+     },
+     {
+      "descriptor": "Underwriting Officer",
+      "id": "8dbb59b0878f01193ff0bf9603014e3f",
+      "count": 4
+     },
+     {
+      "descriptor": "Financial Analysis",
+      "id": "8dbb59b0878f01ef0b1d9e950301063f",
+      "count": 4
+     },
+     {
+      "descriptor": "Actuarial and Analytics",
+      "id": "8dbb59b0878f013d314c22940301a83e",
+      "count": 3
+     },
+     {
+      "descriptor": "Legal Administration",
+      "id": "89aa261a3abf0150b04a9d596a2ce51a",
+      "count": 2
+     },
+     {
+      "descriptor": "Project Management",
+      "id": "89aa261a3abf0155e79b2a586a2c6f1a",
+      "count": 2
+     },
+     {
+      "descriptor": "Strategic Initiatives",
+      "id": "89aa261a3abf01e87f311c576a2c151a",
+      "count": 2
+     },
+     {
+      "descriptor": "Ops Account Specialist",
+      "id": "ba4fc402830c100162af8ad73c200000",
+      "count": 2
+     },
+     {
+      "descriptor": "ETS Engineering",
+      "id": "89250f792ecb1000bf9a728934170000",
+      "count": 2
+     },
+     {
+      "descriptor": "Behavioral Science",
+      "id": "b2f4bafccac60101a2412ffcec700000",
+      "count": 2
+     },
+     {
+      "descriptor": "HR Business Partners",
+      "id": "8dbb59b0878f01cfbe28a7950301083f",
+      "count": 2
+     },
+     {
+      "descriptor": "Enterprise Market Research",
+      "id": "8dbb59b0878f0161d81656950301f23e",
+      "count": 2
+     },
+     {
+      "descriptor": "Account Underwriter",
+      "id": "89aa261a3abf01c38125bd5c6a2cd11b",
+      "count": 1
+     },
+     {
+      "descriptor": "Credit Risk Management",
+      "id": "89aa261a3abf01267ee34b5b6a2c591b",
+      "count": 1
+     },
+     {
+      "descriptor": "Business Unit Leadership",
+      "id": "89aa261a3abf0110a8e7735a6a2c271b",
+      "count": 1
+     },
+     {
+      "descriptor": "Leadership Development Program",
+      "id": "89aa261a3abf01896232c7596a2cf31a",
+      "count": 1
+     },
+     {
+      "descriptor": "Product Management - Claim",
+      "id": "89aa261a3abf011198defe586a2cb11a",
+      "count": 1
+     },
+     {
+      "descriptor": "Operational Effectiveness",
+      "id": "89aa261a3abf014528e9b0586a2c9d1a",
+      "count": 1
+     },
+     {
+      "descriptor": "Reinsurance",
+      "id": "89aa261a3abf018e713de5576a2c591a",
+      "count": 1
+     },
+     {
+      "descriptor": "BI Residual Markets",
+      "id": "89aa261a3abf01d71f22ce576a2c511a",
+      "count": 1
+     },
+     {
+      "descriptor": "Claim Support",
+      "id": "89aa261a3abf0113e7be34576a2c1d1a",
+      "count": 1
+     },
+     {
+      "descriptor": "Underwriting",
+      "id": "89aa261a3abf01c3da0328566a2cc319",
+      "count": 1
+     },
+     {
+      "descriptor": "Customer Service",
+      "id": "89aa261a3abf015e25bd1a566a2cbf19",
+      "count": 1
+     },
+     {
+      "descriptor": "Cyber Risk Control",
+      "id": "c058ae6a35cd100166178d8220b20000",
+      "count": 1
+     },
+     {
+      "descriptor": "Print Center",
+      "id": "c784e6792bde1000addf460d3e9e0000",
+      "count": 1
+     },
+     {
+      "descriptor": "Enterprise Distribution Management",
+      "id": "b0d99455044201aca9e7529dfd0168f5",
+      "count": 1
+     },
+     {
+      "descriptor": "TSM Underwriting",
+      "id": "8dbb59b0878f0124e676a2960301463f",
+      "count": 1
+     },
+     {
+      "descriptor": "Technology Support",
+      "id": "8dbb59b0878f011d4a3b31950301e83e",
+      "count": 1
+     },
+     {
+      "descriptor": "Investments",
+      "id": "8dbb59b0878f01ab74f349940301b03e",
+      "count": 1
+     }
+    ]
+   },
+   {
+    "facetParameter": "workerSubType",
+    "descriptor": "Job Type",
+    "values": [
+     {
+      "descriptor": "Regular",
+      "id": "89aa261a3abf01345745627e242cb715",
+      "count": 322
+     },
+     {
+      "descriptor": "Intern Program (Fixed Term)",
+      "id": "89aa261a3abf01f372c0617e242cb315",
+      "count": 17
+     },
+     {
+      "descriptor": "Temporary (Fixed Term)",
+      "id": "89aa261a3abf01e42a55617e242cb015",
+      "count": 2
+     }
+    ]
+   },
+   {
+    "facetParameter": "timeType",
+    "descriptor": "Time Type",
+    "values": [
+     {
+      "descriptor": "Full time",
+      "id": "85a20ed7d41c01b8f96dd3b5b02b5600",
+      "count": 341
+     }
+    ]
+   },
+   {
+    "facetParameter": "Workplace_Arrangement",
+    "descriptor": "Workplace Arrangement",
+    "values": [
+     {
+      "descriptor": "Hybrid",
+      "id": "0bbb6ddc9f90100200a999cd6de90000",
+      "count": 310
+     },
+     {
+      "descriptor": "Remote",
+      "id": "0bbb6ddc9f90100200a99a67d1090002",
+      "count": 26
+     },
+     {
+      "descriptor": "Office",
+      "id": "0bbb6ddc9f90100200a99a67d1090001",
+      "count": 5
+     }
+    ]
+   },
+   {
+    "facetParameter": "locationMainGroup",
+    "values": [
+     {
+      "facetParameter": "locationCountry",
+      "descriptor": "Location Country",
+      "values": [
+       {
+        "descriptor": "Canada",
+        "id": "a30a87ed25634629aa6c3958aa2b91ea",
+        "count": 2
+       },
+       {
+        "descriptor": "Ireland",
+        "id": "04a05835925f45b3a59406a2a6b72c8a",
+        "count": 4
+       },
+       {
+        "descriptor": "United Kingdom",
+        "id": "29247e57dbaf46fb855b224e03170bc7",
+        "count": 18
+       },
+       {
+        "descriptor": "United States of America",
+        "id": "bc33aa3152ec42d4995f4791a106ed09",
+        "count": 317
+       }
+      ]
+     },
+     {
+      "facetParameter": "locations",
+      "descriptor": "Locations",
+      "values": [
+       {
+        "descriptor": "AB - Calgary",
+        "id": "89aa261a3abf01370250e325672ca163",
+        "count": 1
+       },
+       {
+        "descriptor": "AL - Birmingham",
+        "id": "89aa261a3abf01bb47dc4e27672c9768",
+        "count": 2
+       },
+       {
+        "descriptor": "AL - Hoover",
+        "id": "713a350b8ace100156166bbeda4c0000",
+        "count": 1
+       },
+       {
+        "descriptor": "AZ - Phoenix",
+        "id": "89aa261a3abf01ace9898d26672cef65",
+        "count": 6
+       },
+       {
+        "descriptor": "AZ - Prescott",
+        "id": "177e39cea4b410011da9ab20e3f40000",
+        "count": 1
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "facetParameter": "distance",
+    "descriptor": "Distance",
+    "values": [
+     {
+      "descriptor": "10 miles",
+      "id": "a538cdb60a631000078a2c60ed1700f3",
+      "count": 1
+     },
+     {
+      "descriptor": "25 miles",
+      "id": "a538cdb60a631000078a2c6a410300f4",
+      "count": 1
+     },
+     {
+      "descriptor": "50 miles",
+      "id": "a538cdb60a631000078a2c6eadd300f5",
+      "count": 1
+     },
+     {
+      "descriptor": "100 miles",
+      "id": "a538cdb60a631000078a2c71efcc00f6",
+      "count": 1
+     },
+     {
+      "descriptor": "Any Distance",
+      "id": "a538cdb60a631000078a2c74f73b00f7",
+      "count": 1
+     }
+    ]
+   }
+  ]
+ }
+}

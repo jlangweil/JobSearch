@@ -1,0 +1,113 @@
+<!doctype html>
+<!-- A stand-in for a Workday "My Information" / "Application Questions" step: the same labelling patterns
+     (data-automation-id wrappers, aria-labelledby, a native select, a custom listbox, a radio group, a consent
+     checkbox and a resume upload) without touching a real tenant. -->
+<html lang="en">
+<head><meta charset="utf-8"><title>Application — My Information</title></head>
+<body>
+<h2 data-automation-id="pageHeader">My Information</h2>
+<form>
+  <div data-automation-id="formField-firstName">
+    <label for="fn">First Name<abbr title="required">*</abbr></label>
+    <input id="fn" name="firstName" type="text" required>
+  </div>
+
+  <div data-automation-id="formField-lastName">
+    <label for="ln">Last Name *</label>
+    <input id="ln" name="lastName" type="text" required>
+  </div>
+
+  <div data-automation-id="formField-email">
+    <label for="em">Email Address</label>
+    <input id="em" name="email" type="email">
+  </div>
+
+  <div data-automation-id="formField-phoneNumber">
+    <label for="ph">Phone Number (required)</label>
+    <input id="ph" name="phone" type="tel">
+  </div>
+
+  <div data-automation-id="formField-addressLine1">
+    <label for="a1">Address Line 1</label>
+    <input id="a1" name="addressLine1" type="text">
+  </div>
+
+  <div data-automation-id="formField-city">
+    <label for="ct">City</label>
+    <input id="ct" name="city" type="text">
+  </div>
+
+  <div data-automation-id="formField-postalCode">
+    <label for="pc">Postal Code</label>
+    <input id="pc" name="postalCode" type="text">
+  </div>
+
+  <!-- native select, as some tenants render State -->
+  <div data-automation-id="formField-state">
+    <label for="st">State</label>
+    <select id="st" name="state">
+      <option value="">Select One</option>
+      <option>New Jersey</option>
+      <option>New York</option>
+      <option>Pennsylvania</option>
+    </select>
+  </div>
+
+  <!-- Workday's custom dropdown: a button that opens a detached listbox -->
+  <div data-automation-id="formField-source">
+    <span id="src-label">How Did You Hear About Us?</span>
+    <button type="button" id="src-btn" aria-haspopup="listbox" aria-labelledby="src-label"
+            onclick="document.getElementById('src-list').hidden = !document.getElementById('src-list').hidden">
+      Select One
+    </button>
+    <ul id="src-list" role="listbox" hidden>
+      <li role="option" data-automation-id="promptOption" onclick="pick(this)">Job Board</li>
+      <li role="option" data-automation-id="promptOption" onclick="pick(this)">Company website</li>
+      <li role="option" data-automation-id="promptOption" onclick="pick(this)">Employee Referral</li>
+      <li role="option" data-automation-id="promptOption" onclick="pick(this)">LinkedIn</li>
+    </ul>
+  </div>
+
+  <fieldset data-automation-id="formField-sponsorship">
+    <legend>Will you now or in the future require sponsorship for employment visa status?</legend>
+    <label for="sp-y">Yes</label><input id="sp-y" type="radio" name="sponsorship" value="yes">
+    <label for="sp-n">No</label><input id="sp-n" type="radio" name="sponsorship" value="no">
+  </fieldset>
+
+  <fieldset data-automation-id="formField-veteran">
+    <legend>Veteran Status</legend>
+    <label for="v1">I identify as one or more of the classifications of a protected veteran</label>
+    <input id="v1" type="radio" name="veteran" value="yes">
+    <label for="v2">I am not a protected veteran</label>
+    <input id="v2" type="radio" name="veteran" value="no">
+    <label for="v3">I don't wish to answer</label>
+    <input id="v3" type="radio" name="veteran" value="decline">
+  </fieldset>
+
+  <div data-automation-id="formField-terms">
+    <label for="tc"><input id="tc" type="checkbox" name="terms"> Yes, I have read and consent to the terms</label>
+  </div>
+
+  <div data-automation-id="formField-resume">
+    <label for="cv">Resume/CV</label>
+    <input id="cv" name="resume" type="file" data-automation-id="file-upload-input-ref">
+  </div>
+
+  <!-- a question no profile covers, to prove it is reported rather than guessed -->
+  <div data-automation-id="formField-custom">
+    <label for="cu">Which of our company values resonates with you most?</label>
+    <input id="cu" name="values" type="text">
+  </div>
+
+  <input type="hidden" name="csrf" value="x">
+  <input type="search" id="sq" aria-label="Search jobs">
+  <button type="button" data-automation-id="pageFooterNextButton">Save and Continue</button>
+</form>
+<script>
+  function pick(li) {
+    document.getElementById('src-btn').textContent = li.textContent;
+    document.getElementById('src-list').hidden = true;
+  }
+</script>
+</body>
+</html>

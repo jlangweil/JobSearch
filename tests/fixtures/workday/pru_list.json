@@ -1,0 +1,33 @@
+{
+ "total": 3,
+ "jobPostings": [
+  {
+   "title": "Lead, Network Security Operations - Virtual",
+   "externalPath": "/job/Newark-NJ-USA/Lead--Infrastructure-Administration-Engineer_R-124588-1",
+   "locationsText": "38 Locations",
+   "postedOn": "Posted Today",
+   "bulletFields": [
+    "R-124588"
+   ]
+  },
+  {
+   "title": "Lead, Infrastructure Security Engineer - CASB and DSPM",
+   "externalPath": "/job/Newark-NJ-USA/Lead--Infrastructure-Security-Engineer---CASB-and-DSPM_R-124045-1",
+   "locationsText": "Newark, NJ, USA",
+   "postedOn": "Posted 5 Days Ago",
+   "bulletFields": [
+    "R-124045"
+   ]
+  },
+  {
+   "title": "Lead, Infrastructure Security Engineer - Identity Governance",
+   "externalPath": "/job/Newark-NJ-USA/Lead--Infrastructure-Security-Engineer---Identity-Governance_R-124960-1",
+   "locationsText": "Newark, NJ, USA",
+   "postedOn": "Posted 6 Days Ago",
+   "bulletFields": [
+    "R-124960"
+   ]
+  }
+ ],
+ "userAuthenticated": false
+}

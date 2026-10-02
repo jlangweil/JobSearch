@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Auto-apply — {{ job.title }}{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <a class="text-xs underline" href="/jobs/{{ job.id }}">← back to the job</a>
+  <h1 class="text-lg font-semibold">Auto-apply <span class="rounded bg-amber-100 px-1 text-[10px] uppercase text-amber-800">beta</span></h1>
+  <p class="text-sm text-slate-500">{{ job.company_name_raw }} — {{ job.title }}</p>
+</div>
+
+<div class="grid gap-4 lg:grid-cols-3">
+  <section class="lg:col-span-2 rounded border bg-white p-3">
+    <h2 class="mb-2 font-semibold">What this run will do</h2>
+    <ol class="ml-4 list-decimal space-y-1 text-sm">
+      <li>Open <a class="underline" href="{{ v.apply_url }}" target="_blank" rel="noreferrer">{{ v.host }}</a> in a {{ 'headless' if v.headless else 'visible' }} browser.</li>
+      <li>
+        {% if v.account.known_site %}
+          Sign in as <b>{{ v.account.username }}</b> — you have applied on this site before.
+        {% else %}
+          <b>New site.</b> Sign in as <b>{{ v.account.username }}</b>, and if there is no account yet, create one
+          {% if v.account.per_site_password %}with a generated password saved encrypted for next time{% else %}with your saved password{% endif %}.
+          {% if v.account.mailbox_ready %}A verification code emailed by the site is read from your mailbox automatically.
+          {% else %}<span class="text-amber-800">If the site emails a verification code, the run stops — connect your mailbox on
+            <a class="underline" href="/settings#email">Settings → Job alert emails</a> to have it read automatically.</span>{% endif %}
+        {% endif %}
+      </li>
+      <li>Upload <span class="font-mono text-xs">{{ v.resume.split('\\')[-1] if v.resume else 'no resume' }}</span>{% if v.cover_letter %} and <span class="font-mono text-xs">{{ v.cover_letter.split('\\')[-1] }}</span>{% endif %}.</li>
+      {% if v.apply_mode == 'autofill' %}
+      <li>Hand the resume to the site's own parser (<b>Autofill with Resume</b>), then correct and complete what it produced.</li>
+      {% endif %}
+      {% if v.fill_work_experience %}
+      <li>Type {{ v.roles|length }} roles and {{ v.education|length }} schools into their own fields — the site's resume parser is not trusted with them.</li>
+      {% else %}
+      <li>Leave Work Experience to the site's resume parser (typing it in is switched off in Settings).</li>
+      {% endif %}
+      <li>Answer the standard questions from your <a class="underline" href="/apply#profile">apply profile</a>.</li>
+      <li class="{{ 'font-semibold text-red-700' if v.auto_submit }}">{{ 'Submit the application.' if v.auto_submit else 'Stop on the Review page for you to check and submit.' }}</li>
+    </ol>
+
+    <div class="mt-3 border-t pt-3">
+      <h3 class="text-xs font-semibold uppercase text-slate-500">Work history it will enter</h3>
+      <table class="mt-1 w-full text-xs">
+        {% for r in v.roles %}
+        <tr class="border-t"><td class="py-1 pr-2 text-slate-500">{{ r.start }} – {{ r.end or 'Present' }}</td><td class="pr-2 font-medium">{{ r.org }}</td><td>{{ r.title }}</td><td class="text-slate-500">{{ r.location }}</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+
+    {% if v.blockers %}
+    <div class="mt-3 rounded border border-red-200 bg-red-50 p-2 text-sm text-red-800">
+      <b>Not ready:</b>
+      <ul class="ml-4 list-disc">{% for b in v.blockers %}<li>{{ b }}</li>{% endfor %}</ul>
+      <p class="mt-1 text-xs">Fix these on <a class="underline" href="/apply">the auto-apply page</a>.</p>
+    </div>
+    {% endif %}
+
+    <form method="post" action="/jobs/{{ job.id }}/auto-apply" class="mt-3 flex items-center gap-3">
+      <button class="rounded bg-slate-800 px-3 py-1.5 text-white disabled:opacity-50" {% if v.blockers %}disabled{% endif %}>Start auto-apply</button>
+      <span class="text-xs text-slate-500">You can watch the browser and take over at any point; whatever you type stays.</span>
+    </form>
+  </section>
+
+  <aside class="rounded border bg-white p-3">
+    <h2 class="mb-2 font-semibold">Before you start</h2>
+    <ul class="space-y-2 text-xs text-slate-500">
+      <li><b class="text-slate-700">Read the posting yourself.</b> Auto-apply fills a form; it does not decide whether the job is a fit.</li>
+      <li><b class="text-slate-700">A captcha ends the run.</b> The window stays open so you can finish by hand.</li>
+      <li><b class="text-slate-700">Unknown questions pause it</b> (you can change that in Settings). They appear on <a class="underline" href="/apply#questions">the questions list</a>, and once answered are reused everywhere.</li>
+      <li><b class="text-slate-700">One run at a time.</b> A second run waits for the browser lock.</li>
+    </ul>
+    {% if v.open_questions %}
+    <div class="mt-3 rounded border border-amber-200 bg-amber-50 p-2 text-xs text-amber-900">
+      {{ v.open_questions|length }} question(s) from earlier runs are still unanswered.
+      <a class="underline" href="/apply#questions">Answer them first</a> to keep this run from stopping.
+    </div>
+    {% endif %}
+    {% if v.runs %}
+    <h3 class="mt-3 text-xs font-semibold uppercase text-slate-500">Earlier attempts</h3>
+    <ul class="text-xs">{% for r in v.runs %}<li class="border-t py-1"><a class="underline" href="/apply/runs/{{ r.id }}">{{ r.started_at|local }}</a> — {{ r.status }}</li>{% endfor %}</ul>
+    {% endif %}
+  </aside>
+</div>
+{% endblock %}

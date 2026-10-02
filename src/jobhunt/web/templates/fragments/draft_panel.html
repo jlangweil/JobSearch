@@ -1,0 +1,169 @@
+{% set v = wf.state %}
+<div id="workflow-panel" {% if wf.running %}hx-get="/jobs/{{ job.id }}/workflow/status" hx-trigger="every 2s" hx-swap="outerHTML"{% endif %}>
+  <div class="mb-3 rounded border bg-white px-3 py-2">
+    <b>Stage:</b> {{ wf.stage or 'not started' }}
+    {% if wf.running %}<span class="ml-2 text-blue-700">working… (updates every 2s)</span>{% endif %}
+    {% if wf.done %}<span class="ml-2 text-green-700">finished</span>{% endif %}
+    {% if wf.failure %}
+      <div role="alert" class="mt-2 rounded border border-red-300 bg-red-50 px-2 py-1 text-red-900">Last step failed: {{ wf.failure }}</div>
+    {% endif %}
+    {% if wf.can_retry and not wf.failure %}
+      <div class="mt-2 rounded border border-amber-300 bg-amber-50 px-2 py-1 text-amber-800">This workflow stopped at “{{ (wf.stage or 'a step').replace('_', ' ') }}” and isn't running
+        (the error, if any, was cleared when the server restarted). Nothing is lost: <b>Retry</b> continues from the last completed step.</div>
+    {% endif %}
+    {% if wf.can_retry %}
+      <form method="post" action="/jobs/{{ job.id }}/workflow/resume" class="mt-2 inline">
+        <input type="hidden" name="action" value="retry">
+        <button class="rounded bg-amber-600 px-3 py-1 text-white">Retry from last checkpoint</button>
+      </form>
+    {% endif %}
+    {% if wf.gate and wf.gate.message %}<div class="mt-2 rounded border border-amber-300 bg-amber-50 px-2 py-1">{{ wf.gate.message }}</div>{% endif %}
+  </div>
+
+  {% if not wf.started %}
+    <p class="text-slate-500">No workflow thread for this job. Shortlist it from the queue to start one.</p>
+  {% else %}
+  <div class="grid gap-4 lg:grid-cols-5">
+    <aside class="lg:col-span-2 space-y-3">
+      <div class="rounded border bg-white p-3">
+        <h2 class="mb-2 font-semibold">Requirements &amp; coverage</h2>
+        <ul class="space-y-1">
+          {% for c in v.coverage or [] %}
+          <li class="flex gap-2">
+            <span class="shrink-0 rounded px-1 text-xs {{ 'bg-green-100 text-green-800' if c.status == 'covered' else ('bg-amber-100 text-amber-800' if c.status == 'partial' else 'bg-red-100 text-red-800') }}">{{ c.status }}</span>
+            <span>{% if c.kind == 'must' %}<b>must</b> · {% endif %}{{ c.requirement }}
+              {% if c.covered_by %}<span class="block text-[11px] text-slate-500">{{ c.covered_by | join(', ') }}</span>{% endif %}</span>
+          </li>
+          {% else %}<li class="text-slate-500">Parsing requirements…</li>{% endfor %}
+        </ul>
+      </div>
+      {% if v.keyword_coverage %}
+      <div class="rounded border bg-white p-3">
+        <h2 class="mb-1 font-semibold">ATS keyword match: {{ v.keyword_coverage.percent }}%
+          {% if wf.resume_words %}<span class="ml-2 text-xs font-normal {{ 'text-red-700' if wf.resume_words > (ats_max_words or 1500) else 'text-slate-500' }}">{{ wf.resume_words }} words, about {{ '%.1f' % (wf.resume_words / 500) }} pages</span>{% endif %}
+          {% if v.generation_mode == 'ats_super_match' %}<span class="ml-2 rounded bg-blue-50 px-1 text-[10px] text-blue-700">ATS Super Match</span>{% endif %}</h2>
+        <p class="text-xs text-slate-600">Matched: {{ v.keyword_coverage.matched | join(', ') or '—' }}</p>
+        <p class="text-xs text-red-700">Missing (must): {{ v.keyword_coverage.missing_must | join(', ') or '—' }}</p>
+        <p class="text-xs text-amber-700">Missing (nice): {{ v.keyword_coverage.missing_nice | join(', ') or '—' }}</p>
+        <p class="mt-1 text-[11px] text-slate-500">Only add a keyword if a fact genuinely supports it — add the fact first on the Facts page.</p>
+      </div>
+      {% endif %}
+      {% if wf.bullets %}
+      <div class="rounded border bg-white p-3">
+        <h2 class="mb-1 font-semibold">Bullet → source fact</h2>
+        {% for b in wf.bullets %}
+        <details class="border-t py-1">
+          <summary>{{ b.index }}. {{ b.text[:90] }}{% if b.text|length > 90 %}…{% endif %}</summary>
+          {% if b.fact %}<div class="ml-4 text-xs text-slate-700"><b>{{ b.fact_id }}</b> ({{ b.fact.kind }}): {{ b.fact.text }}
+            {% if b.fact.metrics %}<div>metrics: {{ b.fact.metrics }}</div>{% endif %}</div>
+          {% elif b.fact_id %}<div class="ml-4 text-xs text-red-700">{{ b.fact_id }} is not in this job's candidate facts</div>
+          {% else %}<div class="ml-4 text-xs text-red-700">no fact reference</div>{% endif %}
+        </details>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </aside>
+
+    <section class="lg:col-span-3 space-y-3">
+      {% if wf.gate and wf.gate.errors %}{% set errors = wf.gate.errors %}{% include "fragments/validation_errors.html" %}{% endif %}
+
+      {% if wf.gate and wf.gate.gate == 'review_ats' %}
+      <div class="rounded border border-blue-200 bg-white p-3">
+        <h2 class="mb-1 font-semibold">ATS Super Match: what may be added?</h2>
+        <p class="mb-2 text-xs text-slate-600">Applicant tracking systems rank resumes by how many of the posting's keywords they contain. These keywords from the posting aren't in your facts yet. Tick only the ones that are genuinely true of you: they are used for this job's resume only (as "Additional Skills") and are not saved to your fact bank. Unticked ones are never claimed.</p>
+        <form method="post" action="/jobs/{{ job.id }}/workflow/resume" class="space-y-3">
+          {% if wf.gate.keywords %}
+          <fieldset>
+            <legend class="mb-1 text-sm font-semibold">Keywords from the posting <span class="text-xs font-normal text-slate-500">({{ wf.gate.keywords | length }})</span></legend>
+            <div class="grid gap-x-4 gap-y-1 text-sm sm:grid-cols-2">
+            {% for k in wf.gate.keywords | sort(attribute='kind', reverse=True) %}
+              <label class="flex items-center gap-2"><input type="checkbox" name="keyword" value="{{ k.keyword }}">
+                <span>{{ k.keyword }}</span>{% if k.kind == 'must' %}<span class="rounded bg-amber-100 px-1 text-[10px] text-amber-800">required</span>{% endif %}</label>
+            {% endfor %}
+            </div>
+          </fieldset>
+          {% else %}<p class="text-sm text-slate-500">Your facts already cover every keyword the posting asks for.</p>{% endif %}
+          {% if wf.gate.headline %}
+          <fieldset class="text-sm">
+            <legend class="mb-1 font-semibold">Headline under your name</legend>
+            <label class="flex items-center gap-2"><input type="checkbox" name="use_headline" value="1" checked> Use this headline (edit it if you like):</label>
+            <input name="headline" value="{{ wf.gate.headline }}" class="mt-1 block w-full rounded border px-2 py-1">
+            <p class="mt-1 text-xs text-slate-500">ATS and recruiters look for the posting's job title on your resume. Untick it if it doesn't describe you.</p>
+          </fieldset>
+          {% endif %}
+          <div class="flex flex-wrap gap-2">
+            <button name="action" value="apply" class="rounded bg-blue-700 px-3 py-1.5 text-white">Add what I ticked and draft</button>
+            <button name="action" value="skip" class="rounded border px-3 py-1.5">Add nothing; draft</button>
+            <button name="action" value="abandon" class="rounded border border-red-300 px-3 py-1.5 text-red-700">Abandon</button>
+          </div>
+        </form>
+      </div>
+      {% endif %}
+
+      {% if wf.gate and wf.gate.gate in ['review_resume', 'review_cover'] %}
+      <div class="rounded border bg-white p-3">
+        <h2 class="mb-1 font-semibold">{{ 'Resume draft' if wf.gate.gate == 'review_resume' else 'Cover letter draft' }}
+          {% if wf.gate.document_id %}<a class="ml-2 text-xs text-blue-700" href="/documents/{{ wf.gate.document_id }}">saved as document #{{ wf.gate.document_id }}</a>{% else %}<span class="ml-2 text-xs text-red-700">not saved (invalid)</span>{% endif %}</h2>
+        <form method="post" action="/jobs/{{ job.id }}/workflow/resume">
+          <input type="hidden" name="kind" value="{{ wf.editor_kind }}">
+          <label for="editor" class="text-xs text-slate-600">Edit directly. Each {{ 'bullet' if wf.editor_kind == 'resume' else 'paragraph' }} ends with <code>{fact:id}</code> naming its source fact; edits are validated exactly like model drafts.</label>
+          <textarea id="editor" name="editor" rows="26" class="editor mt-1 w-full rounded border p-2">{{ wf.editor }}</textarea>
+          <div class="mt-2 flex flex-wrap gap-2">
+            <button name="action" value="accept" class="rounded bg-green-700 px-3 py-1.5 text-white" {% if wf.gate.errors or not wf.gate.document_id %}disabled title="fix validation errors first"{% endif %}>Accept</button>
+            <button name="action" value="edit" class="rounded bg-slate-800 px-3 py-1.5 text-white">Save my edit (validate)</button>
+            {% if 'abandon' in wf.actions %}<button name="action" value="abandon" class="rounded border border-red-400 px-3 py-1.5 text-red-700">Abandon job</button>{% endif %}
+          </div>
+        </form>
+        <form method="post" action="/jobs/{{ job.id }}/workflow/resume" class="mt-3 flex gap-2">
+          <input type="hidden" name="action" value="revise">
+          <label for="instructions" class="sr-only">Revision instructions</label>
+          <input id="instructions" name="instructions" placeholder="Optional instructions, e.g. “emphasize API platform ownership”" class="flex-1 rounded border px-2 py-1">
+          <button class="rounded bg-blue-700 px-3 py-1.5 text-white" title="Draft this again from scratch">Regenerate draft</button>
+        </form>
+      </div>
+      {% elif wf.gate and wf.gate.gate == 'approve_and_apply' %}
+      <div class="rounded border bg-white p-3">
+        <h2 class="mb-2 font-semibold">Approve &amp; apply</h2>
+        <p class="mb-2">Nothing is submitted for you. Apply on the employer's site, then confirm here.</p>
+        <ol class="mb-3 list-decimal ml-5 space-y-1">{% for s in wf.gate.checklist.steps %}<li>{{ s }}</li>{% endfor %}</ol>
+        {% if v.ats_warnings %}<div class="mb-2 text-xs text-amber-700">ATS warnings: {{ v.ats_warnings | join('; ') }}</div>{% endif %}
+        <div class="mb-3 flex flex-wrap items-center gap-2 text-sm">
+          {% for doc_id, label in [(v.resume_document_id, 'resume'), (v.cover_document_id, 'cover letter')] if doc_id %}
+          <form method="post" action="/documents/{{ doc_id }}/open" class="inline">
+            <input type="hidden" name="index" value="0"><input type="hidden" name="next" value="/jobs/{{ job.id }}/workflow">
+            <button class="rounded bg-slate-800 px-3 py-1.5 text-white" title="opens the .docx in Word on this computer">Open {{ label }} in Word</button>
+          </form>
+          <a class="text-xs text-blue-700" href="/documents/{{ doc_id }}/files/0">download</a>
+          <a class="mr-3 text-xs text-blue-700" href="/documents/{{ doc_id }}">details</a>
+          {% endfor %}
+        </div>
+        <div class="mb-3 flex flex-wrap items-center gap-2">
+          <a href="{{ wf.gate.checklist.apply_url }}" target="_blank" rel="noopener" class="inline-block rounded bg-blue-700 px-3 py-1.5 text-white">Open application ↗</a>
+          {% if workday %}<a href="/jobs/{{ job.id }}/auto-apply" class="inline-block rounded border border-amber-300 bg-amber-50 px-3 py-1.5 text-amber-900">Auto-apply with these documents <span class="text-[10px] uppercase">beta</span></a>
+          <span class="text-xs text-slate-500">fills the Workday application in a browser and stops on Review; confirm here once you've submitted</span>{% endif %}
+        </div>
+        <form method="post" action="/jobs/{{ job.id }}/workflow/resume" class="grid gap-2 md:grid-cols-3">
+          <label class="text-xs">Method
+            <select name="method" class="w-full rounded border px-1 py-1"><option value="deep_link">deep_link</option><option value="manual">manual</option></select></label>
+          <label class="text-xs">Confirmation / req number <input name="confirmation_ref" class="w-full rounded border px-1 py-1"></label>
+          <label class="text-xs">Notes <input name="notes" class="w-full rounded border px-1 py-1"></label>
+          <div class="md:col-span-3 flex gap-2">
+            <button name="action" value="confirm" class="rounded bg-green-700 px-3 py-1.5 text-white">Confirm applied</button>
+          </div>
+        </form>
+        <form id="regenerate" method="post" action="/jobs/{{ job.id }}/workflow/resume" class="mt-4 space-y-2 border-t pt-3">
+          <input type="hidden" name="action" value="back_to_resume">
+          <h3 class="font-semibold">Regenerate the resume and cover letter</h3>
+          <p class="text-xs text-slate-500">Drafts a new resume from your current fact bank and tailoring settings ({{ 'complete' if cfg_resume_mode == 'complete' else 'focused' }} resume), then a new cover letter.
+            You review both again; the files are replaced when you accept. Earlier versions stay listed under Resumes &amp; letters.</p>
+          <input name="instructions" placeholder="Optional: what to change, e.g. “put the MuleSoft platform work first”" class="w-full rounded border px-2 py-1">
+          <button class="rounded bg-blue-700 px-3 py-1.5 text-white">Regenerate</button>
+        </form>
+      </div>
+      {% elif wf.done %}
+      <div class="rounded border bg-white p-3">Workflow finished ({{ wf.stage }}). {% if v.resume_document_id %}<a class="text-blue-700" href="/documents/{{ v.resume_document_id }}">Resume</a>{% endif %}{% if v.cover_document_id %} · <a class="text-blue-700" href="/documents/{{ v.cover_document_id }}">Cover letter</a>{% endif %} · <a class="text-blue-700" href="/applications">Applications</a> · <a class="text-blue-700" href="/documents">All resumes &amp; letters</a></div>
+      {% endif %}
+    </section>
+  </div>
+  {% endif %}
+</div>

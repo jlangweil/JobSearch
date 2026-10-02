@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Sign In</title></head>
+<body>
+<h2 data-automation-id="pageHeader">Sign In</h2>
+<label for="em">Email Address</label><input id="em" data-automation-id="email" type="email">
+<label for="pw">Password</label><input id="pw" data-automation-id="password" type="password">
+<button data-automation-id="signInSubmitButton" onclick="go()">Sign In</button>
+<a data-automation-id="createAccountLink" href="create.html">Create Account</a>
+<div data-automation-id="errorMessage" id="err" hidden>Invalid email or password.</div>
+<script>
+  function go() {
+    var ok = document.getElementById('em').value && document.getElementById('pw').value.length >= 8;
+    if (ok) { sessionStorage.setItem('signed_in', '1'); location.href = 'information.html'; }
+    else { document.getElementById('err').hidden = false; }
+  }
+</script>
+</body></html>

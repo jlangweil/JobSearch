@@ -1,0 +1,41 @@
+<!doctype html>
+<!-- First American's shape: Apply lands on Create Account. There is no sign-in button anywhere in the DOM, only
+     an "Already have an account? Sign In" link that swaps the panel. A run that types sign-in details here and
+     presses the nearest submit button submits the *create* form with an empty Verify field — which Workday
+     rejects with a message that is not in any of the usual error containers. -->
+<html lang="en"><head><meta charset="utf-8"><title>Create Account</title></head>
+<body>
+<h2 data-automation-id="pageHeader">Create Account</h2>
+<div id="create">
+  <label for="c-em">Email Address</label><input id="c-em" data-automation-id="email" type="text">
+  <label for="c-pw">Password</label><input id="c-pw" data-automation-id="password" type="password">
+  <label for="c-vp">Verify New Password</label><input id="c-vp" data-automation-id="verifyPassword" type="password">
+  <label><input data-automation-id="createAccountCheckbox" type="checkbox"> I consent to the above</label>
+  <button data-automation-id="createAccountSubmitButton" type="submit" onclick="createAccount()">Create Account</button>
+  <p>Already have an account? <a data-automation-id="signInLink" href="#" onclick="showSignIn(); return false;">Sign In</a></p>
+</div>
+<div id="signin" hidden>
+  <label for="s-em">Email Address</label><input id="s-em" data-automation-id="email" type="text">
+  <label for="s-pw">Password</label><input id="s-pw" data-automation-id="password" type="password">
+  <button data-automation-id="signInSubmitButton" type="submit" onclick="signIn()">Sign In</button>
+</div>
+<!-- the tenant's own wording, in a plain paragraph rather than any known error container -->
+<p id="note" hidden></p>
+<script>
+  function note(t) { var n = document.getElementById('note'); n.textContent = t; n.hidden = !t; }
+  function show(which) {
+    document.getElementById('create').hidden = which !== 'create';
+    document.getElementById('signin').hidden = which !== 'signin';
+    note('');
+  }
+  function showSignIn() { show('signin'); }
+  function signIn() { note('We could not find an account with that email address.'); }
+  function createAccount() {
+    var pw = document.getElementById('c-pw').value, vp = document.getElementById('c-vp').value;
+    var agreed = document.querySelector('[data-automation-id="createAccountCheckbox"]').checked;
+    if (!pw || pw !== vp) { note('The passwords you entered do not match.'); return; }
+    if (!agreed) { note('You must consent before creating an account.'); return; }
+    location.href = 'verify.html';
+  }
+</script>
+</body></html>

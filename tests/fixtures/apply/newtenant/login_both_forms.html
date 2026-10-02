@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- The shape of a real Workday sign-in page, and the one that broke the first beta: the sign-in panel and the
+     create-account panel are both in the DOM, with one hidden, and both carry data-automation-id="email" and
+     "password". Anything that takes the *first* match types into invisible inputs and clicks a hidden button,
+     so the page never changes and the run stalls with nothing to report. -->
+<html lang="en">
+<head><meta charset="utf-8"><title>Sign In</title></head>
+<body>
+<h2 data-automation-id="pageHeader">Sign In</h2>
+
+<!-- hidden create-account panel, present from the first paint -->
+<div id="create" hidden>
+  <label for="c-em">Email Address</label><input id="c-em" data-automation-id="email" type="email">
+  <label for="c-pw">Password</label><input id="c-pw" data-automation-id="password" type="password">
+  <label for="c-vp">Verify New Password</label><input id="c-vp" data-automation-id="verifyPassword" type="password">
+  <label><input data-automation-id="createAccountCheckbox" type="checkbox"> I agree to the Terms and Conditions</label>
+  <button data-automation-id="createAccountSubmitButton" onclick="createAccount()">Create Account</button>
+</div>
+
+<!-- visible sign-in panel -->
+<div id="signin">
+  <label for="s-em">Email Address</label><input id="s-em" data-automation-id="email" type="email">
+  <label for="s-pw">Password</label><input id="s-pw" data-automation-id="password" type="password">
+  <button data-automation-id="signInSubmitButton" onclick="signIn()">Sign In</button>
+  <a data-automation-id="createAccountLink" href="#" onclick="showCreate(); return false;">Create Account</a>
+</div>
+
+<div data-automation-id="errorMessage" id="err" hidden></div>
+
+<script>
+  function show(id, on) { document.getElementById(id).hidden = !on; }
+  function error(text) {
+    var e = document.getElementById('err');
+    if (text) { e.textContent = text; e.hidden = false; } else { e.hidden = true; }
+  }
+  function signIn() {
+    // the account does not exist on this tenant yet
+    if (!document.getElementById('s-em').value) { return; }
+    error('We could not find an account with that email address.');
+  }
+  function showCreate() { show('create', true); show('signin', false); error(''); }
+  function createAccount() {
+    var pw = document.getElementById('c-pw').value;
+    var vp = document.getElementById('c-vp').value;
+    var agreed = document.querySelector('[data-automation-id="createAccountCheckbox"]').checked;
+    if (!document.getElementById('c-em').value || pw.length < 8 || pw !== vp || !agreed) {
+      error('Please complete every field before creating your account.');
+      return;
+    }
+    location.href = 'verify.html';
+  }
+</script>
+</body>
+</html>

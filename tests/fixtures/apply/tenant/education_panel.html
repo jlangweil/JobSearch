@@ -1,0 +1,65 @@
+<!doctype html>
+<!-- Education and dates as the tenant draws them: Degree is a dropdown of degree *names*, and From/To are
+     MM and YYYY inputs inside a widget whose own inputs carry no useful label — the only clue to which date
+     they belong to is the caption above them. -->
+<html lang="en">
+<head><meta charset="utf-8"><title>My Experience</title></head>
+<body>
+<h2 data-automation-id="pageHeader">My Experience</h2>
+
+<div role="group" aria-labelledby="Work-Experience-section">
+  <h4 id="Work-Experience-section">Work Experience</h4>
+  <div id="roles"></div>
+  <button data-automation-id="Add Another" onclick="addRole()">Add Another</button>
+</div>
+
+<div role="group" aria-labelledby="Education-section">
+  <h4 id="Education-section">Education</h4>
+  <div id="schools"></div>
+  <button data-automation-id="Add" onclick="addSchool()">Add</button>
+</div>
+
+<button data-automation-id="pageFooterNextButton">Save and Continue</button>
+
+<script>
+  var r = 0, e = 0;
+
+  function dateWidget(caption, prefix, n) {
+    // no labels on the inputs at all: just a caption above a pair of MM / YYYY boxes and a calendar icon
+    return '<div class="date"><span class="cap">' + caption + '</span>' +
+           '<input name="' + prefix + '-month-' + n + '" placeholder="MM">' +
+           '<input name="' + prefix + '-year-' + n + '" placeholder="YYYY">' +
+           '<span class="icon">calendar</span></div>';
+  }
+
+  function addRole() {
+    r += 1;
+    var wrap = document.createElement('div');
+    wrap.innerHTML =
+      '<h5>Work Experience ' + r + '</h5>' +
+      '<label for="t' + r + '">Job Title</label><input id="t' + r + '" name="title-' + r + '">' +
+      '<label for="c' + r + '">Company</label><input id="c' + r + '" name="company-' + r + '">' +
+      dateWidget('From', 'rfrom', r) + dateWidget('To', 'rto', r);
+    document.getElementById('roles').appendChild(wrap);
+  }
+
+  function addSchool() {
+    e += 1;
+    var wrap = document.createElement('div');
+    wrap.innerHTML =
+      '<h5>Education ' + e + '</h5>' +
+      '<label for="s' + e + '">School or University</label><input id="s' + e + '" name="school-' + e + '">' +
+      '<label for="dg' + e + '">Degree</label>' +
+      '<select id="dg' + e + '" name="degree-' + e + '">' +
+        '<option value="">Select One</option>' +
+        '<option>Associate of Science</option>' +
+        '<option>Bachelor of Science</option>' +
+        '<option>Master of Science</option>' +
+        '<option>Doctor of Philosophy</option>' +
+      '</select>' +
+      '<label for="fs' + e + '">Field of Study</label><input id="fs' + e + '" name="field-' + e + '">';
+    document.getElementById('schools').appendChild(wrap);
+  }
+</script>
+</body>
+</html>
